@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { ChartBar, Rocket, Lock } from 'phosphor-react';
 
 // Landing page completo de SIGA con hero, características y CTAs
 export default function HomePage() {
@@ -27,12 +28,41 @@ export default function HomePage() {
               </div>
             </div>
             <div className="col-lg-6 text-center">
-              <img 
-                src="/brand/Mockup_Web.png" 
-                alt="SIGA Dashboard" 
+              {/* 
+                VIDEO HTML5 EN LANDING PAGE:
+                - Se carga directamente sin librerías adicionales (soporte nativo del navegador)
+                - Ubicación del archivo: /static/demo-sigaapp.mp4
+                - Vite sirve archivos de static/ desde la raíz (/) gracias a publicDir: 'static'
+                - Por eso la ruta es /demo-sigaapp.mp4 (sin /static/)
+                
+                Atributos del video:
+                * autoPlay: Reproduce automáticamente al cargar (requiere muted)
+                * loop: Repite infinitamente
+                * muted: Sin sonido (obligatorio para autoplay en navegadores modernos)
+                * playsInline: Evita pantalla completa en móviles iOS
+                
+                ¿Por qué HTML5 video en lugar de GIF?
+                - Mejor calidad con menor tamaño (10x más pequeño que GIF)
+                - Mejor rendimiento y menor consumo de ancho de banda
+                - Soporte nativo, no requiere librerías adicionales
+                
+                Requisitos del archivo:
+                - Formato: MP4 con codec H.264 (máxima compatibilidad)
+                - Tamaño recomendado: < 2MB para carga rápida
+                - Resolución: Optimizada para web (800px-1200px de ancho)
+              */}
+              <video 
+                src="/demo-sigaapp.mp4" 
                 className="img-fluid rounded shadow-lg"
-                style={{ maxHeight: '500px' }}
-              />
+                style={{ maxHeight: '500px', objectFit: 'cover', width: '100%' }}
+                autoPlay
+                loop
+                muted
+                playsInline
+                title="SIGA - Sistema Inteligente de Gestión de Activos"
+              >
+                Tu navegador no soporta videos HTML5.
+              </video>
             </div>
           </div>
         </div>
@@ -48,7 +78,9 @@ export default function HomePage() {
           <div className="row g-4">
             <div className="col-md-4">
               <div className="feature-card h-100 p-4 rounded shadow-sm">
-                <div className="feature-icon mb-3">📊</div>
+                <div className="feature-icon mb-3">
+                  <ChartBar size={48} weight="fill" className="text-primario" />
+                </div>
                 <h3 className="h5 fw-bold text-primario mb-3">Control en Tiempo Real</h3>
                 <p className="text-muted">
                   Monitorea tu inventario al instante. Actualizaciones automáticas en todos tus puntos de venta.
@@ -57,7 +89,9 @@ export default function HomePage() {
             </div>
             <div className="col-md-4">
               <div className="feature-card h-100 p-4 rounded shadow-sm">
-                <div className="feature-icon mb-3">🚀</div>
+                <div className="feature-icon mb-3">
+                  <Rocket size={48} weight="fill" className="text-primario" />
+                </div>
                 <h3 className="h5 fw-bold text-primario mb-3">Fácil de Usar</h3>
                 <p className="text-muted">
                   Interfaz intuitiva que no requiere capacitación extensa. Tu equipo lo dominará en minutos.
@@ -66,7 +100,9 @@ export default function HomePage() {
             </div>
             <div className="col-md-4">
               <div className="feature-card h-100 p-4 rounded shadow-sm">
-                <div className="feature-icon mb-3">🔒</div>
+                <div className="feature-icon mb-3">
+                  <Lock size={48} weight="fill" className="text-primario" />
+                </div>
                 <h3 className="h5 fw-bold text-primario mb-3">Seguro y Confiable</h3>
                 <p className="text-muted">
                   Tus datos protegidos en la nube con respaldos automáticos y encriptación de punta a punta.

@@ -2,6 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { obtenerUsuarioAutenticado, guardarPlanEnCarrito, guardarUsuarioAutenticado } from '../utils/auth.js';
 import { 
+  HandWaving, Rocket, Package, ShoppingCart, Clock, CreditCard, Gift, Sparkle, 
+  Warning, FileText, ClipboardText, CheckCircle, Users, Storefront, Robot, 
+  ChatCircle, UserCircle, ChartBar
+} from 'phosphor-react';
+import { 
   obtenerPlanDelUsuario, 
   obtenerLimitesDelPlan, 
   asignarPlanAUsuario, 
@@ -108,7 +113,7 @@ export default function PerfilPage() {
         <div className="row mb-5">
           <div className="col-lg-8 mx-auto text-center">
             <h1 className="display-5 fw-bold text-primario mb-3">
-              ¡Bienvenido, {usuario.nombre}! 👋
+              ¡Bienvenido, {usuario.nombre}! <HandWaving size={32} weight="fill" className="text-acento" style={{ verticalAlign: 'middle' }} />
             </h1>
             <p className="lead text-muted">
               Tu portal personal de SIGA. Accede a tu aplicación y gestiona tu cuenta.
@@ -121,7 +126,9 @@ export default function PerfilPage() {
           <div className="col-md-6 col-lg-4">
             <div className="card shadow-sm border-0 h-100">
               <div className="card-body text-center p-4">
-                <div className="fs-1 mb-3">🚀</div>
+                <div className="mb-3">
+                  <Rocket size={48} weight="fill" className="text-primario" />
+                </div>
                 <h3 className="h5 fw-bold text-primario mb-3">Aplicación SIGA</h3>
                 <p className="text-muted mb-4">
                   Accede a tu sistema de gestión de inventario y punto de venta.
@@ -136,7 +143,9 @@ export default function PerfilPage() {
           <div className="col-md-6 col-lg-4">
             <div className="card shadow-sm border-0 h-100">
               <div className="card-body text-center p-4">
-                <div className="fs-1 mb-3">📦</div>
+                <div className="mb-3">
+                  <Package size={48} weight="fill" className="text-primario" />
+                </div>
                 <h3 className="h5 fw-bold text-primario mb-3">Planes y Suscripción</h3>
                 <p className="text-muted mb-4">
                   Explora nuestros planes y actualiza tu suscripción.
@@ -151,7 +160,9 @@ export default function PerfilPage() {
           <div className="col-md-6 col-lg-4">
             <div className="card shadow-sm border-0 h-100">
               <div className="card-body text-center p-4">
-                <div className="fs-1 mb-3">🛒</div>
+                <div className="mb-3">
+                  <ShoppingCart size={48} weight="fill" className="text-primario" />
+                </div>
                 <h3 className="h5 fw-bold text-primario mb-3">Carrito</h3>
                 <p className="text-muted mb-4">
                   Revisa tus planes seleccionados y completa tu compra.
@@ -171,7 +182,10 @@ export default function PerfilPage() {
               <div className="card shadow-sm border-0 border-start border-4 border-acento">
                 <div className="card-header bg-light">
                   <div className="d-flex justify-content-between align-items-center">
-                    <h4 className="mb-0 text-primario">📦 Tu Plan Actual</h4>
+                    <h4 className="mb-0 text-primario">
+                      <Package size={20} weight="fill" className="me-2" style={{ verticalAlign: 'middle' }} />
+                      Tu Plan Actual
+                    </h4>
                     <span className="badge bg-acento text-white px-3 py-2">
                       {planActual.nombre}
                     </span>
@@ -183,7 +197,10 @@ export default function PerfilPage() {
                     <div className="alert alert-warning mb-4" role="alert">
                       <div className="d-flex justify-content-between align-items-center flex-wrap">
                         <div>
-                          <strong>⏰ Free Trial Activo</strong>
+                          <strong>
+                            <Clock size={18} weight="fill" className="me-1" style={{ verticalAlign: 'middle' }} />
+                            Free Trial Activo
+                          </strong>
                           <p className="mb-0 mt-2">
                             Tienes <strong>{trialInfo.diasRestantes} días restantes</strong> de tu trial gratuito de 14 días.
                             Después del trial, volverás automáticamente al plan Kiosco.
@@ -193,7 +210,8 @@ export default function PerfilPage() {
                           className="btn btn-success mt-3 mt-md-0"
                           onClick={manejarConvertirTrialAPagado}
                         >
-                          💳 Convertir a Suscripción
+                          <CreditCard size={18} weight="fill" className="me-1" style={{ verticalAlign: 'middle' }} />
+                          Convertir a Suscripción
                         </button>
                       </div>
                     </div>
@@ -220,7 +238,8 @@ export default function PerfilPage() {
                       <ul className="list-unstyled">
                         {planActual.caracteristicas.map((caracteristica, index) => (
                           <li key={index} className="mb-2">
-                            ✅ {caracteristica}
+                            <CheckCircle size={16} weight="fill" className="text-success me-2" style={{ verticalAlign: 'middle' }} />
+                            {caracteristica}
                           </li>
                         ))}
                       </ul>
@@ -230,27 +249,33 @@ export default function PerfilPage() {
                       {limites && (
                         <ul className="list-unstyled">
                           <li className="mb-2">
-                            👥 <strong>Usuarios:</strong>{' '}
+                            <Users size={18} weight="fill" className="me-2" style={{ verticalAlign: 'middle' }} />
+                            <strong>Usuarios:</strong>{' '}
                             {limites.usuarios === -1 ? 'Ilimitados' : limites.usuarios}
                           </li>
                           <li className="mb-2">
-                            🏢 <strong>Bodegas/Sucursales:</strong>{' '}
+                            <Storefront size={18} weight="fill" className="me-2" style={{ verticalAlign: 'middle' }} />
+                            <strong>Bodegas/Sucursales:</strong>{' '}
                             {limites.bodegas === -1 ? 'Ilimitadas' : limites.bodegas}
                           </li>
                           {limites.asistenteSIGA && (
                             <li className="mb-2">
-                              🤖 <strong>Asistente SIGA:</strong> Incluido (RAG con contexto de datos)
+                              <Robot size={18} weight="fill" className="me-2" style={{ verticalAlign: 'middle' }} />
+                              <strong>Asistente SIGA:</strong> Incluido (RAG con contexto de datos)
                             </li>
                           )}
                           <li className="mb-2">
-                            📦 <strong>Productos:</strong>{' '}
+                            <Package size={18} weight="fill" className="me-2" style={{ verticalAlign: 'middle' }} />
+                            <strong>Productos:</strong>{' '}
                             {limites.productos === -1 ? 'Ilimitados' : limites.productos}
                           </li>
                           <li className="mb-2">
-                            📊 <strong>Reportes:</strong> {limites.reportes}
+                            <ChartBar size={18} weight="fill" className="me-2" style={{ verticalAlign: 'middle' }} />
+                            <strong>Reportes:</strong> {limites.reportes}
                           </li>
                           <li className="mb-2">
-                            💬 <strong>Soporte:</strong> {limites.soporte}
+                            <ChatCircle size={18} weight="fill" className="me-2" style={{ verticalAlign: 'middle' }} />
+                            <strong>Soporte:</strong> {limites.soporte}
                           </li>
                         </ul>
                       )}
@@ -262,7 +287,10 @@ export default function PerfilPage() {
                     <div className="alert alert-primary mt-4" role="alert">
                       <div className="d-flex justify-content-between align-items-center flex-wrap">
                         <div>
-                          <strong>🎁 ¡Prueba gratis por 14 días!</strong>
+                          <strong>
+                            <Gift size={18} weight="fill" className="me-1" style={{ verticalAlign: 'middle' }} />
+                            ¡Prueba gratis por 14 días!
+                          </strong>
                           <p className="mb-0 mt-2">
                             Inicia un trial gratuito de 14 días de <strong>{planPro?.nombre}</strong> o{' '}
                             <strong>{planCrecimiento?.nombre}</strong> y descubre todas las funcionalidades.
@@ -296,7 +324,10 @@ export default function PerfilPage() {
                     <div className="alert alert-info mt-4" role="alert">
                       <div className="d-flex justify-content-between align-items-center flex-wrap">
                         <div>
-                          <strong>🚀 ¿Necesitas más?</strong>
+                          <strong>
+                            <Rocket size={18} weight="fill" className="me-1" style={{ verticalAlign: 'middle' }} />
+                            ¿Necesitas más?
+                          </strong>
                           <p className="mb-0 mt-2">
                             Actualiza al plan <strong>{planCrecimiento.nombre}</strong> y obtén
                             usuarios ilimitados, bodegas ilimitadas, reportes completos con IA y
@@ -315,7 +346,10 @@ export default function PerfilPage() {
 
                   {planActual.nombre === 'Crecimiento' && (
                     <div className="alert alert-success mt-4" role="alert">
-                      <strong>✨ ¡Excelente!</strong> Ya tienes el plan más completo. Disfruta de
+                      <strong>
+                        <Sparkle size={18} weight="fill" className="me-1" style={{ verticalAlign: 'middle' }} />
+                        ¡Excelente!
+                      </strong> Ya tienes el plan más completo. Disfruta de
                       todas las funcionalidades de SIGA sin límites.
                     </div>
                   )}
@@ -327,7 +361,10 @@ export default function PerfilPage() {
           <div className="row mb-4">
             <div className="col-lg-10 mx-auto">
               <div className="alert alert-warning" role="alert">
-                <strong>⚠️ Aún no tienes un plan activo</strong>
+                <strong>
+                  <Warning size={18} weight="fill" className="me-1" style={{ verticalAlign: 'middle' }} />
+                  Aún no tienes un plan activo
+                </strong>
                 <p className="mb-0 mt-2">
                   Explora nuestros planes de suscripción y elige el que mejor se adapte a tu
                   negocio.
@@ -345,7 +382,10 @@ export default function PerfilPage() {
           <div className="col-lg-10 mx-auto">
             <div className="card shadow-sm border-0">
               <div className="card-header bg-light">
-                <h4 className="mb-0 text-primario">📄 Historial de Compras y Facturas</h4>
+                <h4 className="mb-0 text-primario">
+                  <FileText size={20} weight="fill" className="me-2" style={{ verticalAlign: 'middle' }} />
+                  Historial de Compras y Facturas
+                </h4>
               </div>
               <div className="card-body">
                 {facturas.length === 0 ? (
@@ -408,7 +448,12 @@ export default function PerfilPage() {
                                       ? 'bg-danger'
                                       : 'bg-warning'
                                   }`}>
-                                    {factura.estado === 'pagada' ? '✅ Pagada' : factura.estado}
+                                    {factura.estado === 'pagada' ? (
+                                      <>
+                                        <CheckCircle size={14} weight="fill" className="me-1" style={{ verticalAlign: 'middle' }} />
+                                        Pagada
+                                      </>
+                                    ) : factura.estado}
                                   </span>
                                 </td>
                                 <td>
@@ -435,7 +480,8 @@ export default function PerfilPage() {
                       <div className="mt-4 pt-4 border-top">
                         <div className="d-flex justify-content-between align-items-center mb-3">
                           <h5 className="mb-0 text-primario">
-                            📄 Factura: {facturaSeleccionada.numeroFactura}
+                            <FileText size={20} weight="fill" className="me-2" style={{ verticalAlign: 'middle' }} />
+                            Factura: {facturaSeleccionada.numeroFactura}
                           </h5>
                           <button
                             className="btn btn-sm btn-outline-secondary"
@@ -462,7 +508,10 @@ export default function PerfilPage() {
           <div className="col-lg-8 mx-auto">
             <div className="card shadow-sm border-0">
               <div className="card-header bg-light">
-                <h4 className="mb-0 text-primario">📋 Información de tu Cuenta</h4>
+                <h4 className="mb-0 text-primario">
+                  <ClipboardText size={20} weight="fill" className="me-2" style={{ verticalAlign: 'middle' }} />
+                  Información de tu Cuenta
+                </h4>
               </div>
               <div className="card-body">
                 <div className="row g-3">
@@ -495,7 +544,10 @@ export default function PerfilPage() {
           <div className="row mt-4">
             <div className="col-lg-8 mx-auto">
               <div className="alert alert-warning" role="alert">
-                <strong>👨‍💼 Eres Administrador:</strong> Puedes acceder al{' '}
+                <strong>
+                  <UserCircle size={18} weight="fill" className="me-1" style={{ verticalAlign: 'middle' }} />
+                  Eres Administrador:
+                </strong> Puedes acceder al{' '}
                 <Link to="/admin" className="alert-link">
                   panel de administración
                 </Link>{' '}

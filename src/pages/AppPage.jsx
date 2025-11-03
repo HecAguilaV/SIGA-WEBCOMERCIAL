@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { obtenerUsuarioAutenticado, cerrarSesion } from '../utils/auth.js';
+import { Rocket } from 'phosphor-react';
 
 // Página protegida que muestra la aplicación SIGA real (prototipo)
 // Solo accesible para usuarios autenticados (clientes o admins)
@@ -28,7 +29,10 @@ export default function AppPage() {
       {/* Header con información del usuario y acciones */}
       <div className="bg-primario text-white p-3 d-flex justify-content-between align-items-center shadow-sm flex-shrink-0">
         <div className="d-flex align-items-center gap-3 flex-wrap">
-          <span className="fw-bold">🚀 Aplicación SIGA</span>
+          <span className="fw-bold">
+            <Rocket size={20} weight="fill" className="me-2" style={{ verticalAlign: 'middle' }} />
+            Aplicación SIGA
+          </span>
           <span className="badge bg-light text-dark">
             {usuario.nombre} ({usuario.rol})
           </span>

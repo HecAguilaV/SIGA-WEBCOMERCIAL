@@ -2,11 +2,6 @@
   <img src="static/brand/Logo_SIGA.png" alt="Logo SIGA" width="300" />
 </p>
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Corazón_de-SIGA-00B4D8?style=for-the-badge&labelColor=03045E" />
-  <img src="https://img.shields.io/badge/Visión-El_tiempo_es_la_moneda-80FFDB?style=for-the-badge&labelColor=03045E" />
-</p>
-
 <h1 align="center">SIGA - Portal Comercial</h1>
 
 <p align="center">
@@ -32,7 +27,7 @@ Proporcionar una plataforma comercial moderna donde los usuarios pueden:
 ## Características Principales
 
 ### Portal Comercial
-- **Página de inicio** con información sobre SIGA
+- **Página de inicio** con información sobre SIGA y video demostrativo
 - **Catálogo de planes** con precios en UF y conversión a CLP
 - **Carrito de compras** persistente en localStorage
 - **Validación de autenticación** antes de permitir el pago
@@ -41,6 +36,7 @@ Proporcionar una plataforma comercial moderna donde los usuarios pueden:
 - **Facturas imprimibles** con diseño profesional
 - **Página de éxito** con visualización inmediata de factura
 - **Historial completo de compras** en el perfil del usuario
+- **Asistente con IA** para consultas y visualización de datos (gráficos de mermas)
 
 ### Gestión de Usuarios
 - Sistema de autenticación simulada
@@ -109,6 +105,8 @@ Proporcionar una plataforma comercial moderna donde los usuarios pueden:
 - **React 18.3** - Framework principal
 - **React Router DOM 6.26** - Navegación
 - **Bootstrap 5.3** - Estilos y componentes UI
+- **Phosphor React 1.4** - Librería de iconos moderna
+- **Recharts** - Librería de gráficos para visualización de datos
 - **Vite 5.4** - Herramienta de build y desarrollo
 - **Jasmine & Karma** - Testing unitario
 - **Babel & Webpack** - Procesamiento de JSX para tests
@@ -179,19 +177,21 @@ El sistema incluye usuarios de prueba:
 
 ```
 SIGA_WEB_COMERCIAL/
-├── static/                 # Archivos estáticos (logo, favicon, etc.)
+├── static/                 # Archivos estáticos (logo, favicon, video, etc.)
 │   ├── brand/             # Logos y marca SIGA
-│   └── favicon/           # Iconos y manifest
+│   ├── favicon/           # Iconos y manifest
+│   └── demo-sigaapp.mp4   # Video demostrativo de la aplicación
 ├── src/
 │   ├── components/        # Componentes reutilizables
 │   │   ├── Boton.jsx
 │   │   ├── CardPlan.jsx
 │   │   ├── Navbar.jsx
 │   │   ├── Footer.jsx
-│   │   ├── AsistenteContextual.jsx
+│   │   ├── AsistenteIA.jsx  # Asistente con IA y chatbot
+│   │   ├── GraficoTorta.jsx # Componente de gráficos de torta
 │   │   └── FacturaComponent.jsx  # Componente de factura imprimible
 │   ├── pages/            # Páginas de la aplicación
-│   │   ├── HomePage.jsx
+│   │   ├── HomePage.jsx  # Landing page con video HTML5
 │   │   ├── PlanesPage.jsx
 │   │   ├── LoginPage.jsx
 │   │   ├── RegistroPage.jsx
@@ -202,7 +202,7 @@ SIGA_WEB_COMERCIAL/
 │   │   ├── AppPage.jsx
 │   │   └── admin/        # Páginas administrativas
 │   ├── datos/            # Datos simulados y CRUD
-│   │   └── datosSimulados.js
+│   │   └── datosSimulados.js  # Incluye datos de mermas para gráficos
 │   ├── utils/            # Utilidades
 │   │   ├── auth.js
 │   │   └── indicadoresEconomicos.js
@@ -226,7 +226,9 @@ SIGA_WEB_COMERCIAL/
 ├── vite.config.js      # Configuración de Vite
 ├── package.json
 ├── README.md
-├── RESUMEN_IMPLEMENTACION.md    # Detalles de implementación
+├── GUIA_DE_ESTUDIO.md          # Guía técnica completa del proyecto
+├── COMENTARIOS_GUIA.md         # Guía para agregar comentarios educativos
+├── RESUMEN_IMPLEMENTACION.md   # Detalles de implementación
 └── GUIA_GIT_RAMAS.md            # Guía para trabajar con Git y ramas
 ```
 
@@ -267,6 +269,21 @@ SIGA_WEB_COMERCIAL/
 - Búsqueda por número, ID o usuario
 - Visualización inmediata después de compra
 - Historial accesible desde el perfil del usuario
+
+### Asistente con IA
+- Chatbot inteligente con respuestas contextuales
+- Visualización de gráficos de mermas por categoría
+- Integración con datos simulados del negocio
+- Interfaz flotante con botón de acceso rápido
+- Soporte para múltiples tipos de mensajes (texto y gráficos)
+- Diseño responsive y accesible
+
+### Video en Landing Page
+- Video HTML5 nativo sin librerías adicionales
+- Reproducción automática en bucle
+- Optimizado para web (MP4 con codec H.264)
+- Ubicación: `/static/demo-sigaapp.mp4`
+- Atributos: autoplay, loop, muted, playsInline
 
 ## Identidad Visual
 
@@ -337,7 +354,14 @@ server: {
 ```
 
 ### Archivos Estáticos
-Los archivos estáticos se sirven desde la carpeta `static/` y son accesibles desde la raíz (`/brand/Logo_SIGA.png`).
+Los archivos estáticos se sirven desde la carpeta `static/` y son accesibles desde la raíz (`/brand/Logo_SIGA.png`, `/demo-sigaapp.mp4`).
+
+**Video en Landing Page:**
+- El video se carga usando el elemento HTML5 `<video>` nativo del navegador
+- No requiere librerías adicionales
+- Formato recomendado: MP4 con codec H.264
+- Ubicación: `/static/demo-sigaapp.mp4`
+- Atributos: `autoPlay`, `loop`, `muted`, `playsInline`
 
 ## Datos Simulados
 
@@ -358,6 +382,8 @@ localStorage.clear()
 
 ## Documentación Adicional
 
+- **[GUIA_DE_ESTUDIO.md](./GUIA_DE_ESTUDIO.md)** - Guía técnica completa con todas las tecnologías, arquitectura y funcionalidades
+- **[COMENTARIOS_GUIA.md](./COMENTARIOS_GUIA.md)** - Guía para agregar comentarios educativos y ejemplos de código comentado
 - **[RESUMEN_IMPLEMENTACION.md](./RESUMEN_IMPLEMENTACION.md)** - Detalles completos de todas las funcionalidades implementadas
 - **[docs/ESTADO_TESTS.md](./docs/ESTADO_TESTS.md)** - Estado actual de tests y plan de acción
 - **[docs/api/openapi.yaml](./docs/api/openapi.yaml)** - Documentación Swagger/OpenAPI de todas las funciones
@@ -393,24 +419,20 @@ Ver más detalles en [`docs/api/README.md`](./docs/api/README.md)
 - [ ] Generación de PDF de facturas
 - [ ] Envío de facturas por email
 - [ ] Filtros y búsqueda avanzada en historial de compras
+- [ ] Integración con backend de IA real para el asistente
+- [ ] Más tipos de gráficos en el asistente (barras, líneas, etc.)
 
 ## Licencia
 
-Este proyecto es parte de un proyecto académico semestral.
+Este proyecto es la base de SIGA.
 
 ## Autor
 
-Desarrollado como parte del proyecto semestral SIGA.
+Héctor Aguila.
+Un Soñador con Poca RAM.
 
 ---
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Primario-03045E-03045E?style=flat-square" />
-  <img src="https://img.shields.io/badge/Acento-00B4D8-00B4D8?style=flat-square" />
-  <img src="https://img.shields.io/badge/Acento_Sec-80FFDB-80FFDB?style=flat-square" />
-  <img src="https://img.shields.io/badge/Neutro-FFFFFF-FFFFFF?style=flat-square" />
-</p>
-
-<p align="center">
-  <strong>Hecho con dedicación para emprendedores que nunca se detienen</strong>
+  <strong>© Para que no te detengas</strong>
 </p>

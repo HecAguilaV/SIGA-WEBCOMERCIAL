@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { vaciarCarrito, obtenerUsuarioAutenticado, obtenerPlanDelCarrito, guardarUsuarioAutenticado } from '../utils/auth.js';
+import { ClipboardText, CheckCircle, Lightbulb, CreditCard, Lock, ShieldCheck, Warning } from 'phosphor-react';
 import { asignarPlanAUsuario, actualizarUsuario, convertirTrialAPagado, crearFactura } from '../datos/datosSimulados.js';
 import { convertirUFaCLP, formatearPrecioCLP } from '../utils/indicadoresEconomicos.js';
 
@@ -211,7 +212,10 @@ export default function CheckoutPage() {
           <div className="col-lg-4 mb-4 mb-lg-0">
             <div className="card shadow-sm border-0 sticky-top" style={{ top: '20px' }}>
               <div className="card-header bg-primario text-white">
-                <h5 className="mb-0">📋 Resumen del Pedido</h5>
+                <h5 className="mb-0">
+                  <ClipboardText size={20} weight="fill" className="me-2" style={{ verticalAlign: 'middle' }} />
+                  Resumen del Pedido
+                </h5>
               </div>
               <div className="card-body">
                 <div className="mb-3 pb-3 border-bottom">
@@ -248,14 +252,18 @@ export default function CheckoutPage() {
                   <ul className="list-unstyled small mb-0">
                     {plan.caracteristicas.map((caracteristica, index) => (
                       <li key={index} className="mb-1">
-                        ✅ {caracteristica}
+                      <CheckCircle size={16} weight="fill" className="text-success me-2" style={{ verticalAlign: 'middle' }} />
+                      {caracteristica}
                       </li>
                     ))}
                   </ul>
                 </div>
                 <div className="alert alert-success mb-0" role="alert">
                   <small>
-                    <strong>💡 Recuerda:</strong> Este es un pago simulado. 
+                    <strong>
+                      <Lightbulb size={16} weight="fill" className="me-1" style={{ verticalAlign: 'middle' }} />
+                      Recuerda:
+                    </strong> Este es un pago simulado. 
                     No se realizará ningún cargo real.
                   </small>
                 </div>
@@ -268,7 +276,10 @@ export default function CheckoutPage() {
             <div className="card shadow-sm border-0">
               <div className="card-header bg-white border-bottom">
                 <div className="d-flex justify-content-between align-items-center">
-                  <h4 className="mb-0 text-primario">💳 Información de Pago</h4>
+                  <h4 className="mb-0 text-primario">
+                    <CreditCard size={24} weight="fill" className="me-2" style={{ verticalAlign: 'middle' }} />
+                    Información de Pago
+                  </h4>
                   <div className="d-flex gap-2 align-items-center">
                     <span className="badge bg-white text-dark border px-3 py-2" style={{ fontSize: '0.75rem', fontWeight: 'bold' }}>
                       VISA
@@ -279,9 +290,10 @@ export default function CheckoutPage() {
                   </div>
                 </div>
                 <div className="mt-2">
-                  <small className="text-muted">
-                    🔒 Pago seguro y encriptado - Transacción simulada
-                  </small>
+                    <small className="text-muted">
+                      <Lock size={14} weight="fill" className="me-1" style={{ verticalAlign: 'middle' }} />
+                      Pago seguro y encriptado - Transacción simulada
+                    </small>
                 </div>
               </div>
               <div className="card-body p-4">
@@ -303,7 +315,7 @@ export default function CheckoutPage() {
                       />
                       {tipoTarjeta !== 'generic' && (
                         <span className="input-group-text bg-white border-start-0">
-                          💳
+                          <CreditCard size={20} weight="fill" />
                         </span>
                       )}
                     </div>
@@ -376,7 +388,10 @@ export default function CheckoutPage() {
                   {/* Error */}
                   {error && (
                     <div className="alert alert-danger" role="alert">
-                      <strong>⚠️ Error:</strong> {error}
+                      <strong>
+                        <Warning size={18} weight="fill" className="me-1" style={{ verticalAlign: 'middle' }} />
+                        Error:
+                      </strong> {error}
                     </div>
                   )}
 
@@ -394,7 +409,8 @@ export default function CheckoutPage() {
                         </>
                       ) : (
                         <>
-                          💳 Pagar {plan.precio} {plan.unidad}/mes
+                          <CreditCard size={18} weight="fill" className="me-2" style={{ verticalAlign: 'middle' }} />
+                          Pagar {plan.precio} {plan.unidad}/mes
                           {!cargandoPrecio && precioCLP && (
                             <small className="d-block mt-1" style={{ fontSize: '0.85rem', opacity: 0.8 }}>
                               ≈ {formatearPrecioCLP(precioCLP)}
@@ -416,15 +432,27 @@ export default function CheckoutPage() {
                   {/* Información de seguridad */}
                   <div className="mt-4 pt-4 border-top">
                     <div className="d-flex align-items-center justify-content-center gap-3">
-                      <small className="text-muted">🔒 SSL Encriptado</small>
+                      <small className="text-muted">
+                        <Lock size={14} weight="fill" className="me-1" style={{ verticalAlign: 'middle' }} />
+                        SSL Encriptado
+                      </small>
                       <small className="text-muted">•</small>
-                      <small className="text-muted">✅ Pago seguro</small>
+                      <small className="text-muted">
+                        <CheckCircle size={14} weight="fill" className="me-1" style={{ verticalAlign: 'middle' }} />
+                        Pago seguro
+                      </small>
                       <small className="text-muted">•</small>
-                      <small className="text-muted">🔐 Protección de datos</small>
+                      <small className="text-muted">
+                        <ShieldCheck size={14} weight="fill" className="me-1" style={{ verticalAlign: 'middle' }} />
+                        Protección de datos
+                      </small>
                     </div>
                     <div className="text-center mt-2">
                       <small className="text-muted">
-                        <strong>⚠️ Modo Simulación:</strong> Esta es una transacción simulada. 
+                        <strong>
+                          <Warning size={14} weight="fill" className="me-1" style={{ verticalAlign: 'middle' }} />
+                          Modo Simulación:
+                        </strong> Esta es una transacción simulada. 
                         No se realizará ningún cargo real a tu tarjeta.
                       </small>
                     </div>

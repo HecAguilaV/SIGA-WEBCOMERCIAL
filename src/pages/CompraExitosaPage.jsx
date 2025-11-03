@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { obtenerUsuarioAutenticado } from '../utils/auth.js';
 import { obtenerFacturaPorNumero } from '../datos/datosSimulados.js';
 import FacturaComponent from '../components/FacturaComponent.jsx';
+import { CheckCircle, FileText } from 'phosphor-react';
 
 // Página de confirmación de compra que muestra la factura generada
 export default function CompraExitosaPage() {
@@ -39,7 +40,7 @@ export default function CompraExitosaPage() {
         <div className="row justify-content-center mb-4">
           <div className="col-lg-8 text-center">
             <div className="mb-4">
-              <div className="display-1 mb-3">✅</div>
+              <CheckCircle size={64} weight="fill" className="text-success mb-3" />
               <h2 className="text-success mb-3">¡Compra exitosa!</h2>
               <p className="lead">
                 Gracias por suscribirte a SIGA. Tu plan ha sido activado correctamente.
@@ -70,7 +71,10 @@ export default function CompraExitosaPage() {
             <div className="col-lg-10">
               <div className="card shadow-sm border-0">
                 <div className="card-header bg-light d-flex justify-content-between align-items-center">
-                  <h4 className="mb-0 text-primario">📄 Factura de Compra</h4>
+                  <h4 className="mb-0 text-primario">
+                    <FileText size={20} weight="fill" className="me-2" style={{ verticalAlign: 'middle' }} />
+                    Factura de Compra
+                  </h4>
                   <button
                     className="btn btn-sm btn-outline-secondary"
                     onClick={() => setMostrarFactura(!mostrarFactura)}

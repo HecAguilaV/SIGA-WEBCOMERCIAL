@@ -558,4 +558,39 @@ export function obtenerTodasLasFacturas() {
   return facturas.sort((a, b) => new Date(b.fechaCompra) - new Date(a.fechaCompra));
 }
 
+// ========== DATOS DE MERMAS PARA EL ASISTENTE IA ==========
+
+const CLAVE_MERMAS = 'siga_mermas';
+
+// Datos simulados de mermas por categoría
+const mermasPorDefecto = [
+  { categoria: 'Productos caducados', cantidad: 45 },
+  { categoria: 'Daños en almacén', cantidad: 28 },
+  { categoria: 'Robo o pérdida', cantidad: 12 },
+  { categoria: 'Error en registro', cantidad: 8 },
+  { categoria: 'Otros', cantidad: 7 },
+];
+
+// Cargar mermas desde localStorage o usar valores por defecto
+function cargarMermas() {
+  return cargarDesdeLocalStorage(CLAVE_MERMAS, mermasPorDefecto);
+}
+
+/**
+ * Obtiene las mermas del mes actual
+ * @returns {array} - Array de objetos con categoria y cantidad
+ */
+export function obtenerMermasMes() {
+  return cargarMermas();
+}
+
+/**
+ * Exporta un objeto reactivo compatible con el código original de Svelte
+ * Para usar con stores reactivos si es necesario
+ */
+export const datosNegocio = {
+  get mermasMes() {
+    return obtenerMermasMes();
+  },
+};
 

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Target, Eye, Lightning, CurrencyDollar, ChartLineUp, Handshake, PaintBrush, Flask } from 'phosphor-react';
 
 // Página "Acerca de" con información sobre SIGA, misión, visión y valores
 export default function AcercaPage() {
@@ -21,7 +22,10 @@ export default function AcercaPage() {
           <div className="col-md-6">
             <div className="card h-100 shadow-sm border-0">
               <div className="card-body p-4">
-                <h2 className="h4 fw-bold text-primario mb-3">🎯 Nuestra Misión</h2>
+                <h2 className="h4 fw-bold text-primario mb-3">
+                  <Target size={28} weight="fill" className="text-primario me-2" style={{ verticalAlign: 'middle' }} />
+                  Nuestra Misión
+                </h2>
                 <p className="text-muted mb-0">
                   Simplificar la gestión de inventarios para empresas de todos los tamaños, 
                   proporcionando herramientas intuitivas y poderosas que permitan a nuestros 
@@ -33,7 +37,10 @@ export default function AcercaPage() {
           <div className="col-md-6">
             <div className="card h-100 shadow-sm border-0">
               <div className="card-body p-4">
-                <h2 className="h4 fw-bold text-primario mb-3">👁️ Nuestra Visión</h2>
+                <h2 className="h4 fw-bold text-primario mb-3">
+                  <Eye size={28} weight="fill" className="text-primario me-2" style={{ verticalAlign: 'middle' }} />
+                  Nuestra Visión
+                </h2>
                 <p className="text-muted mb-0">
                   Ser la plataforma de gestión de inventarios más confiable y fácil de usar 
                   en el mercado, reconocida por nuestra innovación constante y nuestro 
@@ -62,21 +69,27 @@ export default function AcercaPage() {
                 <div className="row g-3 mt-4">
                   <div className="col-md-4">
                     <div className="text-center p-3">
-                      <div className="fs-1 mb-2">⚡</div>
+                      <div className="mb-2">
+                        <Lightning size={48} weight="fill" className="text-primario" />
+                      </div>
                       <h5 className="fw-bold text-primario">Rápido</h5>
                       <p className="small text-muted mb-0">Implementación en minutos</p>
                     </div>
                   </div>
                   <div className="col-md-4">
                     <div className="text-center p-3">
-                      <div className="fs-1 mb-2">💰</div>
+                      <div className="mb-2">
+                        <CurrencyDollar size={48} weight="fill" className="text-primario" />
+                      </div>
                       <h5 className="fw-bold text-primario">Económico</h5>
                       <p className="small text-muted mb-0">Planes flexibles y accesibles</p>
                     </div>
                   </div>
                   <div className="col-md-4">
                     <div className="text-center p-3">
-                      <div className="fs-1 mb-2">📈</div>
+                      <div className="mb-2">
+                        <ChartLineUp size={48} weight="fill" className="text-primario" />
+                      </div>
                       <h5 className="fw-bold text-primario">Escalable</h5>
                       <p className="small text-muted mb-0">Crece con tu negocio</p>
                     </div>
@@ -94,7 +107,9 @@ export default function AcercaPage() {
             <div className="row g-4">
               <div className="col-md-4">
                 <div className="text-center p-3">
-                  <div className="fs-2 mb-3">🤝</div>
+                  <div className="mb-3">
+                    <Handshake size={48} weight="fill" className="text-primario" />
+                  </div>
                   <h5 className="fw-bold text-primario mb-2">Compromiso</h5>
                   <p className="small text-muted">
                     Nos comprometemos con el éxito de cada cliente, ofreciendo soporte continuo 
@@ -104,7 +119,9 @@ export default function AcercaPage() {
               </div>
               <div className="col-md-4">
                 <div className="text-center p-3">
-                  <div className="fs-2 mb-3">🎨</div>
+                  <div className="mb-3">
+                    <PaintBrush size={48} weight="fill" className="text-primario" />
+                  </div>
                   <h5 className="fw-bold text-primario mb-2">Simplicidad</h5>
                   <p className="small text-muted">
                     Creemos que la tecnología debe ser accesible para todos, sin complicaciones innecesarias.
@@ -113,7 +130,9 @@ export default function AcercaPage() {
               </div>
               <div className="col-md-4">
                 <div className="text-center p-3">
-                  <div className="fs-2 mb-3">🔬</div>
+                  <div className="mb-3">
+                    <Flask size={48} weight="fill" className="text-primario" />
+                  </div>
                   <h5 className="fw-bold text-primario mb-2">Innovación</h5>
                   <p className="small text-muted">
                     Estamos en constante evolución, incorporando las mejores prácticas y tecnologías.

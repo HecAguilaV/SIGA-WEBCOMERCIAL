@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { obtenerPlanDelCarrito, vaciarCarrito, obtenerUsuarioAutenticado } from '../utils/auth.js';
 import { useNavigate } from 'react-router-dom';
 import { convertirUFaCLP, formatearPrecioCLP } from '../utils/indicadoresEconomicos.js';
+import { Warning } from 'phosphor-react';
 
 // Página de carrito que persiste en localStorage
 // Muestra el plan seleccionado con precio en UF y conversión a CLP
@@ -118,7 +119,10 @@ export default function CarritoPage() {
               {!usuarioAutenticado && (
                 <div className="alert alert-warning mt-3 mb-0">
                   <small>
-                    <strong>⚠️ Requerido:</strong> Debes iniciar sesión para realizar el pago.
+                    <strong>
+                      <Warning size={16} weight="fill" className="me-1" style={{ verticalAlign: 'middle' }} />
+                      Requerido:
+                    </strong> Debes iniciar sesión para realizar el pago.
                   </small>
                 </div>
               )}

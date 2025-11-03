@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { obtenerUsuarioAutenticado, cerrarSesion } from '../utils/auth.js';
+import { Rocket, ShoppingCart } from 'phosphor-react';
 
 // Barra de navegación principal de la aplicación SIGA
 // Diseñada con la identidad visual de la marca
@@ -54,7 +55,8 @@ export default function Navbar() {
                 </li>
                 <li className="nav-item">
                   <NavLink className="nav-link fw-bold" to="/app">
-                    🚀 Aplicación SIGA
+                    <Rocket size={18} className="me-1" style={{ verticalAlign: 'middle' }} />
+                    Aplicación SIGA
                   </NavLink>
                 </li>
               </>
@@ -70,7 +72,8 @@ export default function Navbar() {
           <ul className="navbar-nav ms-auto">
             <li className="nav-item">
               <NavLink className="nav-link" to="/carrito">
-                🛒 Carrito
+                <ShoppingCart size={18} className="me-1" style={{ verticalAlign: 'middle' }} />
+                Carrito
               </NavLink>
             </li>
             {!usuario ? (

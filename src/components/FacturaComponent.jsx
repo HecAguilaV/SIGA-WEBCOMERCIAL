@@ -1,5 +1,6 @@
 import React from 'react';
 import { formatearPrecioCLP } from '../utils/indicadoresEconomicos.js';
+import { Rocket, CheckCircle, ClipboardText, User, Package, CreditCard, Printer } from 'phosphor-react';
 
 /**
  * Componente de Factura que muestra los detalles de una compra
@@ -199,13 +200,17 @@ export default function FacturaComponent({ factura, onImprimir }) {
         <div className="factura-header">
           <div className="d-flex justify-content-between align-items-start mb-3">
             <div>
-              <div className="factura-logo">🚀 SIGA - Sistema Inteligente de Gestión de Activos</div>
+              <div className="factura-logo">
+                <Rocket size={24} weight="fill" className="me-2" style={{ verticalAlign: 'middle' }} />
+                SIGA - Sistema Inteligente de Gestión de Activos
+              </div>
               <div className="text-muted">Portal Comercial</div>
             </div>
             <div className="text-end">
               <div className="factura-numero">{factura.numeroFactura}</div>
               <div className="factura-estado estado-pagada mt-2">
-                ✅ {factura.estado.toUpperCase()}
+                <CheckCircle size={16} weight="fill" className="me-1" style={{ verticalAlign: 'middle' }} />
+                {factura.estado.toUpperCase()}
               </div>
             </div>
           </div>
@@ -215,7 +220,10 @@ export default function FacturaComponent({ factura, onImprimir }) {
         <div className="factura-info">
           {/* Información de SIGA (Emisor) */}
           <div className="factura-seccion">
-            <h5>📋 Emisor</h5>
+            <h5>
+              <ClipboardText size={20} weight="fill" className="me-2" style={{ verticalAlign: 'middle' }} />
+              Emisor
+            </h5>
             <div className="factura-item">
               <strong>SIGA S.A.</strong>
             </div>
@@ -235,7 +243,10 @@ export default function FacturaComponent({ factura, onImprimir }) {
 
           {/* Información del cliente */}
           <div className="factura-seccion">
-            <h5>👤 Cliente</h5>
+            <h5>
+              <User size={20} weight="fill" className="me-2" style={{ verticalAlign: 'middle' }} />
+              Cliente
+            </h5>
             <div className="factura-item">
               <strong>Nombre:</strong> {factura.usuarioNombre}
             </div>
@@ -256,7 +267,8 @@ export default function FacturaComponent({ factura, onImprimir }) {
         {/* Detalles de la compra */}
         <div className="factura-detalles">
           <h5 className="mb-3" style={{ color: '#03045E', fontWeight: 'bold' }}>
-            📦 Detalles de la Compra
+            <Package size={20} weight="fill" className="me-2" style={{ verticalAlign: 'middle' }} />
+            Detalles de la Compra
           </h5>
           
           <table className="factura-tabla">
@@ -313,7 +325,8 @@ export default function FacturaComponent({ factura, onImprimir }) {
         {/* Información de pago */}
         <div className="factura-detalles">
           <h5 className="mb-3" style={{ color: '#03045E', fontWeight: 'bold' }}>
-            💳 Información de Pago
+            <CreditCard size={20} weight="fill" className="me-2" style={{ verticalAlign: 'middle' }} />
+            Información de Pago
           </h5>
           <div className="factura-item">
             <strong>Método de pago:</strong> {factura.metodoPago}
@@ -347,7 +360,8 @@ export default function FacturaComponent({ factura, onImprimir }) {
         {/* Botón de imprimir (se oculta al imprimir) */}
         <div className="no-imprimir text-center mt-4">
           <button className="btn btn-acento btn-lg" onClick={manejarImprimir}>
-            🖨️ Imprimir Factura
+            <Printer size={20} weight="fill" className="me-2" style={{ verticalAlign: 'middle' }} />
+            Imprimir Factura
           </button>
         </div>
       </div>

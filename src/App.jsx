@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { Rutas } from './router.jsx';
 import Navbar from './components/Navbar.jsx';
 import Footer from './components/Footer.jsx';
-import AsistenteContextual from './components/AsistenteContextual.jsx';
+import AsistenteIA from './components/AsistenteIA.jsx';
 
 // Componente raíz de la aplicación que define el layout general (Navbar + Rutas + Footer + Asistente)
 // El asistente no se muestra en /app porque la aplicación SIGA tiene su propio asistente
@@ -19,8 +19,8 @@ export default function App() {
         <Rutas />
       </main>
       {!estaEnApp && <Footer />}
-      {/* Asistente solo visible fuera de /app */}
-      {!estaEnApp && <AsistenteContextual />}
+      {/* Asistente IA solo visible fuera de /app */}
+      {!estaEnApp && <AsistenteIA />}
     </div>
   );
 }

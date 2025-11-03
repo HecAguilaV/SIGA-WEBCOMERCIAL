@@ -1,5 +1,6 @@
 import React from 'react';
 import { leerUsuarios, leerPlanes } from '../../datos/datosSimulados.js';
+import { Users, User, Package, Lock, CheckCircle, Warning, ClipboardText, Lightning, Lightbulb, House } from 'phosphor-react';
 
 // Dashboard del administrador con métricas completas del portal comercial SIGA
 export default function AdminDashboardPage() {
@@ -27,7 +28,9 @@ export default function AdminDashboardPage() {
         <div className="col-sm-6 col-lg-3">
           <div className="card shadow-sm border-0 h-100">
             <div className="card-body text-center">
-              <div className="fs-1 mb-2">👥</div>
+              <div className="mb-2">
+                <Users size={48} weight="fill" className="text-primario" />
+              </div>
               <div className="fw-bold text-muted mb-2">Total Usuarios</div>
               <div className="display-4 fw-bold text-primario">{totalUsuarios}</div>
               <small className="text-muted">
@@ -40,7 +43,9 @@ export default function AdminDashboardPage() {
         <div className="col-sm-6 col-lg-3">
           <div className="card shadow-sm border-0 h-100">
             <div className="card-body text-center">
-              <div className="fs-1 mb-2">👤</div>
+              <div className="mb-2">
+                <User size={48} weight="fill" className="text-secundario" />
+              </div>
               <div className="fw-bold text-muted mb-2">Clientes Activos</div>
               <div className="display-4 fw-bold text-secundario">{totalClientes}</div>
               <small className="text-muted">Usuarios con rol cliente</small>
@@ -51,7 +56,9 @@ export default function AdminDashboardPage() {
         <div className="col-sm-6 col-lg-3">
           <div className="card shadow-sm border-0 h-100">
             <div className="card-body text-center">
-              <div className="fs-1 mb-2">📦</div>
+              <div className="mb-2">
+                <Package size={48} weight="fill" className="text-acento" />
+              </div>
               <div className="fw-bold text-muted mb-2">Planes Disponibles</div>
               <div className="display-4 fw-bold text-acento">{totalPlanes}</div>
               <small className="text-muted">Suscripciones configuradas</small>
@@ -62,7 +69,9 @@ export default function AdminDashboardPage() {
         <div className="col-sm-6 col-lg-3">
           <div className="card shadow-sm border-0 h-100">
             <div className="card-body text-center">
-              <div className="fs-1 mb-2">🔐</div>
+              <div className="mb-2">
+                <Lock size={48} weight="fill" className="text-primario" />
+              </div>
               <div className="fw-bold text-muted mb-2">Administradores</div>
               <div className="display-4 fw-bold text-primario">{totalAdmins}</div>
               <small className="text-muted">Usuarios con permisos admin</small>
@@ -76,7 +85,10 @@ export default function AdminDashboardPage() {
         <div className="col-lg-6">
           <div className="card shadow-sm border-0">
             <div className="card-header bg-success text-white">
-              <h5 className="mb-0">✅ Suscripciones Activas</h5>
+              <h5 className="mb-0">
+                <CheckCircle size={20} weight="fill" className="me-2" style={{ verticalAlign: 'middle' }} />
+                Suscripciones Activas
+              </h5>
             </div>
             <div className="card-body">
               <p className="text-muted mb-3">
@@ -95,7 +107,10 @@ export default function AdminDashboardPage() {
         <div className="col-lg-6">
           <div className="card shadow-sm border-0">
             <div className="card-header bg-warning text-dark">
-              <h5 className="mb-0">⚠️ Clientes sin Plan</h5>
+              <h5 className="mb-0">
+                <Warning size={20} weight="fill" className="me-2" style={{ verticalAlign: 'middle' }} />
+                Clientes sin Plan
+              </h5>
             </div>
             <div className="card-body">
               <p className="text-muted mb-3">
@@ -117,7 +132,10 @@ export default function AdminDashboardPage() {
         <div className="col-lg-6">
           <div className="card shadow-sm border-0">
             <div className="card-header bg-primario text-white">
-              <h5 className="mb-0">📋 Planes de Suscripción</h5>
+              <h5 className="mb-0">
+                <ClipboardText size={20} weight="fill" className="me-2" style={{ verticalAlign: 'middle' }} />
+                Planes de Suscripción
+              </h5>
             </div>
             <div className="card-body">
               <p className="text-muted mb-3">Planes disponibles en el portal:</p>
@@ -148,22 +166,29 @@ export default function AdminDashboardPage() {
         <div className="col-lg-6">
           <div className="card shadow-sm border-0">
             <div className="card-header bg-secundario text-white">
-              <h5 className="mb-0">⚡ Acciones Rápidas</h5>
+              <h5 className="mb-0">
+                <Lightning size={20} weight="fill" className="me-2" style={{ verticalAlign: 'middle' }} />
+                Acciones Rápidas
+              </h5>
             </div>
             <div className="card-body">
               <p className="text-muted mb-3">Gestiona el portal desde aquí:</p>
               <div className="d-grid gap-2">
                 <a href="/admin/usuarios" className="btn btn-outline-primary">
-                  👥 Gestionar Usuarios
+                  <Users size={18} weight="fill" className="me-2" style={{ verticalAlign: 'middle' }} />
+                  Gestionar Usuarios
                 </a>
                 <a href="/admin/suscripciones" className="btn btn-outline-success">
-                  ✅ Ver Suscripciones
+                  <CheckCircle size={18} weight="fill" className="me-2" style={{ verticalAlign: 'middle' }} />
+                  Ver Suscripciones
                 </a>
                 <a href="/admin/planes" className="btn btn-outline-info">
-                  📦 Gestionar Planes
+                  <Package size={18} weight="fill" className="me-2" style={{ verticalAlign: 'middle' }} />
+                  Gestionar Planes
                 </a>
                 <a href="/" className="btn btn-outline-secondary">
-                  🏠 Ir al Portal Comercial
+                  <House size={18} weight="fill" className="me-2" style={{ verticalAlign: 'middle' }} />
+                  Ir al Portal Comercial
                 </a>
               </div>
             </div>
@@ -173,7 +198,10 @@ export default function AdminDashboardPage() {
 
       {/* Nota informativa */}
       <div className="alert alert-info mt-4" role="alert">
-        <strong>💡 Nota:</strong> Este dashboard muestra métricas básicas basadas en datos simulados. 
+        <strong>
+          <Lightbulb size={18} weight="fill" className="me-1" style={{ verticalAlign: 'middle' }} />
+          Nota:
+        </strong> Este dashboard muestra métricas básicas basadas en datos simulados. 
         En producción, se conectaría con una base de datos real para mostrar estadísticas de ventas, 
         suscripciones activas, ingresos y más.
       </div>
