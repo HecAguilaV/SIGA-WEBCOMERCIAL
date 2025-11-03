@@ -107,6 +107,7 @@ Proporcionar una plataforma comercial moderna donde los usuarios pueden:
 - **Bootstrap 5.3** - Estilos y componentes UI
 - **Phosphor React 1.4** - Librería de iconos moderna
 - **Recharts** - Librería de gráficos para visualización de datos
+- **Google Generative AI (@google/generative-ai)** - SDK para integración con Gemini AI
 - **Vite 5.4** - Herramienta de build y desarrollo
 - **Jasmine & Karma** - Testing unitario
 - **Babel & Webpack** - Procesamiento de JSX para tests
@@ -132,7 +133,12 @@ cd SIGA_WEB_COMERCIAL
 npm install
 ```
 
-3. **Iniciar servidor de desarrollo**:
+3. **Configurar variables de entorno** (opcional, para usar asistente con IA):
+   - Crea un archivo `.env` en la raíz del proyecto
+   - Agrega: `VITE_GEMINI_API_KEY=tu_api_key_aqui`
+   - Ver sección [Configuración](#configuración) para más detalles
+
+4. **Iniciar servidor de desarrollo**:
 ```bash
 npm run dev
 ```
@@ -205,7 +211,8 @@ SIGA_WEB_COMERCIAL/
 │   │   └── datosSimulados.js  # Incluye datos de mermas para gráficos
 │   ├── utils/            # Utilidades
 │   │   ├── auth.js
-│   │   └── indicadoresEconomicos.js
+│   │   ├── indicadoresEconomicos.js
+│   │   └── contextoSIGA.js  # Contexto completo para el asistente con IA
 │   ├── styles/           # Estilos globales
 │   │   └── index.css
 │   ├── router.jsx        # Configuración de rutas
@@ -271,11 +278,14 @@ SIGA_WEB_COMERCIAL/
 - Historial accesible desde el perfil del usuario
 
 ### Asistente con IA
-- Chatbot inteligente con respuestas contextuales
+- Chatbot inteligente con **Google Gemini AI** (modelo gemini-1.5-flash)
+- Respuestas contextuales basadas en información completa de SIGA
+- Contexto incluye: información de la empresa, planes, contacto, ubicación, servicios
 - Visualización de gráficos de mermas por categoría
 - Integración con datos simulados del negocio
-- Interfaz flotante con botón de acceso rápido
+- Interfaz flotante con botón de acceso rápido (logo SIGA)
 - Soporte para múltiples tipos de mensajes (texto y gráficos)
+- Fallback a respuestas simuladas si no hay API key configurada
 - Diseño responsive y accesible
 
 ### Video en Landing Page
@@ -341,6 +351,41 @@ Ver documentación completa de tests en [`docs/ESTADO_TESTS.md`](./docs/ESTADO_T
 - `/admin/suscripciones` - Suscripciones activas
 
 ## Configuración
+
+### Variables de Entorno
+
+El proyecto requiere variables de entorno para funcionalidades avanzadas:
+
+#### Para Desarrollo Local
+
+1. Crea un archivo `.env` en la raíz del proyecto
+2. Agrega las siguientes variables:
+
+```env
+VITE_GEMINI_API_KEY=tu_api_key_de_google_gemini
+```
+
+**Obtener API Key de Gemini:**
+- Ve a https://makersuite.google.com/app/apikey
+- Crea una nueva API key
+- Copia la key y pégala en tu archivo `.env`
+
+**Nota:** El archivo `.env` está en `.gitignore` y no se subirá al repositorio.
+
+#### Para Despliegue en Vercel
+
+1. Ve a tu proyecto en **Vercel Dashboard**
+2. Abre **Settings** → **Environment Variables**
+3. Agrega la variable:
+   - **Name:** `VITE_GEMINI_API_KEY`
+   - **Value:** Tu API key de Google Gemini
+   - **Environment:** Selecciona todas (Production, Preview, Development)
+4. Guarda y vuelve a desplegar
+
+**Importante:**
+- El prefijo `VITE_` es necesario para que Vite exponga la variable al cliente
+- Sin esta variable, el asistente funcionará con respuestas simuladas como fallback
+- Nunca compartas tu API key públicamente
 
 ### Puerto del Servidor
 El servidor de desarrollo está configurado para usar el puerto `5173` de forma fija. Puedes cambiarlo en `vite.config.js`:
@@ -419,8 +464,9 @@ Ver más detalles en [`docs/api/README.md`](./docs/api/README.md)
 - [ ] Generación de PDF de facturas
 - [ ] Envío de facturas por email
 - [ ] Filtros y búsqueda avanzada en historial de compras
-- [ ] Integración con backend de IA real para el asistente
+- [x] Integración con Google Gemini AI para el asistente
 - [ ] Más tipos de gráficos en el asistente (barras, líneas, etc.)
+- [ ] Chat con historial persistente en el asistente
 
 ## Licencia
 

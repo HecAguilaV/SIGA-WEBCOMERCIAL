@@ -11,6 +11,8 @@ export default defineConfig({
     host: true, // Permite acceso desde la red local
     strictPort: true, // Falla si el puerto está ocupado en lugar de usar otro
   },
+  // Exponer variables de entorno con prefijo VITE_
+  // Las variables se pueden acceder con import.meta.env.VITE_GEMINI_API_KEY
 });
 
 

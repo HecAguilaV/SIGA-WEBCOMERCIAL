@@ -10,6 +10,7 @@
     "test": "karma start karma.conf.cjs --single-run"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "bootstrap": "^5.3.3",
     "phosphor-react": "^1.4.1",
     "react": "^18.3.1",

@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, PaperPlaneRight } from 'phosphor-react';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import GraficoTorta from './GraficoTorta';
 import { obtenerMermasMes } from '../datos/datosSimulados.js';
+import { obtenerContextoSIGA } from '../utils/contextoSIGA.js';
 
 // Componente de asistente con IA para conversación y visualización de datos
 // Similar al asistente de SIGA App pero adaptado para React
@@ -29,13 +31,78 @@ export default function AsistenteIA() {
   };
 
   /**
-   * Simula la respuesta del backend de IA
-   * En producción, esto sería una llamada real a /api/chat
+   * Obtiene la respuesta de Gemini AI con el contexto completo de SIGA
+   * Si no hay API key configurada, usa respuestas simuladas como fallback
    */
   const obtenerRespuestaIA = async (mensaje) => {
-    // Simular delay de red
-    await new Promise((resolve) => setTimeout(resolve, 1000 + Math.random() * 1000));
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    
+    // Si no hay API key, usar respuestas simuladas como fallback
+    if (!apiKey) {
+      console.warn('VITE_GEMINI_API_KEY no está configurada. Usando respuestas simuladas.');
+      return obtenerRespuestaSimulada(mensaje);
+    }
 
+    try {
+      // Inicializar Gemini con modelo 1.5 Flash (más rápido y eficiente)
+      const genAI = new GoogleGenerativeAI(apiKey);
+      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+
+      // Obtener el contexto completo de SIGA
+      const contexto = obtenerContextoSIGA();
+      const mensajeLower = mensaje.toLowerCase();
+
+      // Detectar si el usuario pregunta por mermas/gráficos (respuesta especial)
+      if (
+        mensajeLower.includes('merma') ||
+        mensajeLower.includes('pérdida') ||
+        mensajeLower.includes('perdida') ||
+        mensajeLower.includes('daño') ||
+        mensajeLower.includes('dano') ||
+        mensajeLower.includes('gráfico') ||
+        mensajeLower.includes('grafico') ||
+        mensajeLower.includes('visualizar')
+      ) {
+        return '[GRAFICO_MERMAS]';
+      }
+
+      // Preparar el prompt con contexto
+      const prompt = `${contexto}
+
+---
+
+Tú eres SIGA, el asistente virtual inteligente de SIGA (Sistema Inteligente de Gestión de Activos).
+
+INSTRUCCIONES:
+- Responde de manera amable, profesional y concisa
+- Usa SOLO la información proporcionada en el contexto anterior
+- Si te preguntan sobre mermas y quieren ver un gráfico, responde exactamente: "[GRAFICO_MERMAS]"
+- Si no sabes algo fuera del contexto, sé honesto y ofrece ayudar con otra cosa relacionada con SIGA
+- Mantén un tono conversacional pero profesional
+- Responde en español chileno
+
+Pregunta del usuario: ${mensaje}
+
+Respuesta:`;
+
+      // Obtener respuesta de Gemini
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      const texto = response.text();
+
+      return texto.trim();
+    } catch (error) {
+      console.error('Error al obtener respuesta de Gemini:', error);
+      
+      // Fallback a respuestas simuladas si hay error
+      return obtenerRespuestaSimulada(mensaje);
+    }
+  };
+
+  /**
+   * Respuestas simuladas como fallback cuando no hay API key o hay error
+   */
+  const obtenerRespuestaSimulada = (mensaje) => {
     const mensajeLower = mensaje.toLowerCase();
 
     // Detectar si el usuario pregunta por mermas
@@ -54,11 +121,19 @@ export default function AsistenteIA() {
 
     // Respuestas genéricas según el contexto
     if (mensajeLower.includes('hola') || mensajeLower.includes('holi')) {
-      return '¡Hola! Soy SIGA, tu asistente inteligente. ¿En qué puedo ayudarte hoy? Puedo ayudarte con información sobre tu inventario, planes, o mostrar visualizaciones de datos.';
+      return '¡Hola! Soy SIGA, tu asistente inteligente. ¿En qué puedo ayudarte hoy? Puedo ayudarte con información sobre tu inventario, planes, contacto, o mostrar visualizaciones de datos.';
     }
 
     if (mensajeLower.includes('plan') || mensajeLower.includes('suscripción') || mensajeLower.includes('suscripcion')) {
-      return 'Puedo ayudarte con información sobre nuestros planes. Tenemos tres opciones: Kiosco (gratuito), Emprendedor Pro y Crecimiento. ¿Te gustaría conocer más detalles sobre alguno en particular?';
+      return 'Puedo ayudarte con información sobre nuestros planes. Tenemos tres opciones: Kiosco (gratuito), Emprendedor Pro (0.9 UF/mes) y Crecimiento (1.9 UF/mes). ¿Te gustaría conocer más detalles sobre alguno en particular?';
+    }
+
+    if (mensajeLower.includes('contacto') || mensajeLower.includes('email') || mensajeLower.includes('teléfono') || mensajeLower.includes('telefono')) {
+      return 'Para contactarnos:\n- Email de soporte: soporte@siga.com\n- Email de facturación: facturacion@siga.com\n- Teléfono: +56 2 2345 6789\n- Dirección: Los Cerezos 21, Puerto Montt, Chile';
+    }
+
+    if (mensajeLower.includes('ubicación') || mensajeLower.includes('ubicacion') || mensajeLower.includes('dirección') || mensajeLower.includes('direccion')) {
+      return 'Estamos ubicados en Los Cerezos 21, Puerto Montt, Chile. Si necesitas más información de contacto, puedo ayudarte con eso.';
     }
 
     if (mensajeLower.includes('inventario') || mensajeLower.includes('stock')) {
@@ -66,11 +141,11 @@ export default function AsistenteIA() {
     }
 
     if (mensajeLower.includes('ayuda') || mensajeLower.includes('help')) {
-      return 'Estoy aquí para ayudarte. Puedo:\n- Mostrarte gráficos de mermas\n- Informarte sobre planes y suscripciones\n- Responder preguntas sobre tu inventario\n- Y mucho más. ¿Qué necesitas?';
+      return 'Estoy aquí para ayudarte. Puedo:\n- Mostrarte gráficos de mermas\n- Informarte sobre planes y suscripciones\n- Responder preguntas sobre contacto y ubicación\n- Responder preguntas sobre tu inventario\n- Y mucho más. ¿Qué necesitas?';
     }
 
     // Respuesta genérica
-    return 'Entiendo tu consulta. Como asistente inteligente, puedo ayudarte con información sobre tu negocio, visualizar datos como mermas por categoría, y responder preguntas sobre SIGA. ¿Te gustaría ver algún gráfico específico o necesitas información sobre nuestros planes?';
+    return 'Entiendo tu consulta. Como asistente inteligente, puedo ayudarte con información sobre SIGA, planes, contacto, ubicación, visualizar datos como mermas por categoría, y mucho más. ¿En qué específicamente puedo ayudarte?';
   };
 
   /**
@@ -191,7 +266,7 @@ export default function AsistenteIA() {
                   mostrar visualizaciones de datos como mermas, y responder preguntas sobre SIGA.
                 </p>
                 <p className="mb-0 mt-2">
-                  <strong>Prueba preguntando:</strong> "Muéstrame las mermas por categoría" o "¿Qué planes tienen disponibles?"
+                  <strong>Prueba preguntando:</strong> "Muéstrame las mermas por categoría", "¿Qué planes tienen disponibles?", "¿Cuál es su contacto?", o "¿Dónde están ubicados?"
                 </p>
               </div>
             )}
