@@ -21,19 +21,19 @@ export default function Navbar() {
         <Link className="navbar-brand" to="/" title="SIGA - Volver al inicio">
           <img src="/brand/Logo_SIGA.png" alt="Logo de SIGA - Volver al inicio" className="marca-logo" style={{ height: '32px', width: 'auto' }} />
         </Link>
-        
+
         {/* Botón hamburguesa para móviles */}
-        <button 
-          className="navbar-toggler" 
-          type="button" 
-          data-bs-toggle="collapse" 
+        <button
+          className="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
           data-bs-target="#navPrincipal"
           aria-label="Abrir menú"
           aria-expanded="false"
         >
           <span className="navbar-toggler-icon"></span>
         </button>
-        
+
         {/* Menú de navegación */}
         <div className="collapse navbar-collapse" id="navPrincipal">
           {/* Enlaces principales */}
@@ -67,7 +67,7 @@ export default function Navbar() {
               </li>
             )}
           </ul>
-          
+
           {/* Enlaces de usuario */}
           <ul className="navbar-nav ms-auto">
             <li className="nav-item">
@@ -87,10 +87,10 @@ export default function Navbar() {
               </>
             ) : (
               <li className="nav-item dropdown">
-                <a 
-                  className="nav-link dropdown-toggle" 
-                  href="#" 
-                  role="button" 
+                <a
+                  className="nav-link dropdown-toggle"
+                  href="#"
+                  role="button"
                   data-bs-toggle="dropdown"
                   aria-expanded="false"
                 >

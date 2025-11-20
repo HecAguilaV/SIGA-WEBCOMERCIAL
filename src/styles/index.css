@@ -8,12 +8,16 @@
   --color-acento-secundario: #80ffdb;
   --color-blanco: #ffffff;
   --color-fondo: #f7f9fc;
+  --color-texto: #222222;
+  --color-texto-secundario: #666666;
+  --color-borde: rgba(3, 4, 94, 0.1);
+  --color-sombra: rgba(0, 0, 0, 0.08);
 }
 
 body {
   background-color: var(--color-fondo);
-  color: #222;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  color: var(--color-texto);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
 }
 
 .bg-primario {
@@ -179,6 +183,7 @@ body {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -246,7 +251,7 @@ body {
     bottom: 1rem;
     right: 1rem;
   }
-  
+
   .asistente-panel {
     width: calc(100vw - 2rem);
     right: -1rem;
@@ -341,7 +346,8 @@ body {
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  background: #6c757d; /* Gris por defecto */
+  background: #6c757d;
+  /* Gris por defecto */
   color: white;
   border: none;
   box-shadow: 0 4px 12px rgba(108, 117, 125, 0.4);
@@ -361,7 +367,8 @@ body {
 }
 
 .btn-asistente-toggle.abierto {
-  background: var(--color-acento); /* Color esmeralda/acento cuando está abierto */
+  background: var(--color-acento);
+  /* Color esmeralda/acento cuando está abierto */
   box-shadow: 0 4px 12px rgba(0, 180, 216, 0.4);
 }
 
@@ -375,11 +382,13 @@ body {
   height: 100%;
   object-fit: contain;
   padding: 12px;
-  filter: brightness(0) invert(1); /* Hace la imagen blanca */
+  filter: brightness(0) invert(1);
+  /* Hace la imagen blanca */
 }
 
 .btn-asistente-toggle.abierto .siga-logo-asistente {
-  filter: brightness(0) invert(1); /* Mantiene blanco cuando está abierto */
+  filter: brightness(0) invert(1);
+  /* Mantiene blanco cuando está abierto */
 }
 
 .asistente-ia-panel {
@@ -498,6 +507,7 @@ body {
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
@@ -562,4 +572,3 @@ body {
     right: 10px;
   }
 }
-

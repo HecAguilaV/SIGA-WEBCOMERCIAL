@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import Boton from './Boton.jsx';
 import { convertirUFaCLP, formatearPrecioCLP } from '../utils/indicadoresEconomicos.js';
+import { CheckCircle } from 'phosphor-react';
 
 // Tarjeta de plan de suscripción, muestra nombre, precio y características
 // Muestra el precio en UF y también la conversión aproximada a CLP
@@ -25,35 +25,47 @@ export default function CardPlan({ plan, onSeleccionar }) {
     cargarPrecioCLP();
   }, [plan.precio]);
 
+  const isFeatured = plan.nombre === 'Emprendedor Pro';
+
   return (
     <div className="col-md-4 mb-4">
-      <div className="card h-100 shadow-sm">
-        <div className="card-body d-flex flex-column">
-          <h5 className="card-title text-primario">{plan.nombre}</h5>
-          <div className="mb-3">
-            <p className="card-text mb-1">
-              <span className="fs-3 fw-bold text-primario">{plan.precio}</span>
-              <span className="ms-1">{plan.unidad}/mes</span>
-            </p>
-            {!cargandoPrecio && precioCLP && (
-              <p className="text-muted mb-0" style={{ fontSize: '0.9rem' }}>
-                ≈ {formatearPrecioCLP(precioCLP)}/mes
-              </p>
-            )}
-            {cargandoPrecio && (
-              <p className="text-muted mb-0" style={{ fontSize: '0.85rem' }}>
-                <span className="spinner-border spinner-border-sm me-1" role="status"></span>
-                Calculando precio...
-              </p>
-            )}
+      <div className={`plan-card-glass ${isFeatured ? 'featured' : ''}`}>
+        {plan.esFreemium && (
+          <span className="plan-badge">GRATIS</span>
+        )}
+
+        <h3 className="plan-name">{plan.nombre}</h3>
+
+        <div className="mb-3">
+          <div className="plan-price">
+            {plan.precio}
+            <span className="plan-price-unit"> {plan.unidad}/mes</span>
           </div>
-          <ul className="list-unstyled flex-grow-1">
-            {plan.caracteristicas.map((c, i) => (
-              <li key={i} className="mb-1">• {c}</li>
-            ))}
-          </ul>
-          <Boton texto="Seleccionar Plan" onClick={() => onSeleccionar(plan)} clase="btn btn-acento mt-auto" />
+          {!cargandoPrecio && precioCLP && (
+            <p className="text-muted mb-0" style={{ fontSize: '0.9rem' }}>
+              ≈ {formatearPrecioCLP(precioCLP)}/mes
+            </p>
+          )}
+          {cargandoPrecio && (
+            <p className="text-muted mb-0" style={{ fontSize: '0.85rem' }}>
+              <span className="spinner-border spinner-border-sm me-1" role="status"></span>
+              Calculando precio...
+            </p>
+          )}
         </div>
+
+        <ul className="plan-features">
+          {plan.caracteristicas.map((c, i) => (
+            <li key={i}>
+              <CheckCircle size={20} weight="fill" color="#00b4d8" />
+              <span>{c}</span>
+            </li>
+          ))}
+        </ul>
+
+        <button className="plan-button" onClick={() => onSeleccionar(plan)}>
+          Seleccionar Plan
+        </button>
       </div>
     </div>
   );

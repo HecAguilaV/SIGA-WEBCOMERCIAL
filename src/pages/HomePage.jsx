@@ -1,68 +1,58 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ChartBar, Rocket, Lock } from 'phosphor-react';
+import { ChartBar, Rocket, Lock, TrendUp, ArrowRight } from 'phosphor-react';
+import '../styles/HomePage.css';
 
 // Landing page completo de SIGA con hero, características y CTAs
 export default function HomePage() {
   return (
     <>
-      {/* Hero Section */}
-      <section className="hero-gradient py-5 mb-6">
+      {/* Hero Section - SIGA Future Glass */}
+      <section className="hero-section">
+        {/* Fondo animado con destellos */}
+        <div className="hero-background">
+          <div className="hero-glow hero-glow-1"></div>
+          <div className="hero-glow hero-glow-2"></div>
+        </div>
+
         <div className="container">
-          <div className="row align-items-center">
-            <div className="col-lg-6">
-              <span className="etiqueta-badge mb-3 d-inline-block">Sistema Inteligente de Gestión de Activos</span>
-              <h1 className="display-4 fw-bold heading-gradient mb-4">
-                Gestiona tu tiempo, no tu inventario
+          <div className="hero-content">
+            {/* Columna izquierda - Texto */}
+            <div className="hero-text">
+              <h1 className="hero-title">
+                Gestiona tu tiempo,
+                <br />
+                no tu inventario
               </h1>
-              <p className="lead mb-4">
+              <p className="hero-subtitle">
                 SIGA es tu ERP simplificado. Automatiza el control de stock en tiempo real para que te enfoques en lo que realmente importa: crecer sin interrupciones.
               </p>
-              <div className="d-flex flex-wrap gap-3 mb-4">
-                <Link to="/planes" className="btn btn-acento btn-lg">
-                  Ver planes de suscripción
-                </Link>
-                <Link to="/acerca" className="btn btn-outline-secondary btn-lg">
-                  Conoce más sobre SIGA
-                </Link>
-              </div>
+              <Link to="/planes" className="hero-cta">
+                Comienza Gratis
+                <ArrowRight size={20} weight="bold" />
+              </Link>
             </div>
-            <div className="col-lg-6 text-center">
-              {/* 
-                VIDEO HTML5 EN LANDING PAGE:
-                - Se carga directamente sin librerías adicionales (soporte nativo del navegador)
-                - Ubicación del archivo: /static/demo-sigaapp.mp4
-                - Vite sirve archivos de static/ desde la raíz (/) gracias a publicDir: 'static'
-                - Por eso la ruta es /demo-sigaapp.mp4 (sin /static/)
-                
-                Atributos del video:
-                * autoPlay: Reproduce automáticamente al cargar (requiere muted)
-                * loop: Repite infinitamente
-                * muted: Sin sonido (obligatorio para autoplay en navegadores modernos)
-                * playsInline: Evita pantalla completa en móviles iOS
-                
-                ¿Por qué HTML5 video en lugar de GIF?
-                - Mejor calidad con menor tamaño (10x más pequeño que GIF)
-                - Mejor rendimiento y menor consumo de ancho de banda
-                - Soporte nativo, no requiere librerías adicionales
-                
-                Requisitos del archivo:
-                - Formato: MP4 con codec H.264 (máxima compatibilidad)
-                - Tamaño recomendado: < 2MB para carga rápida
-                - Resolución: Optimizada para web (800px-1200px de ancho)
-              */}
-              <video 
-                src="/demo-sigaapp.mp4" 
-                className="img-fluid rounded shadow-lg"
-                style={{ maxHeight: '500px', objectFit: 'cover', width: '100%' }}
-                autoPlay
-                loop
-                muted
-                playsInline
-                title="SIGA - Sistema Inteligente de Gestión de Activos"
-              >
-                Tu navegador no soporta videos HTML5.
-              </video>
+
+            {/* Columna derecha - Tarjetas flotantes con glassmorphism */}
+            <div className="hero-cards">
+              <div className="glass-card glass-card-1">
+                <div className="glass-card-icon">
+                  <ChartBar size={40} weight="fill" color="#00b4d8" />
+                </div>
+                <p className="glass-card-title">Reportes en Tiempo Real</p>
+              </div>
+              <div className="glass-card glass-card-2">
+                <div className="glass-card-icon">
+                  <TrendUp size={40} weight="fill" color="#80ffdb" />
+                </div>
+                <p className="glass-card-title">IA Predictiva</p>
+              </div>
+              <div className="glass-card glass-card-3">
+                <div className="glass-card-icon">
+                  <Lock size={40} weight="fill" color="#00b4d8" />
+                </div>
+                <p className="glass-card-title">100% Seguro</p>
+              </div>
             </div>
           </div>
         </div>

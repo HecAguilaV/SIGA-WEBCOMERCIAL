@@ -1,0 +1,188 @@
+/* ========== ACERCA PAGE - GLASSMORPHISM DESIGN ========== */
+
+.acerca-section {
+    min-height: 100vh;
+    padding: 4rem 0;
+    position: relative;
+    overflow: hidden;
+    background: var(--color-fondo);
+}
+
+/* Hero section con fondo animado */
+.acerca-hero {
+    position: relative;
+    padding: 4rem 0;
+    margin-bottom: 4rem;
+}
+
+.acerca-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    background: linear-gradient(135deg, var(--color-fondo) 0%, rgba(0, 180, 216, 0.05) 100%);
+}
+
+.acerca-glow {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+    animation: breathe 5s ease-in-out infinite;
+    pointer-events: none;
+}
+
+.acerca-glow-1 {
+    top: 10%;
+    right: 20%;
+    width: 400px;
+    height: 400px;
+    background: rgba(128, 255, 219, 0.12);
+}
+
+.acerca-glow-2 {
+    bottom: 10%;
+    left: 20%;
+    width: 350px;
+    height: 350px;
+    background: rgba(0, 180, 216, 0.1);
+    animation-delay: 2.5s;
+}
+
+.acerca-content {
+    position: relative;
+    z-index: 1;
+}
+
+.acerca-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: var(--color-texto);
+    margin-bottom: 1.5rem;
+}
+
+.acerca-subtitle {
+    font-size: 1.25rem;
+    color: var(--color-texto-secundario);
+    line-height: 1.6;
+}
+
+/* Cards con glassmorphism */
+.acerca-card-glass {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    padding: 2.5rem;
+    transition: all 0.3s ease;
+    height: 100%;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+}
+
+.acerca-card-glass:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 35px rgba(0, 180, 216, 0.15);
+    border-color: rgba(0, 180, 216, 0.4);
+}
+
+.acerca-card-icon {
+    margin-bottom: 1.5rem;
+    transition: transform 0.3s ease;
+}
+
+.acerca-card-glass:hover .acerca-card-icon {
+    transform: scale(1.1) rotate(5deg);
+}
+
+/* Card de "Qué es SIGA" destacado */
+.acerca-main-card {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 2px solid rgba(0, 180, 216, 0.3);
+    border-radius: 24px;
+    padding: 3rem;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+}
+
+/* Feature cards pequeños */
+.feature-mini-card {
+    text-align: center;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 16px;
+    transition: all 0.3s ease;
+}
+
+.feature-mini-card:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.7);
+    box-shadow: 0 8px 20px rgba(0, 180, 216, 0.15);
+}
+
+/* CTA final con glassmorphism */
+.acerca-cta-card {
+    background: linear-gradient(135deg, rgba(3, 4, 94, 0.95), rgba(0, 180, 216, 0.95));
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 24px;
+    padding: 3rem;
+    color: white;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.acerca-cta-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(128, 255, 219, 0.2) 0%, transparent 70%);
+    animation: rotate 20s linear infinite;
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.acerca-cta-content {
+    position: relative;
+    z-index: 1;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .acerca-title {
+        font-size: 2.5rem;
+    }
+
+    .acerca-card-glass,
+    .acerca-main-card {
+        margin-bottom: 2rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .acerca-title {
+        font-size: 2rem;
+    }
+
+    .acerca-subtitle {
+        font-size: 1.125rem;
+    }
+}

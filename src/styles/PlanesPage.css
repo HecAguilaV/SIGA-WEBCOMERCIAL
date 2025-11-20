@@ -1,0 +1,205 @@
+/* ========== PLANES PAGE - GLASSMORPHISM DESIGN ========== */
+
+.planes-section {
+    min-height: 80vh;
+    padding: 4rem 0;
+    position: relative;
+    overflow: hidden;
+    background: var(--color-fondo);
+}
+
+/* Fondo con destellos sutiles */
+.planes-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    background: linear-gradient(135deg, var(--color-fondo) 0%, rgba(0, 180, 216, 0.03) 100%);
+}
+
+.planes-glow {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(100px);
+    animation: breathe 6s ease-in-out infinite;
+    pointer-events: none;
+}
+
+.planes-glow-1 {
+    top: 20%;
+    right: 15%;
+    width: 350px;
+    height: 350px;
+    background: rgba(128, 255, 219, 0.1);
+}
+
+.planes-glow-2 {
+    bottom: 20%;
+    left: 15%;
+    width: 300px;
+    height: 300px;
+    background: rgba(0, 180, 216, 0.08);
+    animation-delay: 3s;
+}
+
+.planes-content {
+    position: relative;
+    z-index: 1;
+}
+
+.planes-title {
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--color-texto);
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.planes-subtitle {
+    font-size: 1.25rem;
+    color: var(--color-texto-secundario);
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+/* Cards de planes con glassmorphism */
+.plan-card-glass {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    padding: 2rem;
+    transition: all 0.3s ease;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.plan-card-glass::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #00b4d8, #80ffdb);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+}
+
+.plan-card-glass:hover::before {
+    transform: scaleX(1);
+}
+
+.plan-card-glass:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0, 180, 216, 0.2);
+    border-color: rgba(0, 180, 216, 0.4);
+}
+
+.plan-card-glass.featured {
+    background: rgba(0, 180, 216, 0.1);
+    border: 2px solid rgba(0, 180, 216, 0.5);
+}
+
+.plan-badge {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background: linear-gradient(135deg, #00b4d8, #80ffdb);
+    color: white;
+    border-radius: 999px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.plan-name {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--color-texto);
+    margin-bottom: 0.5rem;
+}
+
+.plan-price {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #00b4d8;
+    margin-bottom: 0.25rem;
+}
+
+.plan-price-unit {
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--color-texto-secundario);
+}
+
+.plan-features {
+    list-style: none;
+    padding: 0;
+    margin: 1.5rem 0;
+}
+
+.plan-features li {
+    padding: 0.75rem 0;
+    color: var(--color-texto);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.plan-features li svg {
+    flex-shrink: 0;
+}
+
+.plan-button {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1.125rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #00b4d8, #80ffdb);
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.plan-button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.plan-button:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.plan-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 180, 216, 0.4);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .planes-title {
+        font-size: 2.5rem;
+    }
+
+    .plan-card-glass {
+        margin-bottom: 2rem;
+    }
+}

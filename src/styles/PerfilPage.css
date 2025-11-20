@@ -1,0 +1,141 @@
+/* ========== PERFIL PAGE - GLASSMORPHISM DESIGN ========== */
+
+.perfil-section {
+    min-height: 100vh;
+    padding: 3rem 0;
+    background: var(--color-fondo);
+}
+
+/* Cards con glassmorphism sutil */
+.perfil-card-glass {
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 16px;
+    padding: 2rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.perfil-card-glass:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 180, 216, 0.15);
+    border-color: rgba(0, 180, 216, 0.3);
+}
+
+/* Card de acción rápida */
+.action-card-glass {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    height: 100%;
+    cursor: pointer;
+}
+
+.action-card-glass:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px rgba(0, 180, 216, 0.2);
+    border-color: rgba(0, 180, 216, 0.5);
+}
+
+.action-card-icon {
+    margin-bottom: 1rem;
+    transition: transform 0.3s ease;
+}
+
+.action-card-glass:hover .action-card-icon {
+    transform: scale(1.1);
+}
+
+/* Plan actual card con borde destacado */
+.plan-actual-card {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 2px solid rgba(0, 180, 216, 0.3);
+    border-left: 4px solid #00b4d8;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.plan-actual-header {
+    background: linear-gradient(135deg, rgba(0, 180, 216, 0.1), rgba(128, 255, 219, 0.1));
+    padding: 1.5rem;
+    border-bottom: 1px solid rgba(0, 180, 216, 0.2);
+}
+
+.plan-actual-body {
+    padding: 2rem;
+}
+
+/* Badges con glassmorphism */
+.badge-glass {
+    background: linear-gradient(135deg, #00b4d8, #80ffdb);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 999px;
+    font-weight: 600;
+    box-shadow: 0 4px 10px rgba(0, 180, 216, 0.3);
+}
+
+/* Alerts con glassmorphism */
+.alert-glass {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(0, 180, 216, 0.3);
+    border-radius: 12px;
+    padding: 1.5rem;
+}
+
+.alert-glass.warning {
+    background: rgba(255, 193, 7, 0.1);
+    border-color: rgba(255, 193, 7, 0.3);
+}
+
+.alert-glass.success {
+    background: rgba(25, 135, 84, 0.1);
+    border-color: rgba(25, 135, 84, 0.3);
+}
+
+.alert-glass.info {
+    background: rgba(13, 202, 240, 0.1);
+    border-color: rgba(13, 202, 240, 0.3);
+}
+
+/* Tabla de facturas con glassmorphism */
+.table-glass {
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.table-glass thead {
+    background: rgba(0, 180, 216, 0.1);
+}
+
+.table-glass tbody tr {
+    transition: background 0.2s ease;
+}
+
+.table-glass tbody tr:hover {
+    background: rgba(0, 180, 216, 0.05);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+
+    .perfil-card-glass,
+    .action-card-glass {
+        margin-bottom: 1.5rem;
+    }
+}

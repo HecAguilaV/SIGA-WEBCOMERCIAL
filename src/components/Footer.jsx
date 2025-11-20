@@ -3,21 +3,27 @@ import React from 'react';
 // Pie de página con identidad visual SIGA
 export default function Footer() {
   return (
-    <footer className="bg-primario text-white mt-auto py-4">
-      <div className="container">
-        <div className="row">
-          <div className="col-12 text-center">
-            <p className="mb-2">
-              <strong>SIGA</strong> - Sistema Inteligente de Gestión de Activos
-            </p>
-            <p className="mb-0">
-              <small>
-                © {new Date().getFullYear()} Todos los derechos reservados | 
-                Portal Comercial y Gestión de Suscripciones
-              </small>
-            </p>
-          </div>
-        </div>
+    <footer
+      style={{
+        backgroundColor: '#03045e',
+        color: '#ffffff',
+        padding: '2rem 1.5rem',
+        textAlign: 'center',
+        marginTop: '3rem',
+        borderTop: '1px solid #00b4d8'
+      }}
+    >
+      <div className="content">
+        <p style={{ margin: '0.5rem 0' }}>
+          <strong style={{ color: '#00b4d8' }}>SIGA</strong> - Sistema Inteligente de Gestión de Activos
+        </p>
+        <p style={{ margin: '0.5rem 0' }}>
+          <small style={{ opacity: 0.8 }}>
+            © 2025 Todos los derechos reservados
+            <br />
+            Desarrollado por {'>'} Un Soñador con Poca RAM 👨🏻‍💻
+          </small>
+        </p>
       </div>
     </footer>
   );
