@@ -13,12 +13,18 @@ module.exports = function (config) {
     frameworks: ['jasmine'],
     
     // Archivos que Karma debe cargar y observar para cambios
+    // Excluir DocsPage.jsx porque usa swagger-ui-react que requiere configuración CSS adicional
     files: [
-      { pattern: 'src/**/*.jsx', watched: true },
-      { pattern: 'src/**/*.js', watched: true },
-      { pattern: 'tests/**/*.spec.jsx', watched: true },
-      { pattern: 'tests/**/*.spec.js', watched: true },
+      // Tests - deben estar incluidos para que se ejecuten
+      { pattern: 'tests/**/*.spec.jsx', watched: true, included: true, served: true },
+      { pattern: 'tests/**/*.spec.js', watched: true, included: true, served: true },
+      // Código fuente - solo para webpack, no incluirlos directamente
+      { pattern: 'src/**/*.jsx', watched: true, included: false, served: false },
+      { pattern: 'src/**/*.js', watched: true, included: false, served: false },
     ],
+    
+    // Excluir DocsPage de los tests (no necesita testing)
+    exclude: ['src/pages/DocsPage.jsx'],
     
     // Preprocesadores: webpack transforma JSX y JS antes de ejecutar los tests
     preprocessors: {
@@ -66,18 +72,29 @@ module.exports = function (config) {
       includeAllSources: true,
     },
     
-    // Navegador para ejecutar los tests (ChromeHeadless = sin interfaz gráfica)
-    browsers: ['ChromeHeadless'],
-    singleRun: false,
+    // Navegador para ejecutar los tests
+    // 'Chrome' = con interfaz gráfica para ver los tests en el navegador
+    // 'ChromeHeadless' = sin interfaz gráfica (para CI/CD)
+    browsers: ['Chrome'],
+    singleRun: false, // false para ver la interfaz gráfica y watch mode
     
     // Configuración del cliente Jasmine
     client: {
       jasmine: {
         random: false, // Ejecutar tests en orden determinístico
       },
-      clearContext: false,
+      clearContext: false, // No limpiar el contexto entre tests (útil para debug)
+      captureConsole: true, // Capturar console.log para debug
+      runInParent: false,
+    },
+    
+    // Configuración para debugging
+    logLevel: config.LOG_INFO, // Mostrar información de debug
+    browserConsoleLogOptions: {
+      level: 'log',
+      format: '%b %T: %m',
+      terminal: true
     },
   });
 };
-
 

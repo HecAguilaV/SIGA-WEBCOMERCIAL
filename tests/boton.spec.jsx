@@ -1,37 +1,46 @@
 import React from 'react';
-import { createRoot } from 'react-dom/client';
+import { render } from 'react-dom';
 import Boton from '../src/components/Boton.jsx';
 
-describe('Boton.jsx', () => {
-  let contenedor;
-  let root;
+describe('Componente Boton', () => {
+  let container;
 
   beforeEach(() => {
-    contenedor = document.createElement('div');
-    document.body.appendChild(contenedor);
-    root = createRoot(contenedor);
+    container = document.createElement('div');
+    document.body.appendChild(container);
   });
 
   afterEach(() => {
-    root.unmount();
-    contenedor.remove();
+    document.body.removeChild(container);
+    container = null;
   });
 
-  it('renderiza el texto pasado por props', () => {
-    root.render(<Boton texto="Hacer clic" onClick={() => {}} />);
-    const boton = contenedor.querySelector('[data-testid="boton-generico"]');
+  it('debe renderizar el botón con el texto proporcionado', () => {
+    render(<Boton texto="Click me" />, container);
+    const boton = container.querySelector('button');
     expect(boton).not.toBeNull();
-    expect(boton.textContent).toContain('Hacer clic');
+    expect(boton.textContent).toContain('Click me');
   });
 
-  it('ejecuta onClick al simular un clic', () => {
-    let ejecutado = false;
-    const onClick = () => { ejecutado = true; };
-    root.render(<Boton texto="Probar" onClick={onClick} />);
-    const boton = contenedor.querySelector('[data-testid="boton-generico"]');
-    boton.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-    expect(ejecutado).toBeTrue();
+  it('debe ejecutar la función onClick cuando se hace clic', () => {
+    const handleClick = jasmine.createSpy('handleClick');
+    render(<Boton texto="Click me" onClick={handleClick} />, container);
+    
+    const boton = container.querySelector('button');
+    boton.click();
+    
+    expect(handleClick).toHaveBeenCalled();
+  });
+
+  it('debe aplicar las clases CSS correctas', () => {
+    render(<Boton texto="Click me" clase="btn btn-primario" />, container);
+    const boton = container.querySelector('button');
+    expect(boton.className).toContain('btn-primario');
+  });
+
+  it('debe usar la clase por defecto si no se especifica', () => {
+    render(<Boton texto="Click me" />, container);
+    const boton = container.querySelector('button');
+    expect(boton.className).toContain('btn-acento');
   });
 });
-
-

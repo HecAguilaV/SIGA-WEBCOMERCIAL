@@ -9,7 +9,6 @@ import {
 import { 
   obtenerPlanDelUsuario, 
   obtenerLimitesDelPlan, 
-  asignarPlanAUsuario, 
   leerPlanes,
   verificarTrialActivo,
   iniciarFreeTrial,

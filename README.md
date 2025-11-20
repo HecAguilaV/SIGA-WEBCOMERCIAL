@@ -278,7 +278,7 @@ SIGA_WEB_COMERCIAL/
 - Historial accesible desde el perfil del usuario
 
 ### Asistente con IA
-- Chatbot inteligente con **Google Gemini AI** (modelo gemini-1.5-flash)
+- Chatbot inteligente con **Google Gemini AI** (modelo gemini-2.5-flash)
 - Respuestas contextuales basadas en información completa de SIGA
 - Contexto incluye: información de la empresa, planes, contacto, ubicación, servicios
 - Visualización de gráficos de mermas por categoría
@@ -334,6 +334,7 @@ Ver documentación completa de tests en [`docs/ESTADO_TESTS.md`](./docs/ESTADO_T
 - `/` - Página de inicio
 - `/planes` - Catálogo de planes
 - `/acerca` - Acerca de SIGA
+- `/docs` - Documentación API (Swagger UI)
 - `/login` - Iniciar sesión
 - `/registro` - Registro de usuario
 - `/carrito` - Carrito de compras
@@ -425,23 +426,23 @@ Para limpiar los datos de prueba, ejecuta en la consola del navegador:
 localStorage.clear()
 ```
 
-## Documentación Adicional
-
-- **[GUIA_DE_ESTUDIO.md](./GUIA_DE_ESTUDIO.md)** - Guía técnica completa con todas las tecnologías, arquitectura y funcionalidades
-- **[COMENTARIOS_GUIA.md](./COMENTARIOS_GUIA.md)** - Guía para agregar comentarios educativos y ejemplos de código comentado
-- **[RESUMEN_IMPLEMENTACION.md](./RESUMEN_IMPLEMENTACION.md)** - Detalles completos de todas las funcionalidades implementadas
-- **[docs/ESTADO_TESTS.md](./docs/ESTADO_TESTS.md)** - Estado actual de tests y plan de acción
-- **[docs/api/openapi.yaml](./docs/api/openapi.yaml)** - Documentación Swagger/OpenAPI de todas las funciones
-- **[GUIA_GIT_RAMAS.md](./GUIA_GIT_RAMAS.md)** - Guía para trabajar con Git y ramas
+## Documentación y Testing
 
 ### Documentación Swagger/OpenAPI
 
-El proyecto incluye documentación OpenAPI completa que describe todas las funciones como endpoints REST. Esto facilita la migración futura a un backend real.
+Visualiza la documentación completa de la API de forma interactiva directamente en la aplicación:
 
-**Para visualizar la documentación:**
-1. Ve a https://editor.swagger.io/
-2. Copia el contenido de `docs/api/openapi.yaml`
-3. Pégalo en el editor para ver la documentación interactiva
+**📖 Documentación en la aplicación:**
+👉 [http://localhost:5173/docs](http://localhost:5173/docs) (desarrollo local)
+👉 `https://tu-dominio.com/docs` (producción)
+
+**📖 Swagger Editor (Online) - Alternativa:**
+👉 [Ver Documentación Swagger](https://editor.swagger.io/?url=https://raw.githubusercontent.com/HecAguilaV/FullStackII_ProyectoSemestral/main/docs/api/openapi.yaml)
+
+O copia y pega esta URL:
+```
+https://editor.swagger.io/?url=https://raw.githubusercontent.com/HecAguilaV/FullStackII_ProyectoSemestral/main/docs/api/openapi.yaml
+```
 
 **31 endpoints documentados** incluyendo:
 - Gestión de usuarios (7 endpoints)
@@ -452,7 +453,28 @@ El proyecto incluye documentación OpenAPI completa que describe todas las funci
 - Carrito (3 endpoints)
 - Indicadores económicos (3 endpoints)
 
-Ver más detalles en [`docs/api/README.md`](./docs/api/README.md)
+### Interfaz de Testing (Jasmine/Karma)
+
+Para ver la interfaz gráfica de los tests:
+
+1. **Modifica `karma.conf.cjs`** cambiando `ChromeHeadless` por `Chrome`:
+```javascript
+browsers: ['Chrome'], // En lugar de ['ChromeHeadless']
+singleRun: false,     // Para que no se cierre automáticamente
+```
+
+2. **Ejecuta los tests:**
+```bash
+npm test
+```
+
+3. **Reporte HTML de Coverage:**
+Después de ejecutar los tests, abre el reporte HTML generado:
+```
+coverage/html/index.html
+```
+
+La interfaz de Karma se abrirá en tu navegador mostrando todos los tests con sus resultados en tiempo real.
 
 ## Características Futuras
 

@@ -145,7 +145,8 @@ export default function CheckoutPage() {
       });
       
       // Guardar el número de factura en localStorage para que CompraExitosaPage pueda mostrarla
-      localStorage.setItem('siga_factura_actual', factura.numeroFactura);
+      // Usar numeroFactura (alias) o numero como fallback
+      localStorage.setItem('siga_factura_actual', factura.numeroFactura || factura.numero);
     }
     
     vaciarCarrito();

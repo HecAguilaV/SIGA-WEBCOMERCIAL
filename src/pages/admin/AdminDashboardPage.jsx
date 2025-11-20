@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { leerUsuarios, leerPlanes } from '../../datos/datosSimulados.js';
 import { Users, User, Package, Lock, CheckCircle, Warning, ClipboardText, Lightning, Lightbulb, House } from 'phosphor-react';
 
@@ -97,9 +98,9 @@ export default function AdminDashboardPage() {
               <div className="display-6 fw-bold text-success mb-2">
                 {usuarios.filter((u) => u.planId !== null && u.rol === 'cliente').length}
               </div>
-              <a href="/admin/suscripciones" className="btn btn-sm btn-outline-success">
+              <Link to="/admin/suscripciones" className="btn btn-sm btn-outline-success">
                 Ver todas las suscripciones →
-              </a>
+              </Link>
             </div>
           </div>
         </div>
@@ -119,9 +120,9 @@ export default function AdminDashboardPage() {
               <div className="display-6 fw-bold text-warning mb-2">
                 {usuarios.filter((u) => u.planId === null && u.rol === 'cliente').length}
               </div>
-              <a href="/admin/suscripciones" className="btn btn-sm btn-outline-warning">
+              <Link to="/admin/suscripciones" className="btn btn-sm btn-outline-warning">
                 Ver detalles →
-              </a>
+              </Link>
             </div>
           </div>
         </div>
@@ -156,9 +157,9 @@ export default function AdminDashboardPage() {
                   </div>
                 ))}
               </div>
-              <a href="/admin/planes" className="btn btn-sm btn-outline-primary mt-3 w-100">
+              <Link to="/admin/planes" className="btn btn-sm btn-outline-primary mt-3 w-100">
                 Gestionar Planes →
-              </a>
+              </Link>
             </div>
           </div>
         </div>
@@ -174,22 +175,22 @@ export default function AdminDashboardPage() {
             <div className="card-body">
               <p className="text-muted mb-3">Gestiona el portal desde aquí:</p>
               <div className="d-grid gap-2">
-                <a href="/admin/usuarios" className="btn btn-outline-primary">
+                <Link to="/admin/usuarios" className="btn btn-outline-primary">
                   <Users size={18} weight="fill" className="me-2" style={{ verticalAlign: 'middle' }} />
                   Gestionar Usuarios
-                </a>
-                <a href="/admin/suscripciones" className="btn btn-outline-success">
+                </Link>
+                <Link to="/admin/suscripciones" className="btn btn-outline-success">
                   <CheckCircle size={18} weight="fill" className="me-2" style={{ verticalAlign: 'middle' }} />
                   Ver Suscripciones
-                </a>
-                <a href="/admin/planes" className="btn btn-outline-info">
+                </Link>
+                <Link to="/admin/planes" className="btn btn-outline-info">
                   <Package size={18} weight="fill" className="me-2" style={{ verticalAlign: 'middle' }} />
                   Gestionar Planes
-                </a>
-                <a href="/" className="btn btn-outline-secondary">
+                </Link>
+                <Link to="/" className="btn btn-outline-secondary">
                   <House size={18} weight="fill" className="me-2" style={{ verticalAlign: 'middle' }} />
                   Ir al Portal Comercial
-                </a>
+                </Link>
               </div>
             </div>
           </div>

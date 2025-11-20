@@ -1,92 +1,101 @@
 import React, { useState } from 'react';
-import { leerUsuarios } from '../datos/datosSimulados.js';
-import { guardarUsuarioAutenticado } from '../utils/auth.js';
 import { useNavigate } from 'react-router-dom';
+import { iniciarSesion } from '../utils/auth.js';
 
-// Formulario de inicio de sesión simple con validación básica
+/**
+ * Página de inicio de sesión
+ */
 export default function LoginPage() {
-  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
-  const validarEmail = (valor) => /[^@\s]+@[^@\s]+\.[^@\s]+/.test(valor);
-
-  const manejarSubmit = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setError('');
-    if (!validarEmail(email)) {
-      setError('Por favor ingresa un email válido.');
+    
+    if (!email || !password) {
+      setError('Por favor completa todos los campos');
       return;
     }
-    const lista = leerUsuarios();
-    const usuario = lista.find((u) => u.email === email && u.password === password);
-    if (!usuario) {
-      setError('Credenciales inválidas.');
+
+    // Validar formato de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError('Email inválido');
       return;
     }
-    // Guardar el usuario autenticado en localStorage
-    // Esto permite que el usuario permanezca logueado al recargar la página
-    guardarUsuarioAutenticado(usuario);
-    
-    // SISTEMA DE REDIRECCIÓN INTELIGENTE:
-    // Si el usuario intentó acceder a una página protegida (ej: /checkout) antes de iniciar sesión,
-    // esa página guardó la ruta en localStorage. Ahora lo redirigimos allí.
-    
-    // Verificar si hay una ruta de redirección guardada
-    const redirectPath = localStorage.getItem('siga_redirect_after_login');
-    
-    if (redirectPath) {
-      // Si hay una ruta guardada (ej: '/checkout'):
-      // 1. Eliminarla de localStorage (ya no la necesitamos)
-      localStorage.removeItem('siga_redirect_after_login');
-      // 2. Redirigir al usuario a esa ruta
-      //    Ejemplo: Si venía del carrito, lo llevamos al checkout
-      navigate(redirectPath);
-      return; // Detener la ejecución (no seguir con la lógica de abajo)
-    }
-    
-    // Si NO hay ruta guardada, usar la redirección por defecto según el rol:
-    // - Administradores → Panel de administración
-    // - Clientes → Página de perfil
-    if (usuario.rol === 'admin') {
-      navigate('/admin');
-    } else {
+
+    const usuario = iniciarSesion(email, password);
+    if (usuario) {
       navigate('/perfil');
+    } else {
+      setError('Credenciales inválidas');
+    }
+  };
+
+  const handleEmailBlur = (e) => {
+    const emailValue = e.target.value;
+    if (emailValue && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue)) {
+      setError('Email inválido');
+    } else {
+      setError('');
     }
   };
 
   return (
-    <section className="py-5">
-      <div className="container" style={{ maxWidth: 480 }}>
-        <h2 className="mb-4 text-primario">Iniciar Sesión</h2>
-        <form onSubmit={manejarSubmit} data-testid="form-login">
-          <div className="mb-3">
-            <label className="form-label">Email</label>
-            <input
-              className="form-control"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="tu@correo.com"
-            />
+    <div className="container py-5">
+      <div className="row justify-content-center">
+        <div className="col-md-6">
+          <div className="card shadow">
+            <div className="card-body p-5">
+              <h2 className="card-title text-center mb-4">Iniciar Sesión</h2>
+              
+              {error && (
+                <div className="alert alert-danger" role="alert">
+                  {error}
+                </div>
+              )}
+
+              <form onSubmit={handleSubmit}>
+                <div className="mb-3">
+                  <label htmlFor="email" className="form-label">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    className="form-control"
+                    id="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    onBlur={handleEmailBlur}
+                    required
+                  />
+                </div>
+
+                <div className="mb-3">
+                  <label htmlFor="password" className="form-label">
+                    Contraseña
+                  </label>
+                  <input
+                    type="password"
+                    className="form-control"
+                    id="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                </div>
+
+                <button type="submit" className="btn btn-primario w-100">
+                  Iniciar Sesión
+                </button>
+              </form>
+            </div>
           </div>
-          <div className="mb-3">
-            <label className="form-label">Contraseña</label>
-            <input
-              className="form-control"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-            />
-          </div>
-          {error && <div className="alert alert-danger">{error}</div>}
-          <button type="submit" className="btn btn-acento w-100">Entrar</button>
-        </form>
+        </div>
       </div>
-    </section>
+    </div>
   );
 }
-
 
