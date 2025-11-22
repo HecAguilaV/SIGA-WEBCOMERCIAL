@@ -37,7 +37,7 @@ const planesPorDefecto = [
     unidad: 'UF',
     esFreemium: true,
     caracteristicas: [
-      'Asistente SIGA con RAG',
+      'Asistente SIGA con Inteligencia Artificial',
       'Punto de venta básico',
       'Gestión simple de inventario',
       '1 bodega/sucursal',
@@ -51,7 +51,7 @@ const planesPorDefecto = [
     unidad: 'UF',
     esFreemium: false,
     caracteristicas: [
-      'Asistente SIGA con RAG',
+      'Asistente SIGA con Inteligencia Artificial',
       'Reportes avanzados',
       '2 bodegas/sucursales',
       '3 usuarios',
@@ -65,7 +65,7 @@ const planesPorDefecto = [
     unidad: 'UF',
     esFreemium: false,
     caracteristicas: [
-      'Asistente SIGA con RAG',
+      'Asistente SIGA con Inteligencia Artificial',
       'Integraciones contables',
       'Bodegas/sucursales ilimitadas',
       'Usuarios ilimitados',

@@ -54,19 +54,19 @@ Proporcionar una plataforma comercial moderna donde los usuarios pueden:
 
 ### Planes de Suscripción
 1. **Kiosco (Freemium)** - Plan gratuito permanente
-   - Asistente SIGA con RAG
+   - Asistente SIGA con Inteligencia Artificial
    - 1 bodega/sucursal
    - 1 usuario
    - Productos limitados
 
 2. **Emprendedor Pro** - 0.9 UF/mes
-   - Asistente SIGA con RAG
+   - Asistente SIGA con Inteligencia Artificial
    - 2 bodegas/sucursales
    - 3 usuarios
    - Reportes avanzados
 
 3. **Crecimiento** - 1.9 UF/mes
-   - Asistente SIGA con RAG
+   - Asistente SIGA con Inteligencia Artificial
    - Bodegas ilimitadas
    - Usuarios ilimitados
    - Integraciones contables

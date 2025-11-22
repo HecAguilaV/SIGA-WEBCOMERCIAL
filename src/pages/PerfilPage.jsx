@@ -253,7 +253,7 @@ export default function PerfilPage() {
                         {limites.asistenteSIGA && (
                           <li className="mb-2">
                             <Robot size={18} weight="fill" className="me-2" style={{ verticalAlign: 'middle' }} />
-                            <strong>Asistente SIGA:</strong> Incluido (RAG con contexto de datos)
+                            <strong>Asistente SIGA:</strong> Incluido (con Inteligencia Artificial)
                           </li>
                         )}
                         <li className="mb-2">

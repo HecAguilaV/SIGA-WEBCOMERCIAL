@@ -55,7 +55,7 @@ ${plan.caracteristicas.map(car => `  - ${car}`).join('\n')}
 
 ### Plan Kiosco (Gratuito)
 - Ideal para: Pequeños negocios o emprendedores que están comenzando
-- Incluye: Asistente SIGA con RAG, punto de venta básico, gestión simple de inventario
+- Incluye: Asistente SIGA con Inteligencia Artificial, punto de venta básico, gestión simple de inventario
 - Limitaciones: 1 bodega/sucursal, 1 usuario, productos limitados (100), reportes básicos, soporte por email
 
 ### Plan Emprendedor Pro (0.9 UF/mes)
@@ -98,7 +98,7 @@ Ofrecemos un **trial gratuito de 14 días** para los planes Emprendedor Pro y Cr
 - Análisis de ventas y tendencias
 
 ### Asistente SIGA con IA
-- Chatbot inteligente con RAG (Retrieval Augmented Generation)
+- Chatbot inteligente con Inteligencia Artificial
 - Disponible en todos los planes
 - Puede ayudar con:
   - Información sobre inventario
