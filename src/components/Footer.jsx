@@ -21,7 +21,7 @@ export default function Footer() {
           <small style={{ opacity: 0.8 }}>
             © 2025 Todos los derechos reservados
             <br />
-            Desarrollado por {'>'} Un Soñador con Poca RAM 👨🏻‍💻 el mas perron de los qls
+            Desarrollado por {'>'} Un Soñador con Poca RAM 👨🏻‍💻
           </small>
         </p>
       </div>
