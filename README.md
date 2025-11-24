@@ -437,11 +437,11 @@ Visualiza la documentación completa de la API de forma interactiva directamente
 👉 `https://tu-dominio.com/docs` (producción)
 
 **📖 Swagger Editor (Online) - Alternativa:**
-👉 [Ver Documentación Swagger](https://editor.swagger.io/?url=https://raw.githubusercontent.com/HecAguilaV/FullStackII_ProyectoSemestral/main/docs/api/openapi.yaml)
+👉 [Ver Documentación Swagger](https://editor.swagger.io/?url=https://raw.githubusercontent.com/HecAguilaV/SIGA-WEBCOMERCIAL/main/docs/api/openapi.yaml)
 
 O copia y pega esta URL:
 ```
-https://editor.swagger.io/?url=https://raw.githubusercontent.com/HecAguilaV/FullStackII_ProyectoSemestral/main/docs/api/openapi.yaml
+https://editor.swagger.io/?url=https://raw.githubusercontent.com/HecAguilaV/SIGA-WEBCOMERCIAL/main/docs/api/openapi.yaml
 ```
 
 **31 endpoints documentados** incluyendo:

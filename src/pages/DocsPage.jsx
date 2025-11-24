@@ -9,7 +9,7 @@ export default function DocsPage() {
 
   useEffect(() => {
     // Cargar el archivo OpenAPI desde GitHub (URL raw)
-    const openApiUrl = 'https://raw.githubusercontent.com/HecAguilaV/FullStackII_ProyectoSemestral/main/docs/api/openapi.yaml';
+    const openApiUrl = 'https://raw.githubusercontent.com/HecAguilaV/SIGA-WEBCOMERCIAL/main/docs/api/openapi.yaml';
     setSpec(openApiUrl);
   }, []);
 
