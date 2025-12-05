@@ -1,0 +1,9 @@
+# Configuración local para este proyecto
+# Ejecuta: source .zshrc.local
+
+export PNPM_HOME="$HOME/Library/pnpm"
+export PATH="$PNPM_HOME:$PATH"
+alias pnpm="$HOME/Library/pnpm/pnpm"
+
+echo "✓ pnpm configurado. Versión: $($HOME/Library/pnpm/pnpm --version)"
+

@@ -89,9 +89,10 @@ Proporcionar una plataforma comercial moderna donde los usuarios pueden:
 - **Generación automática** de facturas después de cada compra
 - **Números únicos** de factura (formato: FAC-YYYYMMDD-XXXX)
 - **Facturas imprimibles** con diseño profesional optimizado para papel
-- **Persistencia** de todas las facturas en localStorage
+- **Persistencia** en backend con fallback a localStorage
 - **Historial completo** de compras accesible desde el perfil
 - **Búsqueda** de facturas por número, ID o usuario
+- **Integración completa** con API del backend
 - Información completa: emisor, cliente, detalles de compra, método de pago
 
 ### Seguridad y Validación
@@ -111,26 +112,47 @@ Proporcionar una plataforma comercial moderna donde los usuarios pueden:
 - **Vite 5.4** - Herramienta de build y desarrollo
 - **Jasmine & Karma** - Testing unitario
 - **Babel & Webpack** - Procesamiento de JSX para tests
-- **localStorage** - Persistencia de datos
+- **pnpm 10.24.0** - Gestor de paquetes (recomendado por seguridad)
+- **Backend REST API** - Integración con API real (Spring Boot)
+- **localStorage** - Persistencia de datos (fallback)
 - **OpenAPI/Swagger** - Documentación de API (referencia)
 
 ## Instalación
 
 ### Requisitos Previos
-- Node.js 16+ y npm instalados
+- Node.js 16+ instalado
+- pnpm instalado (recomendado para mayor seguridad)
 - Git (opcional)
+
+### Instalar pnpm
+
+Si no tienes pnpm instalado:
+```bash
+curl -fsSL https://get.pnpm.io/install.sh | sh -
+```
+
+**Importante:** Después de instalar, cierra y abre una nueva terminal, o ejecuta:
+```bash
+source ~/.zshrc
+```
+
+Si pnpm no funciona después de instalar, ejecuta en tu terminal:
+```bash
+export PNPM_HOME="$HOME/Library/pnpm"
+export PATH="$PNPM_HOME:$PATH"
+```
 
 ### Pasos de Instalación
 
-1. **Clonar el repositorio** (si aplica):
+1. **Clonar el repositorio**:
 ```bash
-git clone <url-del-repositorio>
-cd SIGA_WEB_COMERCIAL
+git clone https://github.com/HecAguilaV/SIGA-WEBCOMERCIAL.git
+cd SIGA-WEBCOMERCIAL
 ```
 
 2. **Instalar dependencias**:
 ```bash
-npm install
+pnpm install
 ```
 
 3. **Configurar variables de entorno** (opcional, para usar asistente con IA):
@@ -140,7 +162,7 @@ npm install
 
 4. **Iniciar servidor de desarrollo**:
 ```bash
-npm run dev
+pnpm run dev
 ```
 
 La aplicación estará disponible en `http://localhost:5173`
@@ -151,20 +173,20 @@ La aplicación estará disponible en `http://localhost:5173`
 
 ```bash
 # Servidor de desarrollo
-npm run dev
+pnpm run dev
 
 # Build para producción
-npm run build
+pnpm run build
 
 # Preview de producción
-npm run preview
+pnpm run preview
 ```
 
 ### Testing
 
 ```bash
 # Ejecutar pruebas unitarias
-npm test
+pnpm test
 ```
 
 ### Usuarios por Defecto
@@ -409,19 +431,56 @@ Los archivos estáticos se sirven desde la carpeta `static/` y son accesibles de
 - Ubicación: `/static/demo-sigaapp.mp4`
 - Atributos: `autoPlay`, `loop`, `muted`, `playsInline`
 
-## Datos Simulados
+## Documentación Técnica
 
-Todos los datos se almacenan en `localStorage`:
+Todos los documentos técnicos están ubicados en la carpeta `docs/`:
+
+1. **ERS (Especificación de Requisitos de Software)**
+   - Ubicación: `docs/ERS.md`
+   - Descripción completa del sistema, requisitos funcionales y no funcionales
+
+2. **Manual de Usuario**
+   - Ubicación: `docs/MANUAL_USUARIO.md`
+   - Guía completa paso a paso para usuarios finales
+
+3. **Documento de Cobertura de Testing**
+   - Ubicación: `docs/COBERTURA_TESTING.md`
+   - Estado actual de tests, métricas de cobertura y plan de mejora
+   - Reporte HTML disponible en `coverage/html/index.html` después de ejecutar tests
+
+4. **Documentación de APIs**
+   - Especificación OpenAPI: `docs/api/openapi.yaml`
+   - Swagger UI accesible en `/docs` de la aplicación
+   - Documentación adicional: `docs/api/README.md`
+
+5. **Documento APIs e Integración**
+   - Ubicación: `docs/APIS_INTEGRACION.md`
+   - Arquitectura de integración, endpoints, autenticación JWT
+
+---
+
+## Datos y Persistencia
+
+### Backend API (Principal)
+El sistema está integrado con un backend REST API que maneja:
+- **Autenticación:** Registro, login, refresh tokens
+- **Planes:** Listado y detalles de planes
+- **Suscripciones:** Creación y gestión de suscripciones
+- **Facturas:** Creación, listado y búsqueda de facturas
+- **Chat:** Asistente IA comercial
+
+### Fallback a localStorage
+Si el backend no está disponible, el sistema usa datos locales en `localStorage`:
 - **Planes:** `siga_planes`
 - **Usuarios:** `siga_usuarios`
 - **Suscripciones:** `siga_suscripciones`
-- **Facturas:** `siga_facturas` (Nuevo)
+- **Facturas:** `siga_facturas`
 - **Usuario autenticado:** `siga_usuario_actual`
 - **Carrito:** `siga_carrito_plan`
 - **Redirección:** `siga_redirect_after_login`
 - **Factura actual:** `siga_factura_actual`
 
-Para limpiar los datos de prueba, ejecuta en la consola del navegador:
+Para limpiar los datos de prueba (solo localStorage), ejecuta en la consola del navegador:
 ```javascript
 localStorage.clear()
 ```
@@ -465,7 +524,7 @@ singleRun: false,     // Para que no se cierre automáticamente
 
 2. **Ejecuta los tests:**
 ```bash
-npm test
+pnpm test
 ```
 
 3. **Reporte HTML de Coverage:**
@@ -496,8 +555,8 @@ Este proyecto es la base de SIGA.
 
 ## Autor
 
-Héctor Aguila.
-Un Soñador con Poca RAM.
+>**Héctor Aguila**
+>>Un Soñador con Poca RAM
 
 ---
 

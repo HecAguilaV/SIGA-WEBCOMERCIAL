@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { obtenerUsuarioAutenticado } from '../utils/auth.js';
 import { obtenerFacturaPorNumero } from '../datos/datosSimulados.js';
+import { getFacturaByNumero } from '../services/api.js';
 import FacturaComponent from '../components/FacturaComponent.jsx';
 import { CheckCircle, FileText } from 'phosphor-react';
 
@@ -14,18 +15,33 @@ export default function CompraExitosaPage() {
 
   // Cargar la factura generada al montar el componente
   useEffect(() => {
-    // Obtener el número de factura guardado en localStorage
-    const numeroFactura = localStorage.getItem('siga_factura_actual');
-    
-    if (numeroFactura) {
-      // Buscar la factura por su número
-      const facturaEncontrada = obtenerFacturaPorNumero(numeroFactura);
-      setFactura(facturaEncontrada);
+    const cargarFactura = async () => {
+      // Obtener el número de factura guardado en localStorage
+      const numeroFactura = localStorage.getItem('siga_factura_actual');
       
-      // Limpiar el número de factura del localStorage después de cargarlo
-      // (opcional: puedes mantenerlo si quieres que persista)
-      // localStorage.removeItem('siga_factura_actual');
-    }
+      if (numeroFactura) {
+        try {
+          // Intentar obtener factura desde el backend
+          const response = await getFacturaByNumero(numeroFactura);
+          if (response.success && response.factura) {
+            setFactura(response.factura);
+          } else {
+            throw new Error('Factura no encontrada en backend');
+          }
+        } catch (error) {
+          console.warn('Error al cargar factura desde backend, usando local:', error);
+          // Fallback a datos locales
+          const facturaEncontrada = obtenerFacturaPorNumero(numeroFactura);
+          setFactura(facturaEncontrada);
+        }
+        
+        // Limpiar el número de factura del localStorage después de cargarlo
+        // (opcional: puedes mantenerlo si quieres que persista)
+        // localStorage.removeItem('siga_factura_actual');
+      }
+    };
+    
+    cargarFactura();
   }, []);
 
   // Función para manejar la impresión de la factura

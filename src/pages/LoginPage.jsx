@@ -1,21 +1,26 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { iniciarSesion } from '../utils/auth.js';
+import { iniciarSesion } from '../services/auth.js';
 
 /**
  * Página de inicio de sesión
+ * Integrada con backend real con fallback a datos locales
  */
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+    setLoading(true);
     
     if (!email || !password) {
       setError('Por favor completa todos los campos');
+      setLoading(false);
       return;
     }
 
@@ -23,14 +28,24 @@ export default function LoginPage() {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       setError('Email inválido');
+      setLoading(false);
       return;
     }
 
-    const usuario = iniciarSesion(email, password);
-    if (usuario) {
-      navigate('/perfil');
-    } else {
-      setError('Credenciales inválidas');
+    try {
+      const usuario = await iniciarSesion(email, password);
+      if (usuario) {
+        // Verificar si hay una ruta de redirección guardada
+        const redirectPath = localStorage.getItem('siga_redirect_after_login') || '/perfil';
+        localStorage.removeItem('siga_redirect_after_login');
+        navigate(redirectPath);
+      } else {
+        setError('Credenciales inválidas');
+      }
+    } catch (err) {
+      setError(err.message || 'Error al iniciar sesión. Por favor intenta nuevamente.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -87,8 +102,15 @@ export default function LoginPage() {
                   />
                 </div>
 
-                <button type="submit" className="btn btn-primario w-100">
-                  Iniciar Sesión
+                <button type="submit" className="btn btn-primario w-100" disabled={loading}>
+                  {loading ? (
+                    <>
+                      <span className="spinner-border spinner-border-sm me-2" role="status"></span>
+                      Iniciando sesión...
+                    </>
+                  ) : (
+                    'Iniciar Sesión'
+                  )}
                 </button>
               </form>
             </div>

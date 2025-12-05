@@ -15,6 +15,7 @@ import AdminDashboardPage from './pages/admin/AdminDashboardPage.jsx';
 import AdminUsuariosPage from './pages/admin/AdminUsuariosPage.jsx';
 import AdminSuscripcionesPage from './pages/admin/AdminSuscripcionesPage.jsx';
 import AdminPlanesPage from './pages/admin/AdminPlanesPage.jsx';
+import DocsPage from './pages/DocsPage.jsx';
 import { obtenerUsuarioAutenticado } from './utils/auth.js';
 
 // Ruta privada simple para restringir vistas de administrador
@@ -42,6 +43,7 @@ export function Rutas() {
       <Route path="/" element={<HomePage />} />
       <Route path="/planes" element={<PlanesPage />} />
       <Route path="/acerca" element={<AcercaPage />} />
+      <Route path="/docs" element={<DocsPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/registro" element={<RegistroPage />} />
       <Route path="/carrito" element={<CarritoPage />} />

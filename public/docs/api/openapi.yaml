@@ -1,0 +1,1118 @@
+openapi: 3.0.3
+info:
+  title: SIGA Portal Comercial API
+  description: |
+    API de referencia para el Portal Comercial SIGA.
+    
+    **Nota:** Esta documentación describe las funciones JavaScript como si fueran endpoints REST.
+    Actualmente el proyecto usa localStorage y funciones JavaScript, pero esta documentación
+    servirá como referencia cuando se migre a un backend real.
+    
+    Todas las funciones están documentadas con sus parámetros, valores de retorno y ejemplos.
+  version: 1.0.0
+  contact:
+    name: SIGA Support
+    email: soporte@siga.com
+  license:
+    name: Propietario
+    url: https://siga.com/licencia
+
+servers:
+  - url: http://localhost:5173/api
+    description: Servidor de desarrollo local
+  - url: https://api.siga.com/v1
+    description: Servidor de producción (futuro)
+
+tags:
+  - name: Usuarios
+    description: Gestión de usuarios del sistema
+  - name: Planes
+    description: Gestión de planes de suscripción
+  - name: Suscripciones
+    description: Gestión de suscripciones y trials
+  - name: Facturas
+    description: Gestión de facturas y compras
+  - name: Autenticación
+    description: Autenticación y sesiones
+  - name: Carrito
+    description: Gestión del carrito de compras
+  - name: Indicadores Económicos
+    description: APIs de indicadores económicos (UF, USD, CLP)
+
+paths:
+  # ============================================
+  # GESTIÓN DE USUARIOS
+  # ============================================
+  
+  /usuarios:
+    get:
+      tags:
+        - Usuarios
+      summary: Obtener todos los usuarios
+      description: Retorna la lista completa de usuarios registrados en el sistema
+      operationId: leerUsuarios
+      responses:
+        '200':
+          description: Lista de usuarios obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Usuario'
+              example:
+                - id: 1
+                  nombre: "Admin"
+                  email: "admin@siga.com"
+                  rol: "admin"
+                  planId: null
+                - id: 2
+                  nombre: "Hector"
+                  email: "hector@siga.com"
+                  rol: "cliente"
+                  planId: 2
+    
+    post:
+      tags:
+        - Usuarios
+      summary: Crear un nuevo usuario
+      description: Crea un nuevo usuario en el sistema. Genera un ID automático.
+      operationId: crearUsuario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioInput'
+            examples:
+              cliente:
+                value:
+                  nombre: "Juan Pérez"
+                  email: "juan@ejemplo.com"
+                  password: "clave123"
+                  rol: "cliente"
+                  planId: null
+      responses:
+        '201':
+          description: Usuario creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+              example:
+                id: 3
+                nombre: "Juan Pérez"
+                email: "juan@ejemplo.com"
+                password: "clave123"
+                rol: "cliente"
+                planId: null
+
+  /usuarios/{id}:
+    get:
+      tags:
+        - Usuarios
+      summary: Obtener usuario por ID
+      description: Retorna un usuario específico por su ID
+      operationId: obtenerUsuarioPorId
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del usuario
+          schema:
+            type: integer
+            example: 2
+      responses:
+        '200':
+          description: Usuario encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+        '404':
+          description: Usuario no encontrado
+    
+    put:
+      tags:
+        - Usuarios
+      summary: Actualizar usuario
+      description: Actualiza los datos de un usuario existente
+      operationId: actualizarUsuario
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioUpdate'
+      responses:
+        '200':
+          description: Usuario actualizado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+    
+    delete:
+      tags:
+        - Usuarios
+      summary: Eliminar usuario
+      description: Elimina un usuario del sistema
+      operationId: eliminarUsuario
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Usuario eliminado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+  
+  /usuarios/{id}/reset-password:
+    post:
+      tags:
+        - Usuarios
+      summary: Resetear contraseña de usuario
+      description: Cambia la contraseña de un usuario específico
+      operationId: resetearPasswordUsuario
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - nuevaPassword
+              properties:
+                nuevaPassword:
+                  type: string
+                  example: "nuevaClave123"
+      responses:
+        '200':
+          description: Contraseña actualizada exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+
+  # ============================================
+  # GESTIÓN DE PLANES
+  # ============================================
+  
+  /planes:
+    get:
+      tags:
+        - Planes
+      summary: Obtener todos los planes
+      description: Retorna la lista completa de planes de suscripción disponibles
+      operationId: leerPlanes
+      responses:
+        '200':
+          description: Lista de planes obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Plan'
+    
+    post:
+      tags:
+        - Planes
+      summary: Crear un nuevo plan
+      description: Crea un nuevo plan de suscripción en el sistema
+      operationId: crearPlan
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlanInput'
+      responses:
+        '201':
+          description: Plan creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Plan'
+
+  /planes/{id}:
+    get:
+      tags:
+        - Planes
+      summary: Obtener plan por ID
+      description: Retorna un plan específico por su ID
+      operationId: obtenerPlanPorId
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Plan encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Plan'
+    
+    put:
+      tags:
+        - Planes
+      summary: Actualizar plan
+      description: Actualiza los datos de un plan existente
+      operationId: actualizarPlan
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlanUpdate'
+      responses:
+        '200':
+          description: Plan actualizado exitosamente
+    
+    delete:
+      tags:
+        - Planes
+      summary: Eliminar plan
+      description: Elimina un plan del sistema
+      operationId: eliminarPlan
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Plan eliminado exitosamente
+
+  /planes/{id}/limites:
+    get:
+      tags:
+        - Planes
+      summary: Obtener límites de un plan
+      description: Retorna los límites y restricciones de un plan específico
+      operationId: obtenerLimitesDelPlan
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Límites del plan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LimitesPlan'
+
+  # ============================================
+  # GESTIÓN DE SUSCRIPCIONES
+  # ============================================
+  
+  /suscripciones/asignar:
+    post:
+      tags:
+        - Suscripciones
+      summary: Asignar plan a usuario
+      description: Asigna un plan de suscripción a un usuario específico
+      operationId: asignarPlanAUsuario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - usuarioId
+                - planId
+              properties:
+                usuarioId:
+                  type: integer
+                  example: 2
+                planId:
+                  type: integer
+                  example: 2
+      responses:
+        '200':
+          description: Plan asignado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+
+  /usuarios/{usuarioId}/plan:
+    get:
+      tags:
+        - Suscripciones
+      summary: Obtener plan del usuario
+      description: Retorna el plan actual asignado a un usuario
+      operationId: obtenerPlanDelUsuario
+      parameters:
+        - name: usuarioId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Plan del usuario
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Plan'
+        '404':
+          description: Usuario no tiene plan asignado
+
+  /suscripciones/trial/iniciar:
+    post:
+      tags:
+        - Suscripciones
+      summary: Iniciar free trial
+      description: Inicia un trial gratuito de 14 días para un usuario
+      operationId: iniciarFreeTrial
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - usuarioId
+                - planId
+              properties:
+                usuarioId:
+                  type: integer
+                  example: 2
+                planId:
+                  type: integer
+                  example: 2
+      responses:
+        '200':
+          description: Trial iniciado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+        '400':
+          description: El usuario ya usó su trial gratuito
+
+  /usuarios/{usuarioId}/trial:
+    get:
+      tags:
+        - Suscripciones
+      summary: Verificar trial activo
+      description: Verifica si un usuario tiene un trial activo y retorna información
+      operationId: verificarTrialActivo
+      parameters:
+        - name: usuarioId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Información del trial
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrialInfo'
+        '404':
+          description: Usuario no tiene trial activo
+
+  /suscripciones/trial/convertir:
+    post:
+      tags:
+        - Suscripciones
+      summary: Convertir trial a suscripción pagada
+      description: Convierte un trial activo en una suscripción pagada permanente
+      operationId: convertirTrialAPagado
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - usuarioId
+              properties:
+                usuarioId:
+                  type: integer
+                  example: 2
+      responses:
+        '200':
+          description: Trial convertido exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+
+  # ============================================
+  # GESTIÓN DE FACTURAS
+  # ============================================
+  
+  /facturas:
+    post:
+      tags:
+        - Facturas
+      summary: Crear una nueva factura
+      description: Genera una nueva factura después de una compra exitosa
+      operationId: crearFactura
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FacturaInput'
+      responses:
+        '201':
+          description: Factura creada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Factura'
+
+  /usuarios/{usuarioId}/facturas:
+    get:
+      tags:
+        - Facturas
+      summary: Obtener facturas del usuario
+      description: Retorna todas las facturas de un usuario específico, ordenadas por fecha (más reciente primero)
+      operationId: obtenerFacturasDelUsuario
+      parameters:
+        - name: usuarioId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lista de facturas del usuario
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Factura'
+
+  /facturas/{id}:
+    get:
+      tags:
+        - Facturas
+      summary: Obtener factura por ID
+      description: Retorna una factura específica por su ID
+      operationId: obtenerFacturaPorId
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Factura encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Factura'
+        '404':
+          description: Factura no encontrada
+
+  /facturas/numero/{numeroFactura}:
+    get:
+      tags:
+        - Facturas
+      summary: Obtener factura por número
+      description: Busca una factura por su número único (ej: FAC-20241201-0001)
+      operationId: obtenerFacturaPorNumero
+      parameters:
+        - name: numeroFactura
+          in: path
+          required: true
+          description: Número de factura en formato FAC-YYYYMMDD-XXXX
+          schema:
+            type: string
+            example: "FAC-20241201-0001"
+      responses:
+        '200':
+          description: Factura encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Factura'
+        '404':
+          description: Factura no encontrada
+
+  /facturas/todas:
+    get:
+      tags:
+        - Facturas
+      summary: Obtener todas las facturas (Admin)
+      description: Retorna todas las facturas del sistema. Solo disponible para administradores.
+      operationId: obtenerTodasLasFacturas
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista completa de facturas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Factura'
+
+  # ============================================
+  # AUTENTICACIÓN
+  # ============================================
+  
+  /auth/login:
+    post:
+      tags:
+        - Autenticación
+      summary: Iniciar sesión
+      description: Autentica un usuario y establece una sesión
+      operationId: iniciarSesion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: "hector@siga.com"
+                password:
+                  type: string
+                  example: "hector123"
+      responses:
+        '200':
+          description: Login exitoso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  usuario:
+                    $ref: '#/components/schemas/Usuario'
+                  token:
+                    type: string
+                    description: Token de autenticación (futuro)
+        '401':
+          description: Credenciales inválidas
+
+  /auth/logout:
+    post:
+      tags:
+        - Autenticación
+      summary: Cerrar sesión
+      description: Cierra la sesión del usuario actual
+      operationId: cerrarSesion
+      responses:
+        '200':
+          description: Sesión cerrada exitosamente
+
+  /auth/usuario-actual:
+    get:
+      tags:
+        - Autenticación
+      summary: Obtener usuario autenticado
+      description: Retorna el usuario actualmente autenticado
+      operationId: obtenerUsuarioAutenticado
+      responses:
+        '200':
+          description: Usuario autenticado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+        '401':
+          description: No hay usuario autenticado
+
+  # ============================================
+  # CARRITO
+  # ============================================
+  
+  /carrito:
+    get:
+      tags:
+        - Carrito
+      summary: Obtener plan del carrito
+      description: Retorna el plan actualmente en el carrito del usuario
+      operationId: obtenerPlanDelCarrito
+      responses:
+        '200':
+          description: Plan en el carrito
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Plan'
+        '404':
+          description: Carrito vacío
+    
+    post:
+      tags:
+        - Carrito
+      summary: Agregar plan al carrito
+      description: Guarda un plan en el carrito para compra posterior
+      operationId: guardarPlanEnCarrito
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Plan'
+      responses:
+        '200':
+          description: Plan agregado al carrito exitosamente
+    
+    delete:
+      tags:
+        - Carrito
+      summary: Vaciar carrito
+      description: Elimina el plan del carrito
+      operationId: vaciarCarrito
+      responses:
+        '200':
+          description: Carrito vaciado exitosamente
+
+  # ============================================
+  # INDICADORES ECONÓMICOS
+  # ============================================
+  
+  /indicadores/uf:
+    get:
+      tags:
+        - Indicadores Económicos
+      summary: Obtener valor de UF
+      description: Obtiene el valor actual de la Unidad de Fomento (UF) desde mindicador.cl
+      operationId: obtenerValorUF
+      responses:
+        '200':
+          description: Valor de UF obtenido exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  valor:
+                    type: number
+                    example: 37934.23
+                  fecha:
+                    type: string
+                    format: date
+                    example: "2024-12-01"
+
+  /indicadores/usd:
+    get:
+      tags:
+        - Indicadores Económicos
+      summary: Obtener valor de USD
+      description: Obtiene el valor actual del dólar estadounidense desde mindicador.cl
+      operationId: obtenerValorUSD
+      responses:
+        '200':
+          description: Valor de USD obtenido exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  valor:
+                    type: number
+                    example: 950.50
+                  fecha:
+                    type: string
+                    format: date
+
+  /indicadores/convertir-uf-clp:
+    get:
+      tags:
+        - Indicadores Económicos
+      summary: Convertir UF a CLP
+      description: Convierte un valor en UF a pesos chilenos usando el valor actual
+      operationId: convertirUFaCLP
+      parameters:
+        - name: valorUF
+          in: query
+          required: true
+          description: Valor en UF a convertir
+          schema:
+            type: number
+            example: 0.9
+      responses:
+        '200':
+          description: Conversión exitosa
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  valorUF:
+                    type: number
+                    example: 0.9
+                  valorCLP:
+                    type: number
+                    example: 34140.81
+                  fecha:
+                    type: string
+                    format: date-time
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Usuario:
+      type: object
+      required:
+        - id
+        - nombre
+        - email
+        - rol
+      properties:
+        id:
+          type: integer
+          example: 1
+        nombre:
+          type: string
+          example: "Hector"
+        email:
+          type: string
+          format: email
+          example: "hector@siga.com"
+        password:
+          type: string
+          description: Solo para creación/actualización
+        rol:
+          type: string
+          enum: [admin, cliente]
+          example: "cliente"
+        planId:
+          type: integer
+          nullable: true
+          example: 2
+        enTrial:
+          type: boolean
+          example: false
+        fechaInicioTrial:
+          type: string
+          format: date-time
+          nullable: true
+        fechaFinTrial:
+          type: string
+          format: date-time
+          nullable: true
+
+    UsuarioInput:
+      type: object
+      required:
+        - nombre
+        - email
+        - password
+        - rol
+      properties:
+        nombre:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+        rol:
+          type: string
+          enum: [admin, cliente]
+        planId:
+          type: integer
+          nullable: true
+
+    UsuarioUpdate:
+      type: object
+      properties:
+        nombre:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+        rol:
+          type: string
+          enum: [admin, cliente]
+        planId:
+          type: integer
+          nullable: true
+        enTrial:
+          type: boolean
+
+    Plan:
+      type: object
+      required:
+        - id
+        - nombre
+        - precio
+        - unidad
+      properties:
+        id:
+          type: integer
+          example: 1
+        nombre:
+          type: string
+          example: "Emprendedor Pro"
+        precio:
+          type: number
+          example: 0.9
+        unidad:
+          type: string
+          example: "UF"
+        esFreemium:
+          type: boolean
+          example: false
+        caracteristicas:
+          type: array
+          items:
+            type: string
+          example:
+            - "Asistente SIGA con RAG"
+            - "Reportes avanzados"
+            - "2 bodegas/sucursales"
+
+    PlanInput:
+      type: object
+      required:
+        - nombre
+        - precio
+        - unidad
+        - caracteristicas
+      properties:
+        nombre:
+          type: string
+        precio:
+          type: number
+        unidad:
+          type: string
+        esFreemium:
+          type: boolean
+          default: false
+        caracteristicas:
+          type: array
+          items:
+            type: string
+
+    PlanUpdate:
+      type: object
+      properties:
+        nombre:
+          type: string
+        precio:
+          type: number
+        unidad:
+          type: string
+        esFreemium:
+          type: boolean
+        caracteristicas:
+          type: array
+          items:
+            type: string
+
+    LimitesPlan:
+      type: object
+      properties:
+        usuarios:
+          type: integer
+          description: "-1 significa ilimitado"
+          example: 3
+        bodegas:
+          type: integer
+          description: "-1 significa ilimitado"
+          example: 2
+        productos:
+          type: integer
+          description: "-1 significa ilimitado"
+          example: 500
+        reportes:
+          type: string
+          example: "Avanzados"
+        soporte:
+          type: string
+          example: "Email + Chat"
+        asistenteSIGA:
+          type: boolean
+          example: true
+
+    TrialInfo:
+      type: object
+      properties:
+        activo:
+          type: boolean
+          example: true
+        fechaInicio:
+          type: string
+          format: date-time
+        fechaFin:
+          type: string
+          format: date-time
+        diasRestantes:
+          type: integer
+          example: 12
+        planId:
+          type: integer
+          example: 2
+
+    Factura:
+      type: object
+      required:
+        - id
+        - numeroFactura
+        - usuarioId
+        - planId
+        - precioUF
+        - estado
+      properties:
+        id:
+          type: integer
+          example: 1
+        numeroFactura:
+          type: string
+          description: Formato FAC-YYYYMMDD-XXXX
+          example: "FAC-20241201-0001"
+        usuarioId:
+          type: integer
+          example: 2
+        usuarioNombre:
+          type: string
+          example: "Hector"
+        usuarioEmail:
+          type: string
+          format: email
+          example: "hector@siga.com"
+        planId:
+          type: integer
+          example: 2
+        planNombre:
+          type: string
+          example: "Emprendedor Pro"
+        precioUF:
+          type: number
+          example: 0.9
+        precioCLP:
+          type: number
+          nullable: true
+          example: 34140.81
+        unidad:
+          type: string
+          example: "UF"
+        fechaCompra:
+          type: string
+          format: date-time
+          example: "2024-12-01T15:30:00.000Z"
+        fechaVencimiento:
+          type: string
+          format: date-time
+          nullable: true
+          example: "2025-01-01T15:30:00.000Z"
+        estado:
+          type: string
+          enum: [pagada, cancelada, reembolsada]
+          example: "pagada"
+        metodoPago:
+          type: string
+          example: "Tarjeta de crédito"
+        ultimos4Digitos:
+          type: string
+          example: "4242"
+
+    FacturaInput:
+      type: object
+      required:
+        - usuarioId
+        - usuarioNombre
+        - usuarioEmail
+        - planId
+        - planNombre
+        - precioUF
+        - unidad
+      properties:
+        usuarioId:
+          type: integer
+        usuarioNombre:
+          type: string
+        usuarioEmail:
+          type: string
+          format: email
+        planId:
+          type: integer
+        planNombre:
+          type: string
+        precioUF:
+          type: number
+        precioCLP:
+          type: number
+          nullable: true
+        unidad:
+          type: string
+          default: "UF"
+        fechaVencimiento:
+          type: string
+          format: date-time
+          nullable: true
+        metodoPago:
+          type: string
+          default: "Tarjeta de crédito"
+        ultimos4Digitos:
+          type: string
+

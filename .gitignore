@@ -36,3 +36,6 @@ Thumbs.db
 *.tmp
 *.temp
 
+# Documentos internos y de desarrollo
+CHALLA/
+

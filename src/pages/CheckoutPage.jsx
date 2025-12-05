@@ -4,6 +4,7 @@ import { vaciarCarrito, obtenerUsuarioAutenticado, obtenerPlanDelCarrito, guarda
 import { ClipboardText, CheckCircle, Lightbulb, CreditCard, Lock, ShieldCheck, Warning } from 'phosphor-react';
 import { asignarPlanAUsuario, actualizarUsuario, convertirTrialAPagado, crearFactura } from '../datos/datosSimulados.js';
 import { convertirUFaCLP, formatearPrecioCLP } from '../utils/indicadoresEconomicos.js';
+import { createSuscripcion, createFactura } from '../services/api.js';
 
 // Página de pago simulada con diseño profesional tipo pasarela de pago real
 export default function CheckoutPage() {
@@ -104,21 +105,42 @@ export default function CheckoutPage() {
     // Simular procesamiento de pago (delay de 2 segundos para realismo)
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
-    // Simulación de pago exitoso
+    // Procesar pago y crear suscripción
     if (plan && usuario) {
-      // Si el usuario está en trial, convertirlo a suscripción pagada
-      if (usuario.enTrial) {
-        convertirTrialAPagado(usuario.id);
+      try {
+        // Intentar crear suscripción en el backend real
+        const response = await createSuscripcion(plan.id, 'MENSUAL');
+        
+        if (response.success && response.suscripcion) {
+          // Suscripción creada exitosamente en el backend
+          const usuarioActualizado = { 
+            ...usuario, 
+            planId: plan.id, 
+            enTrial: false,
+            suscripcionId: response.suscripcion.id 
+          };
+          guardarUsuarioAutenticado(usuarioActualizado);
+        } else {
+          throw new Error('Error al crear suscripción');
+        }
+      } catch (error) {
+        console.warn('Error al crear suscripción en backend, usando datos locales:', error);
+        
+        // Fallback a datos locales
+        // Si el usuario está en trial, convertirlo a suscripción pagada
+        if (usuario.enTrial) {
+          convertirTrialAPagado(usuario.id);
+        }
+        
+        // Asignar el plan comprado al usuario en datos simulados
+        asignarPlanAUsuario(usuario.id, plan.id);
+        // Actualizar usuario en localStorage con el nuevo plan
+        const usuarioActualizado = { ...usuario, planId: plan.id, enTrial: false };
+        guardarUsuarioAutenticado(usuarioActualizado);
+        
+        // Actualizar también en el array de usuarios
+        actualizarUsuario(usuario.id, { planId: plan.id, enTrial: false });
       }
-      
-      // Asignar el plan comprado al usuario en datos simulados
-      asignarPlanAUsuario(usuario.id, plan.id);
-      // Actualizar usuario en localStorage con el nuevo plan
-      const usuarioActualizado = { ...usuario, planId: plan.id, enTrial: false };
-      guardarUsuarioAutenticado(usuarioActualizado);
-      
-      // Actualizar también en el array de usuarios
-      actualizarUsuario(usuario.id, { planId: plan.id, enTrial: false });
       
       // GENERAR FACTURA después de la compra exitosa
       // Extraer últimos 4 dígitos de la tarjeta para la factura
@@ -129,24 +151,53 @@ export default function CheckoutPage() {
       const fechaVencimiento = new Date();
       fechaVencimiento.setMonth(fechaVencimiento.getMonth() + 1);
       
-      // Crear la factura con todos los datos necesarios
-      const factura = crearFactura({
-        usuarioId: usuario.id,
-        usuarioNombre: usuario.nombre,
-        usuarioEmail: usuario.email,
-        planId: plan.id,
-        planNombre: plan.nombre,
-        precioUF: plan.precio,
-        precioCLP: precioCLP, // Precio convertido a CLP
-        unidad: plan.unidad,
-        fechaVencimiento: fechaVencimiento.toISOString(),
-        metodoPago: 'Tarjeta de crédito',
-        ultimos4Digitos: ultimos4Digitos,
-      });
-      
-      // Guardar el número de factura en localStorage para que CompraExitosaPage pueda mostrarla
-      // Usar numeroFactura (alias) o numero como fallback
-      localStorage.setItem('siga_factura_actual', factura.numeroFactura || factura.numero);
+      // Intentar crear factura en el backend
+      let factura = null;
+      try {
+        const facturaData = {
+          usuarioId: usuario.id,
+          usuarioNombre: usuario.nombre,
+          usuarioEmail: usuario.email,
+          planId: plan.id,
+          planNombre: plan.nombre,
+          precioUF: plan.precio,
+          precioCLP: precioCLP, // Precio convertido a CLP
+          unidad: plan.unidad,
+          fechaVencimiento: fechaVencimiento.toISOString(),
+          metodoPago: 'Tarjeta de crédito',
+          ultimos4Digitos: ultimos4Digitos,
+        };
+        
+        const facturaResponse = await createFactura(facturaData);
+        
+        if (facturaResponse.success && facturaResponse.factura) {
+          factura = facturaResponse.factura;
+          // Guardar el número de factura en localStorage para que CompraExitosaPage pueda mostrarla
+          localStorage.setItem('siga_factura_actual', factura.numeroFactura || factura.numero);
+        } else {
+          throw new Error('Error al crear factura en backend');
+        }
+      } catch (error) {
+        console.warn('Error al crear factura en backend, usando datos locales:', error);
+        
+        // Fallback a datos locales
+        factura = crearFactura({
+          usuarioId: usuario.id,
+          usuarioNombre: usuario.nombre,
+          usuarioEmail: usuario.email,
+          planId: plan.id,
+          planNombre: plan.nombre,
+          precioUF: plan.precio,
+          precioCLP: precioCLP, // Precio convertido a CLP
+          unidad: plan.unidad,
+          fechaVencimiento: fechaVencimiento.toISOString(),
+          metodoPago: 'Tarjeta de crédito',
+          ultimos4Digitos: ultimos4Digitos,
+        });
+        
+        // Guardar el número de factura en localStorage para que CompraExitosaPage pueda mostrarla
+        localStorage.setItem('siga_factura_actual', factura.numeroFactura || factura.numero);
+      }
     }
     
     vaciarCarrito();

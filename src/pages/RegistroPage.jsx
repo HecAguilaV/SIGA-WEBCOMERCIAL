@@ -1,30 +1,53 @@
 import React, { useState } from 'react';
-import { crearUsuario, leerUsuarios } from '../datos/datosSimulados.js';
-import { guardarUsuarioAutenticado } from '../utils/auth.js';
+import { registrarUsuario } from '../services/auth.js';
 import { useNavigate } from 'react-router-dom';
 
 // Formulario de registro de usuario (rol por defecto: cliente)
+// Integrado con backend real con fallback a datos locales
 export default function RegistroPage() {
   const navigate = useNavigate();
   const [nombre, setNombre] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const validarEmail = (valor) => /[^@\s]+@[^@\s]+\.[^@\s]+/.test(valor);
 
-  const manejarSubmit = (e) => {
+  const manejarSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    if (!nombre.trim()) return setError('El nombre es requerido.');
-    if (!validarEmail(email)) return setError('Email inválido.');
-    if (password.length < 6) return setError('La contraseña debe tener al menos 6 caracteres.');
-    const existe = leerUsuarios().some((u) => u.email === email);
-    if (existe) return setError('El email ya está registrado.');
-    const nuevo = crearUsuario({ nombre, email, password, rol: 'cliente' });
-    guardarUsuarioAutenticado(nuevo);
-    // Redirigir al perfil después del registro exitoso
-    navigate('/perfil');
+    setLoading(true);
+
+    if (!nombre.trim()) {
+      setError('El nombre es requerido.');
+      setLoading(false);
+      return;
+    }
+    if (!validarEmail(email)) {
+      setError('Email inválido.');
+      setLoading(false);
+      return;
+    }
+    if (password.length < 6) {
+      setError('La contraseña debe tener al menos 6 caracteres.');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const nuevo = await registrarUsuario({ nombre, email, password });
+      if (nuevo) {
+        // Redirigir al perfil después del registro exitoso
+        navigate('/perfil');
+      } else {
+        setError('Error al registrar usuario. Por favor intenta nuevamente.');
+      }
+    } catch (err) {
+      setError(err.message || 'Error al registrar usuario. El email puede estar en uso.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -45,7 +68,16 @@ export default function RegistroPage() {
             <input className="form-control" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
           </div>
           {error && <div className="alert alert-danger">{error}</div>}
-          <button type="submit" className="btn btn-acento w-100">Crear cuenta</button>
+          <button type="submit" className="btn btn-acento w-100" disabled={loading}>
+            {loading ? (
+              <>
+                <span className="spinner-border spinner-border-sm me-2" role="status"></span>
+                Creando cuenta...
+              </>
+            ) : (
+              'Crear cuenta'
+            )}
+          </button>
         </form>
       </div>
     </section>

@@ -16,6 +16,7 @@ import {
   convertirTrialAPagado,
   obtenerFacturasDelUsuario,
 } from '../datos/datosSimulados.js';
+import { getFacturas } from '../services/api.js';
 import { formatearPrecioCLP } from '../utils/indicadoresEconomicos.js';
 import FacturaComponent from '../components/FacturaComponent.jsx';
 import '../styles/PerfilPage.css';
@@ -58,10 +59,26 @@ export default function PerfilPage() {
 
   // Cargar facturas del usuario al montar el componente
   useEffect(() => {
-    if (usuario && usuario.id) {
-      const facturasUsuario = obtenerFacturasDelUsuario(usuario.id);
-      setFacturas(facturasUsuario);
-    }
+    const cargarFacturas = async () => {
+      if (usuario && usuario.id) {
+        try {
+          // Intentar cargar facturas desde el backend
+          const response = await getFacturas();
+          if (response.success && response.facturas) {
+            setFacturas(response.facturas);
+          } else {
+            throw new Error('Error al obtener facturas del backend');
+          }
+        } catch (error) {
+          console.warn('Error al cargar facturas desde backend, usando locales:', error);
+          // Fallback a datos locales
+          const facturasUsuario = obtenerFacturasDelUsuario(usuario.id);
+          setFacturas(facturasUsuario);
+        }
+      }
+    };
+    
+    cargarFacturas();
   }, [usuario]);
 
   const limites = planActual ? obtenerLimitesDelPlan(planActual.id) : null;

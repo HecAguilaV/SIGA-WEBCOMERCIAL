@@ -57,7 +57,20 @@ module.exports = function (config) {
               },
             },
           },
+          {
+            // Ignorar archivos CSS en tests (no son necesarios para pruebas unitarias)
+            test: /\.css$/,
+            use: ['null-loader'],
+          },
         ],
+      },
+      // Resolver fallbacks para módulos que no se usan en tests
+      resolve: {
+        extensions: ['.js', '.jsx'],
+        fallback: {
+          "fs": false,
+          "path": false,
+        },
       },
     },
     

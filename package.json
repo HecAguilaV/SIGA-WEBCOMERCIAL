@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:clean": "lsof -ti:5173 | xargs kill -9 2>/dev/null || true && rm -rf node_modules/.vite && npm run dev",
+    "dev:clean": "lsof -ti:5173 | xargs kill -9 2>/dev/null || true && rm -rf node_modules/.vite && pnpm run dev",
+    "sync:openapi": "mkdir -p public/docs/api && cp docs/api/openapi.yaml public/docs/api/openapi.yaml",
+    "prebuild": "mkdir -p public/docs/api && cp docs/api/openapi.yaml public/docs/api/openapi.yaml",
     "build": "vite build",
     "preview": "vite preview",
     "test": "karma start karma.conf.cjs",
@@ -32,8 +34,8 @@
     "karma-coverage": "^2.2.1",
     "karma-jasmine": "^5.1.0",
     "karma-webpack": "^5.0.0",
+    "null-loader": "^4.0.1",
     "vite": "^5.4.10",
     "webpack": "^5.95.0"
   }
 }
-
