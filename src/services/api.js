@@ -272,10 +272,10 @@ export async function registerUser(userData) {
 }
 
 /**
- * Iniciar sesión
+ * Iniciar sesión (comercial)
  */
 export async function loginUser(email, password) {
-  const data = await apiRequest('/auth/login', {
+  const data = await apiRequest('/comercial/auth/login', {
     method: 'POST',
     body: JSON.stringify({ email, password }),
     skipAuth: true,
