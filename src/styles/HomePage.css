@@ -150,7 +150,7 @@
 /* Columna derecha - Tarjetas flotantes */
 .hero-cards {
     position: relative;
-    height: 500px;
+    height: 600px; /* ✅ Aumentado de 500px a 600px para acomodar cards más grandes */
     animation: fadeInRight 0.8s ease-out;
 }
 
@@ -161,7 +161,7 @@
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 16px;
-    padding: 1.5rem;
+    padding: 1.5rem; /* Base padding, se sobrescribe en desktop */
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease;
     cursor: default;
@@ -185,26 +185,42 @@
     margin: 0;
 }
 
-/* Posicionamiento de las tarjetas */
+/* Posicionamiento de las tarjetas - Más grandes en desktop */
 .glass-card-1 {
     top: 0;
     left: 0;
-    width: 220px;
+    width: 280px; /* ✅ Aumentado de 220px a 280px */
+    padding: 2rem; /* ✅ Aumentado padding */
     animation: floatIn 0.8s ease-out 0.2s both;
 }
 
 .glass-card-2 {
     top: 140px;
     right: 20px;
-    width: 200px;
+    width: 260px; /* ✅ Aumentado de 200px a 260px */
+    padding: 2rem; /* ✅ Aumentado padding */
     animation: floatIn 0.8s ease-out 0.4s both;
 }
 
 .glass-card-3 {
     top: 300px;
     left: 40px;
-    width: 210px;
+    width: 270px; /* ✅ Aumentado de 210px a 270px */
+    padding: 2rem; /* ✅ Aumentado padding */
     animation: floatIn 0.8s ease-out 0.6s both;
+}
+
+/* Iconos más grandes en desktop */
+.glass-card-icon {
+    font-size: 3rem; /* ✅ Aumentado de 2.5rem */
+    margin-bottom: 1rem; /* ✅ Aumentado espacio */
+}
+
+.glass-card-title {
+    font-size: 1.125rem; /* ✅ Aumentado de 1rem */
+    font-weight: 600;
+    color: var(--color-texto);
+    margin: 0;
 }
 
 /* Animaciones */
@@ -270,6 +286,11 @@
     .glass-card-2,
     .glass-card-3 {
         width: 180px;
+        padding: 1.5rem; /* ✅ Padding reducido en tablet */
+    }
+    
+    .glass-card-icon {
+        font-size: 2.5rem; /* ✅ Iconos más pequeños en tablet */
     }
 }
 

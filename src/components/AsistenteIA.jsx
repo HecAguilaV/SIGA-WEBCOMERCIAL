@@ -1,10 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import GraficoTorta from './GraficoTorta';
-import GraficoBarras from './GraficoBarras';
-import GraficoLineas from './GraficoLineas';
-import { obtenerDatosNegocio } from '../datos/datosSimulados.js';
 import { obtenerContextoSIGA } from '../utils/contextoSIGA.js';
 import '../styles/AsistenteIA.css';
 
@@ -26,13 +22,6 @@ export default function AsistenteIA() {
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [resizeOffset, setResizeOffset] = useState({ y: 0 });
 
-  // Estado para gráficos y modal
-  const [graficoActivo, setGraficoActivo] = useState(null);
-  const [graficoAbierto, setGraficoAbierto] = useState(false);
-  const [modalExplicacion, setModalExplicacion] = useState('');
-  const [modalAnimating, setModalAnimating] = useState(false);
-  const [graficoGeneradoLocal, setGraficoGeneradoLocal] = useState(false);
-
   // Estado para voz
   const [estamosUsandoVoz, setEstamosUsandoVoz] = useState(false);
   const reconocimientoRef = useRef(null);
@@ -45,13 +34,15 @@ export default function AsistenteIA() {
   // Contexto basado en ruta
   const obtenerContextoActual = () => {
     const ruta = location.pathname;
-    if (ruta === "/") return "El usuario está viendo el inventario. ";
-    if (ruta === "/analisis") return "El usuario está viendo análisis de ventas. ";
+    if (ruta === "/") return "El usuario está viendo la página principal. ";
+    if (ruta === "/planes") return "El usuario está viendo los planes de suscripción. ";
+    if (ruta === "/perfil") return "El usuario está viendo su perfil y suscripción. ";
+    if (ruta === "/carrito") return "El usuario está viendo su carrito de compras. ";
     if (ruta === "/acerca") return "El usuario está leyendo sobre SIGA. ";
     return "";
   };
 
-  // Posicionar panel al abrir
+  // Posicionar panel al abrir y enfocar input
   useEffect(() => {
     if (estaAbierto && botonToggleRef.current) {
       const rect = botonToggleRef.current.getBoundingClientRect();
@@ -59,13 +50,18 @@ export default function AsistenteIA() {
       const altoPanel = 500;
 
       let x = rect.left - anchoPanel - 20;
-      let y = rect.top;
+      let y = rect.top - 40; // ✅ Movido 1cm (40px) más arriba
 
       if (x < 0) x = rect.right + 20;
       if (y + altoPanel > window.innerHeight) y = window.innerHeight - altoPanel - 20;
 
       setPosX(Math.max(0, x));
       setPosY(Math.max(0, y));
+      
+      // ✅ Enfocar automáticamente el input cuando se abre
+      setTimeout(() => {
+        inputMensajeRef.current?.focus();
+      }, 100);
     }
   }, [estaAbierto]);
 
@@ -165,113 +161,6 @@ export default function AsistenteIA() {
     };
   }, [estaArrastrando, estaRedimensionando, offset, resizeOffset]);
 
-  // Lógica de gráficos
-  const generarGraficoDesdeSolicitud = (tipoSolicitado, textoUsuario) => {
-    const negocio = obtenerDatosNegocio();
-    const textoLower = (textoUsuario || "").toLowerCase();
-
-    // Ventas por local (Torta)
-    if (
-      textoLower.includes("por local") ||
-      textoLower.includes("ventas semanales por local") ||
-      (textoLower.includes("local") && textoLower.includes("venta"))
-    ) {
-      const ventasPorLocal = negocio.locales.map(l => ({
-        nombre: l.nombre,
-        total: negocio.ventasSemana
-          .filter(v => v.localId === l.id)
-          .reduce((a, b) => a + b.cantidad, 0)
-      }));
-      return {
-        tipo: "torta",
-        titulo: "Ventas semanales por local",
-        etiquetas: ventasPorLocal.map(v => v.nombre),
-        valores: ventasPorLocal.map(v => v.total)
-      };
-    }
-
-    // Productos más vendidos (Barras o Torta)
-    if (textoLower.includes("productos") || textoLower.includes("más vendidos")) {
-      const ventasPorProducto = negocio.productos.map(p => ({
-        nombre: p.nombre,
-        total: negocio.ventasSemana
-          .filter(v => v.productoId === p.id)
-          .reduce((a, b) => a + b.cantidad, 0)
-      }));
-      const sorted = [...ventasPorProducto].sort((a, b) => b.total - a.total).slice(0, 6);
-      return {
-        tipo: tipoSolicitado === "torta" ? "torta" : "barras",
-        titulo: "Productos más vendidos (semana)",
-        etiquetas: sorted.map(s => s.nombre),
-        valores: sorted.map(s => s.total)
-      };
-    }
-
-    // Tendencia (Líneas)
-    if (textoLower.includes("tendencia") || textoLower.includes("por día") || tipoSolicitado === "lineas") {
-      return {
-        tipo: "lineas",
-        titulo: "Tendencia de ventas (últimos 7 días)",
-        etiquetas: negocio.ventasPorDia.map(d => d.dia),
-        valores: negocio.ventasPorDia.map(d => d.totalVentas)
-      };
-    }
-
-    // Default: Mermas (Torta)
-    const mermas = negocio.mermasMes || [];
-    return {
-      tipo: "torta",
-      titulo: "Mermas por categoría",
-      etiquetas: mermas.map(m => m.categoria),
-      valores: mermas.map(m => m.cantidad)
-    };
-  };
-
-  const generarExplicacionGrafico = (grafico) => {
-    if (!grafico || !grafico.etiquetas || !grafico.valores) return "";
-    const total = grafico.valores.reduce((a, b) => a + b, 0) || 1;
-    let maxIndex = 0;
-    for (let i = 1; i < grafico.valores.length; i++) {
-      if (grafico.valores[i] > grafico.valores[maxIndex]) maxIndex = i;
-    }
-    const topLabel = grafico.etiquetas[maxIndex];
-    const topValue = grafico.valores[maxIndex];
-    const pct = Math.round((topValue / total) * 100);
-    return `Resumen: muestra '${grafico.titulo}' — el mayor aporte es ${topLabel} con ${topValue} unidades (${pct}%).`;
-  };
-
-  const openModalFromElement = (el) => {
-    if (el) {
-      const rect = el.getBoundingClientRect();
-      const startX = rect.left + rect.width / 2;
-      const startY = rect.top + rect.height / 2;
-      document.documentElement.style.setProperty("--modal-start-x", `${startX}px`);
-      document.documentElement.style.setProperty("--modal-start-y", `${startY}px`);
-    }
-    setModalAnimating(true);
-    setGraficoAbierto(true);
-    setTimeout(() => setModalAnimating(false), 420);
-  };
-
-  const generarGraficoVentasPorLocal = () => {
-    const grafico = generarGraficoDesdeSolicitud("torta", "ventas por local");
-    if (grafico) {
-      setGraficoActivo(grafico);
-      const explicacion = generarExplicacionGrafico(grafico);
-      setModalExplicacion(explicacion || "He generado un gráfico y lo abrí en una vista ampliada.");
-      openModalFromElement(botonToggleRef.current);
-
-      if (explicacion) {
-        setMensajes(prev => [...prev, {
-          id: crypto.randomUUID(),
-          emisor: "siga",
-          tipo: "texto",
-          contenido: explicacion
-        }]);
-      }
-    }
-  };
-
   // Envío de mensajes
   const enviarMensaje = async (textoOverride = null) => {
     const contenido = textoOverride || mensajeUsuario.trim();
@@ -281,30 +170,6 @@ export default function AsistenteIA() {
     setMensajeUsuario('');
     setEstaPensando(true);
     setMensajeError('');
-
-    // Detección local de gráficos
-    const esPeticionGrafico = /gr[aá]fico|por local|ventas por local|comparativa|comparar|productos m[aá]s vendidos|m[aá]s vendidos|tendencia|por d[ií]a|ventas semanales/i.test(contenido);
-
-    if (esPeticionGrafico) {
-      const grafico = generarGraficoDesdeSolicitud(undefined, contenido);
-      if (grafico) {
-        setGraficoActivo(grafico);
-        setGraficoAbierto(true);
-        setGraficoGeneradoLocal(true);
-        const explicacion = generarExplicacionGrafico(grafico);
-        setModalExplicacion(explicacion);
-
-        setMensajes(prev => [...prev, {
-          id: crypto.randomUUID(),
-          emisor: "siga",
-          tipo: "texto",
-          contenido: explicacion || "He generado un gráfico y lo abrí en una vista ampliada."
-        }]);
-
-        setEstaPensando(false);
-        return; // Salir si se generó localmente
-      }
-    }
 
     // Llamada a API Gemini
     try {
@@ -319,37 +184,18 @@ export default function AsistenteIA() {
       
       Usuario: ${contenido}
       
-      Si el usuario pide un gráfico, responde con una de estas etiquetas al inicio: [GRAFICO_TORTA], [GRAFICO_BARRAS], [GRAFICO_LINEAS].
-      Responde de forma útil y concisa.`;
+      Responde de forma útil y concisa sobre planes, suscripciones, facturas y el portal comercial de SIGA. 
+      NO generes gráficos ni análisis de datos operativos. Este es el portal comercial, no la aplicación operativa.`;
 
       const result = await model.generateContent(prompt);
       const response = await result.response;
       const textoIA = response.text();
 
-      // Procesar respuesta IA
-      let textoLimpio = textoIA;
-      let tipoGraficoIA = null;
-
-      if (textoIA.includes("[GRAFICO_TORTA]")) tipoGraficoIA = "torta";
-      else if (textoIA.includes("[GRAFICO_BARRAS]")) tipoGraficoIA = "barras";
-      else if (textoIA.includes("[GRAFICO_LINEAS]")) tipoGraficoIA = "lineas";
-
-      if (tipoGraficoIA) {
-        textoLimpio = textoLimpio.replace(/\[GRAFICO_.*?\]/g, "").trim();
-        const grafico = generarGraficoDesdeSolicitud(tipoGraficoIA, contenido);
-        setGraficoActivo(grafico);
-        setGraficoAbierto(true);
-        const explicacion = generarExplicacionGrafico(grafico);
-        setModalExplicacion(explicacion);
-
-        if (explicacion && !textoLimpio) textoLimpio = explicacion;
-      }
-
       setMensajes(prev => [...prev, {
         id: crypto.randomUUID(),
         emisor: "siga",
         tipo: "texto",
-        contenido: textoLimpio || "Aquí tienes la información solicitada."
+        contenido: textoIA || "Aquí tienes la información solicitada."
       }]);
 
     } catch (error) {
@@ -415,27 +261,18 @@ export default function AsistenteIA() {
             >
               🎤
             </button>
-            <button
-              type="button"
-              className="btn-grafico-quick"
-              onClick={generarGraficoVentasPorLocal}
-              title="Generar gráfico de ventas por local"
-              disabled={estaPensando}
-            >
-              📊
-            </button>
           </div>
 
           <div className="mensajes-area">
             {mensajes.length === 0 && (
               <div className="mensaje-bienvenida">
                 <p><strong>¡Hola! 👋</strong></p>
-                <p>Soy tu asistente SIGA. Puedo ayudarte con:</p>
+                <p>Soy tu asistente SIGA del portal comercial. Puedo ayudarte con:</p>
                 <ul className="bienvenida-lista">
-                  <li>📊 Análisis de ventas y tendencias</li>
-                  <li>📦 Consultas sobre inventario</li>
-                  <li>⚠️ Alertas de stock crítico</li>
-                  <li>💡 Recomendaciones de gestión</li>
+                  <li>💳 Información sobre planes y suscripciones</li>
+                  <li>📋 Consultas sobre facturas y pagos</li>
+                  <li>🔐 Ayuda con acceso a la WebApp</li>
+                  <li>💡 Preguntas sobre el portal comercial</li>
                 </ul>
                 <p className="hint">Escribe tu pregunta o usa el micrófono 🎤</p>
               </div>
@@ -487,67 +324,6 @@ export default function AsistenteIA() {
             </div>
           </form>
         </div>
-      )}
-
-      {graficoAbierto && graficoActivo && (
-        <>
-          <div className={`grafico-modal-backdrop ${modalAnimating ? 'animando' : ''}`}></div>
-          <div
-            className={`grafico-modal movable ${modalAnimating ? 'animando' : ''}`}
-            style={{
-              left: `${posX}px`,
-              top: `${posY}px`,
-              background: 'rgba(255, 255, 255, 0.45)',
-              backdropFilter: 'blur(20px) saturate(180%)',
-              WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-              border: '1px solid rgba(255, 255, 255, 0.5)',
-              boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.15)',
-              borderRadius: '24px',
-              width: '600px',
-              height: '450px',
-              display: 'flex',
-              flexDirection: 'column'
-            }}
-          >
-            <header className="grafico-modal-header" onMouseDown={iniciarArrastre} style={{ cursor: 'grab' }}>
-              <div>
-                <strong>{graficoActivo.titulo}</strong>
-                {modalExplicacion && <div className="grafico-explicacion-header">{modalExplicacion}</div>}
-              </div>
-              <button
-                className="cerrar-modal"
-                onClick={() => {
-                  setGraficoAbierto(false);
-                  setGraficoActivo(null);
-                  setModalExplicacion('');
-                }}
-              >✕</button>
-            </header>
-            <div className="grafico-modal-body">
-              {graficoActivo.tipo === "torta" && (
-                <GraficoTorta
-                  titulo={graficoActivo.titulo}
-                  etiquetas={graficoActivo.etiquetas}
-                  valores={graficoActivo.valores}
-                />
-              )}
-              {graficoActivo.tipo === "barras" && (
-                <GraficoBarras
-                  titulo={graficoActivo.titulo}
-                  etiquetas={graficoActivo.etiquetas}
-                  valores={graficoActivo.valores}
-                />
-              )}
-              {graficoActivo.tipo === "lineas" && (
-                <GraficoLineas
-                  titulo={graficoActivo.titulo}
-                  etiquetas={graficoActivo.etiquetas}
-                  valores={graficoActivo.valores}
-                />
-              )}
-            </div>
-          </div>
-        </>
       )}
     </div>
   );

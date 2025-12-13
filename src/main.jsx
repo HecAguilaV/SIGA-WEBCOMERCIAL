@@ -10,7 +10,12 @@ import App from './App.jsx';
 // Se configura el enrutador, estilos y se monta el componente raíz.
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <BrowserRouter>
+    <BrowserRouter
+      future={{
+        v7_startTransition: true,
+        v7_relativeSplatPath: true,
+      }}
+    >
       <App />
     </BrowserRouter>
   </React.StrictMode>

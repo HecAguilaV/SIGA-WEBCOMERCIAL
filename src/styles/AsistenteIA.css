@@ -2,10 +2,18 @@
 
 .asistente-contextual {
   position: fixed;
-  bottom: 2rem;
+  bottom: 3.5rem; /* ✅ Movido 1cm (1.5rem ≈ 24px) más arriba desde 2rem */
   right: 2rem;
   z-index: 999;
   font-family: "Inter", "Segoe UI", Roboto, sans-serif;
+}
+
+/* Responsive: En móviles, ajustar posición */
+@media (max-width: 768px) {
+  .asistente-contextual {
+    bottom: 1.5rem;
+    right: 1rem;
+  }
 }
 
 .toggle-asistente {

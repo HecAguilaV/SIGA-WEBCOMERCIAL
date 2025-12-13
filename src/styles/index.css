@@ -283,6 +283,8 @@ body {
 .feature-card {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   border-left: 4px solid var(--color-acento);
+  padding: 2.5rem !important; /* ✅ Más grande en desktop (de p-4 a 2.5rem) */
+  min-height: 280px; /* ✅ Altura mínima para consistencia */
 }
 
 .feature-card:hover {
@@ -291,7 +293,21 @@ body {
 }
 
 .feature-icon {
-  font-size: 3rem;
+  font-size: 3.5rem; /* ✅ Aumentado de 3rem a 3.5rem */
+  margin-bottom: 1.5rem; /* ✅ Más espacio */
+}
+
+/* Responsive para feature cards */
+@media (max-width: 768px) {
+  .feature-card {
+    padding: 1.5rem !important; /* ✅ Padding reducido en móvil */
+    min-height: auto; /* ✅ Sin altura mínima en móvil */
+  }
+  
+  .feature-icon {
+    font-size: 2.5rem; /* ✅ Iconos más pequeños en móvil */
+    margin-bottom: 1rem;
+  }
 }
 
 /* Estilos adicionales para admin */

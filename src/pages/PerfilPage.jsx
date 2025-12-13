@@ -16,7 +16,7 @@ import {
   convertirTrialAPagado,
   obtenerFacturasDelUsuario,
 } from '../datos/datosSimulados.js';
-import { getFacturas } from '../services/api.js';
+import { getFacturas, getSuscripciones, obtenerTokenOperativo } from '../services/api.js';
 import { formatearPrecioCLP } from '../utils/indicadoresEconomicos.js';
 import FacturaComponent from '../components/FacturaComponent.jsx';
 import '../styles/PerfilPage.css';
@@ -31,6 +31,9 @@ export default function PerfilPage() {
   const [puedeTrial, setPuedeTrial] = useState(false);
   const [facturas, setFacturas] = useState([]); // Estado para almacenar las facturas del usuario
   const [facturaSeleccionada, setFacturaSeleccionada] = useState(null); // Factura seleccionada para ver/imprimir
+  const [cargandoSSO, setCargandoSSO] = useState(false); // Estado para manejar SSO
+  const [errorSSO, setErrorSSO] = useState(''); // Mensaje de error SSO
+  const [tieneSuscripcionActiva, setTieneSuscripcionActiva] = useState(false); // Estado de suscripción activa
 
   if (!usuario) {
     return null;
@@ -81,6 +84,32 @@ export default function PerfilPage() {
     cargarFacturas();
   }, [usuario]);
 
+  // Verificar suscripción activa al montar el componente
+  useEffect(() => {
+    const verificarSuscripcion = async () => {
+      if (usuario && usuario.id) {
+        try {
+          const response = await getSuscripciones();
+          if (response.success && response.suscripciones) {
+            const suscripcionActiva = response.suscripciones.find(
+              s => s.estado === 'ACTIVA'
+            );
+            setTieneSuscripcionActiva(!!suscripcionActiva);
+          } else {
+            // Si falla, verificar desde planId (fallback)
+            setTieneSuscripcionActiva(usuario.planId !== null && usuario.planId !== 1);
+          }
+        } catch (error) {
+          console.warn('Error al verificar suscripción, usando fallback:', error);
+          // Fallback: considerar activa si tiene plan asignado (excepto Kiosco)
+          setTieneSuscripcionActiva(usuario.planId !== null && usuario.planId !== 1);
+        }
+      }
+    };
+    
+    verificarSuscripcion();
+  }, [usuario]);
+
   const limites = planActual ? obtenerLimitesDelPlan(planActual.id) : null;
   const planCrecimiento = planes.find((p) => p.nombre === 'Crecimiento');
   const planPro = planes.find((p) => p.nombre === 'Emprendedor Pro');
@@ -123,6 +152,56 @@ export default function PerfilPage() {
     }
   };
 
+  // Manejar acceso a WebApp mediante SSO
+  const manejarAccederAWebApp = async () => {
+    setCargandoSSO(true);
+    setErrorSSO('');
+    
+    try {
+      // Verificar que tenga suscripción activa
+      const suscripcionesResponse = await getSuscripciones();
+      
+      if (!suscripcionesResponse.success || !suscripcionesResponse.suscripciones || 
+          suscripcionesResponse.suscripciones.length === 0) {
+        // Fallback: verificar planId
+        if (!usuario.planId || usuario.planId === 1) {
+          setErrorSSO('No tienes una suscripción activa. Por favor adquiere un plan primero.');
+          setCargandoSSO(false);
+          return;
+        }
+      } else {
+        // Verificar que tenga al menos una suscripción activa
+        const suscripcionActiva = suscripcionesResponse.suscripciones.find(
+          s => s.estado === 'ACTIVA'
+        );
+        
+        if (!suscripcionActiva) {
+          setErrorSSO('Tu suscripción no está activa. Por favor renueva tu plan.');
+          setCargandoSSO(false);
+          return;
+        }
+      }
+      
+      // Obtener token operativo mediante SSO
+      const ssoResponse = await obtenerTokenOperativo();
+      
+      if (!ssoResponse.success || !ssoResponse.data?.accessToken) {
+        throw new Error(ssoResponse.message || 'No se pudo obtener acceso a WebApp');
+      }
+      
+      const tokenOperativo = ssoResponse.data.accessToken;
+      const webAppUrl = ssoResponse.data.webAppUrl || 'https://app.siga.com';
+      
+      // Redirigir a WebApp con token en URL
+      window.location.href = `${webAppUrl}?token=${tokenOperativo}`;
+      
+    } catch (error) {
+      console.error('Error al acceder a WebApp:', error);
+      setErrorSSO(error.message || 'No se pudo acceder a WebApp. Verifica tu suscripción.');
+      setCargandoSSO(false);
+    }
+  };
+
   return (
     <div className="perfil-section">
       <div className="container">
@@ -138,56 +217,10 @@ export default function PerfilPage() {
           </div>
         </div>
 
-        {/* Tarjetas de acciones principales */}
-        <div className="row g-4 mb-5">
-          <div className="col-md-6 col-lg-4">
-            <Link to="/app" style={{ textDecoration: 'none' }}>
-              <div className="action-card-glass">
-                <div className="action-card-icon">
-                  <Rocket size={48} weight="fill" className="text-primario" />
-                </div>
-                <h3 className="h5 fw-bold text-primario mb-3">Aplicación SIGA</h3>
-                <p className="text-muted mb-0">
-                  Accede a tu sistema de gestión de inventario y punto de venta.
-                </p>
-              </div>
-            </Link>
-          </div>
-        </div>
-
-        <div className="col-md-6 col-lg-4">
-          <Link to="/planes" style={{ textDecoration: 'none' }}>
-            <div className="action-card-glass">
-              <div className="action-card-icon">
-                <Package size={48} weight="fill" className="text-primario" />
-              </div>
-              <h3 className="h5 fw-bold text-primario mb-3">Planes y Suscripción</h3>
-              <p className="text-muted mb-0">
-                Explora nuestros planes y actualiza tu suscripción.
-              </p>
-            </div>
-          </Link>
-        </div>
-
-        <div className="col-md-6 col-lg-4">
-          <Link to="/carrito" style={{ textDecoration: 'none' }}>
-            <div className="action-card-glass">
-              <div className="action-card-icon">
-                <ShoppingCart size={48} weight="fill" className="text-primario" />
-              </div>
-              <h3 className="h5 fw-bold text-primario mb-3">Carrito</h3>
-              <p className="text-muted mb-0">
-                Revisa tus planes seleccionados y completa tu compra.
-              </p>
-            </div>
-          </Link>
-        </div>
-      </div>
-
-      {/* Plan Actual y Suscripción */}
+        {/* Plan Actual y Suscripción - Primero, información más importante */}
       {planActual ? (
-        <div className="row mb-4">
-          <div className="col-lg-10 mx-auto">
+        <div className="row mb-5">
+          <div className="col-lg-12">
             <div className="plan-actual-card">
               <div className="plan-actual-header">
                 <div className="d-flex justify-content-between align-items-center">
@@ -291,6 +324,46 @@ export default function PerfilPage() {
                   </div>
                 </div>
 
+                {/* Sección de Acceso a WebApp */}
+                {planActual && planActual.esFreemium === false && (
+                  <div className="card mb-4 border-primary">
+                    <div className="card-body">
+                      <h5 className="card-title d-flex align-items-center text-primario">
+                        <Rocket size={24} weight="fill" className="me-2" />
+                        Acceder a WebApp
+                      </h5>
+                      <p className="card-text text-muted">
+                        Accede a tu aplicación SIGA para gestionar tu negocio, inventario y ventas.
+                      </p>
+                      
+                      {errorSSO && (
+                        <div className="alert alert-warning mb-3" role="alert">
+                          <Warning size={20} className="me-2" />
+                          {errorSSO}
+                        </div>
+                      )}
+                      
+                      <button
+                        className="btn btn-primary btn-lg"
+                        onClick={manejarAccederAWebApp}
+                        disabled={cargandoSSO}
+                      >
+                        {cargandoSSO ? (
+                          <>
+                            <span className="spinner-border spinner-border-sm me-2" role="status"></span>
+                            Conectando...
+                          </>
+                        ) : (
+                          <>
+                            <Rocket size={20} weight="fill" className="me-2" />
+                            Acceder a WebApp
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
                 {/* Opción de free trial o actualizar plan */}
                 {planActual.nombre === 'Kiosco' && puedeTrial && (
                   <div className="alert alert-primary mt-4" role="alert">
@@ -385,6 +458,36 @@ export default function PerfilPage() {
           </div>
         </div>
       )}
+
+      {/* Acciones Rápidas - Después del plan */}
+      <div className="row g-4 mb-5">
+        <div className="col-md-6 col-lg-4">
+          <Link to="/planes" style={{ textDecoration: 'none' }}>
+            <div className="action-card-glass">
+              <div className="action-card-icon">
+                <Package size={48} weight="fill" className="text-primario" />
+              </div>
+              <h3 className="h5 fw-bold text-primario mb-3">Planes y Suscripción</h3>
+              <p className="text-muted mb-0">
+                Explora nuestros planes y actualiza tu suscripción.
+              </p>
+            </div>
+          </Link>
+        </div>
+        <div className="col-md-6 col-lg-4">
+          <Link to="/carrito" style={{ textDecoration: 'none' }}>
+            <div className="action-card-glass">
+              <div className="action-card-icon">
+                <ShoppingCart size={48} weight="fill" className="text-primario" />
+              </div>
+              <h3 className="h5 fw-bold text-primario mb-3">Carrito</h3>
+              <p className="text-muted mb-0">
+                Revisa tus planes seleccionados y completa tu compra.
+              </p>
+            </div>
+          </Link>
+        </div>
+      </div>
 
       {/* Historial de Compras y Facturas */}
       <div className="row mb-4">
@@ -564,6 +667,7 @@ export default function PerfilPage() {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

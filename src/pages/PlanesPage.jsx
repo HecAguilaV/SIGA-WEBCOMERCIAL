@@ -23,14 +23,20 @@ export default function PlanesPage() {
           const planesMapeados = response.planes.map(plan => ({
             id: plan.id,
             nombre: plan.nombre,
-            precio: parseFloat(plan.precioMensual) || 0,
-            unidad: 'CLP',
-            esFreemium: plan.precioMensual === '0' || plan.precioMensual === 0,
-            caracteristicas: [
-              plan.descripcion || 'Plan de suscripción',
-              `${plan.limiteBodegas || 1} bodega${plan.limiteBodegas > 1 ? 's' : ''}`,
-              `${plan.limiteUsuarios || 1} usuario${plan.limiteUsuarios > 1 ? 's' : ''}`,
-            ],
+            precio: parseFloat(plan.precio) || 0, // ✅ CORREGIDO: usar 'precio' en lugar de 'precioMensual'
+            unidad: plan.unidad || 'UF', // ✅ CORREGIDO: usar unidad del backend (UF)
+            esFreemium: plan.esFreemium || plan.precio === 0,
+            caracteristicas: plan.caracteristicas && plan.caracteristicas.length > 0 
+              ? plan.caracteristicas // ✅ Usar características del backend si existen
+              : [ // Fallback: construir características desde otros campos
+                  plan.descripcion || 'Plan de suscripción',
+                  plan.limiteBodegas !== null && plan.limiteBodegas !== undefined
+                    ? `${plan.limiteBodegas === -1 ? 'Ilimitadas' : plan.limiteBodegas} bodega${plan.limiteBodegas !== 1 ? 's' : ''}`
+                    : 'Bodegas ilimitadas',
+                  plan.limiteUsuarios !== null && plan.limiteUsuarios !== undefined
+                    ? `${plan.limiteUsuarios === -1 ? 'Ilimitados' : plan.limiteUsuarios} usuario${plan.limiteUsuarios !== 1 ? 's' : ''}`
+                    : 'Usuarios ilimitados',
+                ],
           }));
           setPlanes(planesMapeados);
         } else {

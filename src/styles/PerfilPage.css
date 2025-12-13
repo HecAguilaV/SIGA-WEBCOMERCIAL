@@ -131,11 +131,42 @@
     background: rgba(0, 180, 216, 0.05);
 }
 
-/* Responsive */
+/* Responsive - Optimizado para móviles */
 @media (max-width: 768px) {
+    .perfil-section {
+        padding: 1.5rem 0; /* ✅ Padding reducido en móvil */
+    }
 
     .perfil-card-glass,
     .action-card-glass {
         margin-bottom: 1.5rem;
+        padding: 1.5rem; /* ✅ Padding reducido en móvil */
+    }
+    
+    .plan-actual-body {
+        padding: 1.5rem; /* ✅ Padding reducido en móvil */
+    }
+    
+    .plan-actual-header {
+        padding: 1rem; /* ✅ Padding reducido en móvil */
+    }
+}
+
+@media (max-width: 576px) {
+    .perfil-section {
+        padding: 1rem 0; /* ✅ Padding aún más reducido en móviles pequeños */
+    }
+    
+    .action-card-glass {
+        padding: 1.25rem; /* ✅ Padding mínimo en móviles pequeños */
+    }
+    
+    .action-card-icon {
+        margin-bottom: 0.75rem; /* ✅ Espacio reducido */
+    }
+    
+    .action-card-icon svg {
+        width: 36px; /* ✅ Iconos más pequeños */
+        height: 36px;
     }
 }

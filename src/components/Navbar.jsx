@@ -53,12 +53,15 @@ export default function Navbar() {
                 <li className="nav-item">
                   <NavLink className="nav-link" to="/perfil">Mi Perfil</NavLink>
                 </li>
-                <li className="nav-item">
-                  <NavLink className="nav-link fw-bold" to="/app">
-                    <Rocket size={18} className="me-1" style={{ verticalAlign: 'middle' }} />
-                    Aplicación SIGA
-                  </NavLink>
-                </li>
+                {/* Mostrar acceso a WebApp solo si tiene suscripción activa (no Kiosco) */}
+                {usuario.planId && usuario.planId !== 1 && (
+                  <li className="nav-item">
+                    <NavLink className="nav-link fw-bold" to="/perfil">
+                      <Rocket size={18} className="me-1" style={{ verticalAlign: 'middle' }} />
+                      Acceder a WebApp
+                    </NavLink>
+                  </li>
+                )}
               </>
             )}
             {usuario?.rol === 'admin' && (

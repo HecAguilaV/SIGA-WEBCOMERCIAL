@@ -229,6 +229,18 @@ export async function createSuscripcion(planId, periodo = 'MENSUAL') {
   });
 }
 
+/**
+ * Obtener token operativo para acceso a WebApp (SSO)
+ * Intercambia el token comercial por un token operativo
+ * @returns {Promise<{success: boolean, data?: {accessToken: string, webAppUrl?: string}, message?: string}>}
+ */
+export async function obtenerTokenOperativo() {
+  return apiRequest('/comercial/auth/obtener-token-operativo', {
+    method: 'POST',
+    // El token comercial se envía automáticamente en el header Authorization
+  });
+}
+
 // ========== FACTURAS ==========
 
 /**
