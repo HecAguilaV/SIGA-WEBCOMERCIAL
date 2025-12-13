@@ -157,7 +157,7 @@ pnpm install
 
 3. **Configurar variables de entorno** (opcional, para usar asistente con IA):
    - Crea un archivo `.env` en la raíz del proyecto
-   - Agrega: `VITE_GEMINI_API_KEY=tu_api_key_aqui`
+   - ~~`VITE_GEMINI_API_KEY`~~ **NO REQUERIDO** - El asistente IA usa el endpoint del backend que ya tiene configurada la API key
    - Ver sección [Configuración](#configuración) para más detalles
 
 4. **Iniciar servidor de desarrollo**:
@@ -385,7 +385,9 @@ El proyecto requiere variables de entorno para funcionalidades avanzadas:
 2. Agrega las siguientes variables:
 
 ```env
-VITE_GEMINI_API_KEY=tu_api_key_de_google_gemini
+# VITE_GEMINI_API_KEY - NO REQUERIDO
+# El asistente IA usa el endpoint del backend (/api/comercial/chat)
+# La API key de Gemini está configurada en el backend (Railway)
 ```
 
 **Obtener API Key de Gemini:**
