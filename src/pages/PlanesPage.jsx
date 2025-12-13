@@ -30,7 +30,7 @@ export default function PlanesPage() {
             nombre: plan.nombre,
             precio: parseFloat(plan.precio) || 0, // ✅ CORREGIDO: usar 'precio' en lugar de 'precioMensual'
             unidad: plan.unidad || 'UF', // ✅ CORREGIDO: usar unidad del backend (UF)
-            esFreemium: plan.esFreemium || plan.precio === 0,
+            esFreemium: false, // Ya no hay planes gratuitos permanentes, solo free trial temporal
             caracteristicas: plan.caracteristicas && plan.caracteristicas.length > 0 
               ? plan.caracteristicas // ✅ Usar características del backend si existen
               : [ // Fallback: construir características desde otros campos
