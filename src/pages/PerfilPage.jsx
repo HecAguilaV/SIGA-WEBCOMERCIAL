@@ -16,7 +16,7 @@ import {
   convertirTrialAPagado,
   obtenerFacturasDelUsuario,
 } from '../datos/datosSimulados.js';
-import { getFacturas, getSuscripciones, obtenerTokenOperativo } from '../services/api.js';
+import { getFacturas, getSuscripciones, obtenerTokenOperativo, updateEmail, saveTokens } from '../services/api.js';
 import { formatearPrecioCLP } from '../utils/indicadoresEconomicos.js';
 import FacturaComponent from '../components/FacturaComponent.jsx';
 import '../styles/PerfilPage.css';
@@ -35,6 +35,11 @@ export default function PerfilPage() {
   const [errorSSO, setErrorSSO] = useState(''); // Mensaje de error SSO
   const [tieneSuscripcionActiva, setTieneSuscripcionActiva] = useState(false); // Estado de suscripción activa
   const [errorFacturas, setErrorFacturas] = useState(''); // Error al cargar facturas
+  const [mostrarActualizarEmail, setMostrarActualizarEmail] = useState(false); // Mostrar formulario de actualizar email
+  const [nuevoEmail, setNuevoEmail] = useState(''); // Nuevo email
+  const [passwordEmail, setPasswordEmail] = useState(''); // Contraseña para confirmar cambio de email
+  const [cargandoEmail, setCargandoEmail] = useState(false); // Loading al actualizar email
+  const [mensajeEmail, setMensajeEmail] = useState(''); // Mensaje de éxito/error al actualizar email
 
   if (!usuario) {
     return null;
@@ -220,6 +225,66 @@ export default function PerfilPage() {
       console.error('Error al acceder a WebApp:', error);
       setErrorSSO(error.message || 'No se pudo acceder a WebApp. Verifica tu suscripción.');
       setCargandoSSO(false);
+    }
+  };
+
+  const manejarActualizarEmail = async (e) => {
+    e.preventDefault();
+    setMensajeEmail('');
+    setCargandoEmail(true);
+
+    // Validaciones
+    if (!nuevoEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(nuevoEmail)) {
+      setMensajeEmail('Por favor ingresa un email válido');
+      setCargandoEmail(false);
+      return;
+    }
+
+    if (!passwordEmail) {
+      setMensajeEmail('Por favor ingresa tu contraseña actual para confirmar');
+      setCargandoEmail(false);
+      return;
+    }
+
+    if (nuevoEmail === usuario.email) {
+      setMensajeEmail('El nuevo email debe ser diferente al actual');
+      setCargandoEmail(false);
+      return;
+    }
+
+    try {
+      const response = await updateEmail(nuevoEmail, passwordEmail);
+      
+      if (response.success) {
+        // Actualizar tokens
+        if (response.accessToken && response.refreshToken) {
+          saveTokens(response.accessToken, response.refreshToken);
+        }
+        
+        // Actualizar usuario en localStorage
+        const usuarioActualizado = {
+          ...usuario,
+          email: response.user?.email || nuevoEmail,
+        };
+        guardarUsuarioAutenticado(usuarioActualizado);
+        
+        setMensajeEmail('✅ Email actualizado exitosamente');
+        setNuevoEmail('');
+        setPasswordEmail('');
+        setMostrarActualizarEmail(false);
+        
+        // Recargar la página después de 2 segundos para reflejar los cambios
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      } else {
+        throw new Error(response.message || 'Error al actualizar el email');
+      }
+    } catch (error) {
+      console.error('Error al actualizar email:', error);
+      setMensajeEmail(error.message || 'Error al actualizar el email. Verifica tu contraseña.');
+    } finally {
+      setCargandoEmail(false);
     }
   };
 
@@ -650,7 +715,21 @@ export default function PerfilPage() {
                 </div>
                 <div className="col-md-6">
                   <strong className="text-muted d-block mb-1">Email:</strong>
-                  <p className="mb-0">{usuario.email}</p>
+                  <div className="d-flex align-items-center gap-2">
+                    <p className="mb-0">{usuario.email}</p>
+                    <button
+                      type="button"
+                      className="btn btn-sm btn-outline-primary"
+                      onClick={() => {
+                        setMostrarActualizarEmail(!mostrarActualizarEmail);
+                        setMensajeEmail('');
+                        setNuevoEmail('');
+                        setPasswordEmail('');
+                      }}
+                    >
+                      {mostrarActualizarEmail ? 'Cancelar' : 'Cambiar'}
+                    </button>
+                  </div>
                 </div>
                 <div className="col-md-6">
                   <strong className="text-muted d-block mb-1">Rol:</strong>
@@ -663,6 +742,84 @@ export default function PerfilPage() {
                   <p className="mb-0 text-muted">#{usuario.id}</p>
                 </div>
               </div>
+
+              {/* Formulario de actualizar email */}
+              {mostrarActualizarEmail && (
+                <div className="mt-4 pt-4 border-top">
+                  <h5 className="mb-3 text-primario">Cambiar Email</h5>
+                  
+                  {mensajeEmail && (
+                    <div className={`alert ${mensajeEmail.includes('✅') ? 'alert-success' : 'alert-danger'}`} role="alert">
+                      {mensajeEmail}
+                    </div>
+                  )}
+
+                  <form onSubmit={manejarActualizarEmail}>
+                    <div className="mb-3">
+                      <label htmlFor="nuevoEmail" className="form-label">
+                        Nuevo Email <span className="text-danger">*</span>
+                      </label>
+                      <input
+                        type="email"
+                        className="form-control"
+                        id="nuevoEmail"
+                        value={nuevoEmail}
+                        onChange={(e) => setNuevoEmail(e.target.value)}
+                        placeholder="nuevo@email.com"
+                        required
+                        disabled={cargandoEmail}
+                      />
+                    </div>
+
+                    <div className="mb-3">
+                      <label htmlFor="passwordEmail" className="form-label">
+                        Contraseña Actual <span className="text-danger">*</span>
+                        <small className="text-muted d-block">Necesaria para confirmar el cambio</small>
+                      </label>
+                      <input
+                        type="password"
+                        className="form-control"
+                        id="passwordEmail"
+                        value={passwordEmail}
+                        onChange={(e) => setPasswordEmail(e.target.value)}
+                        placeholder="Ingresa tu contraseña actual"
+                        required
+                        disabled={cargandoEmail}
+                      />
+                    </div>
+
+                    <div className="d-flex gap-2">
+                      <button
+                        type="submit"
+                        className="btn btn-primary"
+                        disabled={cargandoEmail}
+                      >
+                        {cargandoEmail ? (
+                          <>
+                            <span className="spinner-border spinner-border-sm me-2" role="status"></span>
+                            Actualizando...
+                          </>
+                        ) : (
+                          'Actualizar Email'
+                        )}
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-outline-secondary"
+                        onClick={() => {
+                          setMostrarActualizarEmail(false);
+                          setNuevoEmail('');
+                          setPasswordEmail('');
+                          setMensajeEmail('');
+                        }}
+                        disabled={cargandoEmail}
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              )}
             </div>
           </div>
         </div>

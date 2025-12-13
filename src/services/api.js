@@ -320,6 +320,17 @@ export async function cambiarPasswordConToken(token, newPassword) {
   });
 }
 
+/**
+ * Actualizar email del usuario autenticado
+ * Requiere autenticación (JWT token)
+ */
+export async function updateEmail(newEmail, password) {
+  return apiRequest('/comercial/auth/update-email', {
+    method: 'PUT',
+    body: JSON.stringify({ newEmail, password }),
+  });
+}
+
 // ========== ENDPOINTS PROTEGIDOS ==========
 
 /**
