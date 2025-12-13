@@ -133,7 +133,22 @@ async function apiRequest(endpoint, options = {}) {
 
   try {
     const response = await fetch(url, requestOptions);
-    const data = await response.json();
+    
+    // Intentar parsear JSON, pero manejar errores de parseo
+    let data = {};
+    let responseText = '';
+    try {
+      responseText = await response.text();
+      if (responseText) {
+        data = JSON.parse(responseText);
+      }
+    } catch (parseError) {
+      // Si no se puede parsear JSON, usar el texto como mensaje
+      console.warn('No se pudo parsear respuesta JSON:', parseError);
+      if (responseText) {
+        data = { message: responseText };
+      }
+    }
 
     // Si el token expiró (401), intentar renovarlo
     if (response.status === 401 && !options.skipAuth) {
@@ -142,7 +157,13 @@ async function apiRequest(endpoint, options = {}) {
         // Reintentar la petición con el nuevo token
         headers['Authorization'] = `Bearer ${newToken}`;
         const retryResponse = await fetch(url, { ...requestOptions, headers });
-        const retryData = await retryResponse.json();
+        const retryText = await retryResponse.text();
+        let retryData = {};
+        try {
+          retryData = JSON.parse(retryText);
+        } catch (e) {
+          retryData = { message: retryText };
+        }
         
         if (!retryResponse.ok) {
           throw new Error(retryData.message || 'Error en la solicitud');
@@ -160,7 +181,26 @@ async function apiRequest(endpoint, options = {}) {
       if (response.status === 404) {
         throw new Error(`Endpoint no encontrado (404): ${url}. Verifica que el endpoint exista en el backend.`);
       }
-      throw new Error(data.message || `Error ${response.status}: ${response.statusText}`);
+      
+      // Para errores 500, intentar extraer mensaje más descriptivo
+      if (response.status === 500) {
+        let errorMsg = data.message || responseText || `Error del servidor (500): ${response.statusText}`;
+        
+        // Si el mensaje contiene información sobre campos faltantes, hacerlo más claro
+        if (errorMsg.includes('usuarioEmail') || errorMsg.includes('usuario email') || errorMsg.includes('usuarioEmail due to missing')) {
+          errorMsg = 'Error: El email del usuario es requerido pero no está disponible. Por favor, actualiza tu perfil con un email válido.';
+        } else if (errorMsg.includes('JSON parse error')) {
+          // Extraer información del error de parseo si está disponible
+          const match = errorMsg.match(/JSON property (\w+) due to missing/);
+          if (match) {
+            errorMsg = `Error de validación: El campo '${match[1]}' es requerido pero no fue proporcionado.`;
+          }
+        }
+        
+        throw new Error(errorMsg);
+      }
+      
+      throw new Error(data.message || responseText || `Error ${response.status}: ${response.statusText}`);
     }
 
     return data;
