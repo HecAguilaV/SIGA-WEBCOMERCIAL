@@ -150,13 +150,17 @@ async function apiRequest(endpoint, options = {}) {
       }
     }
 
-    // Si el token expiró (401), intentar renovarlo
-    if (response.status === 401 && !options.skipAuth) {
+    // Si el token expiró (401), intentar renovarlo (solo una vez)
+    if (response.status === 401 && !options.skipAuth && !options.skipRefresh) {
       try {
         const newToken = await refreshAccessToken();
-        // Reintentar la petición con el nuevo token
+        // Reintentar la petición con el nuevo token (solo una vez)
         headers['Authorization'] = `Bearer ${newToken}`;
-        const retryResponse = await fetch(url, { ...requestOptions, headers });
+        const retryResponse = await fetch(url, { 
+          ...requestOptions, 
+          headers,
+          skipRefresh: true // Evitar bucle infinito
+        });
         const retryText = await retryResponse.text();
         let retryData = {};
         try {
@@ -166,12 +170,14 @@ async function apiRequest(endpoint, options = {}) {
         }
         
         if (!retryResponse.ok) {
-          throw new Error(retryData.message || 'Error en la solicitud');
+          // Si el retry también falla, no intentar de nuevo
+          const errorMsg = retryData.message || 'Error en la solicitud';
+          throw new Error(errorMsg);
         }
         
         return retryData;
       } catch (refreshError) {
-        // Si el refresh falla, ya se redirigió a login
+        // Si el refresh falla, ya se redirigió a login o limpió tokens
         throw refreshError;
       }
     }

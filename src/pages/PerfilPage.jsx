@@ -69,79 +69,108 @@ export default function PerfilPage() {
     setPuedeTrial(puedeIniciarTrial(usuario.id));
   }, [usuario.id]);
 
-  // Cargar facturas del usuario al montar el componente
+  // Cargar facturas del usuario al montar el componente (solo una vez)
+  const [facturasCargadas, setFacturasCargadas] = useState(false);
+  
   useEffect(() => {
+    // Evitar múltiples cargas
+    if (facturasCargadas || !usuario || !usuario.id) {
+      return;
+    }
+    
     const cargarFacturas = async () => {
-      if (usuario && usuario.id) {
-        try {
-          setErrorFacturas('');
-          // Intentar cargar facturas desde el backend
-          const response = await getFacturas();
-          if (response.success && response.facturas) {
-            setFacturas(response.facturas);
-          } else {
-            // Si no hay facturas, es válido (usuario nuevo)
-            setFacturas([]);
-          }
-        } catch (error) {
-          // Manejar 404 específicamente (usuario sin facturas es válido)
-          if (error.message?.includes('404') || error.message?.includes('NOT_FOUND')) {
-            console.log('ℹ️ Usuario sin facturas (404 es válido para usuarios nuevos)');
-            setFacturas([]);
-            setErrorFacturas(''); // No mostrar error si es 404 (usuario nuevo)
-          } else if (!permitirFallbackLocal) {
-            console.error('Error al cargar facturas desde backend:', error);
-            setFacturas([]);
-            setErrorFacturas(error?.message || 'No se pudieron cargar las facturas desde el backend.');
-          } else {
-            console.warn('Error al cargar facturas desde backend, usando locales:', error);
-            // Fallback a datos locales
-            const facturasUsuario = obtenerFacturasDelUsuario(usuario.id);
-            setFacturas(facturasUsuario);
-          }
+      try {
+        setErrorFacturas('');
+        // Intentar cargar facturas desde el backend
+        const response = await getFacturas();
+        if (response.success && response.facturas) {
+          setFacturas(response.facturas);
+        } else {
+          // Si no hay facturas, es válido (usuario nuevo)
+          setFacturas([]);
+        }
+        setFacturasCargadas(true);
+      } catch (error) {
+        // Manejar 404 específicamente (usuario sin facturas es válido)
+        if (error.message?.includes('404') || error.message?.includes('NOT_FOUND')) {
+          console.log('ℹ️ Usuario sin facturas (404 es válido para usuarios nuevos)');
+          setFacturas([]);
+          setErrorFacturas(''); // No mostrar error si es 404 (usuario nuevo)
+          setFacturasCargadas(true);
+        } else if (error.message?.includes('401') || error.message?.includes('Sesión expirada') || error.message?.includes('No autenticado')) {
+          // Si es 401, el refresh token ya intentó renovar. Si falló, se redirigió a login.
+          // No intentar cargar de nuevo para evitar bucle infinito
+          console.warn('⚠️ Error de autenticación al cargar facturas. Sesión puede haber expirado.');
+          setFacturas([]);
+          setFacturasCargadas(true); // Marcar como cargado para evitar reintentos
+        } else if (!permitirFallbackLocal) {
+          console.error('Error al cargar facturas desde backend:', error);
+          setFacturas([]);
+          setErrorFacturas(error?.message || 'No se pudieron cargar las facturas desde el backend.');
+          setFacturasCargadas(true);
+        } else {
+          console.warn('Error al cargar facturas desde backend, usando locales:', error);
+          // Fallback a datos locales
+          const facturasUsuario = obtenerFacturasDelUsuario(usuario.id);
+          setFacturas(facturasUsuario);
+          setFacturasCargadas(true);
         }
       }
     };
     
     cargarFacturas();
-  }, [usuario]);
+  }, [usuario?.id, facturasCargadas]);
 
-  // Verificar suscripción activa al montar el componente
+  // Verificar suscripción activa al montar el componente (solo una vez)
+  const [suscripcionVerificada, setSuscripcionVerificada] = useState(false);
+  
   useEffect(() => {
+    // Evitar múltiples verificaciones
+    if (suscripcionVerificada || !usuario || !usuario.id) {
+      return;
+    }
+    
     const verificarSuscripcion = async () => {
-      if (usuario && usuario.id) {
-        try {
-          const response = await getSuscripciones();
-          if (response.success && response.suscripciones) {
-            const suscripcionActiva = response.suscripciones.find(
-              s => s.estado === 'ACTIVA'
-            );
-            setTieneSuscripcionActiva(!!suscripcionActiva);
-          } else {
-            // Si no hay suscripciones, es válido (usuario nuevo)
+      try {
+        const response = await getSuscripciones();
+        if (response.success && response.suscripciones) {
+          const suscripcionActiva = response.suscripciones.find(
+            s => s.estado === 'ACTIVA'
+          );
+          setTieneSuscripcionActiva(!!suscripcionActiva);
+        } else {
+          // Si no hay suscripciones, es válido (usuario nuevo)
+          setTieneSuscripcionActiva(false);
+        }
+        setSuscripcionVerificada(true);
+      } catch (error) {
+        // Manejar 404 específicamente (usuario sin suscripciones es válido)
+        if (error.message?.includes('404') || error.message?.includes('NOT_FOUND')) {
+          console.log('ℹ️ Usuario sin suscripciones (404 es válido para usuarios nuevos)');
+          setTieneSuscripcionActiva(false);
+          setSuscripcionVerificada(true);
+        } else if (error.message?.includes('401') || error.message?.includes('Sesión expirada') || error.message?.includes('No autenticado')) {
+          // Si es 401, el refresh token ya intentó renovar. Si falló, se redirigió a login.
+          // No intentar verificar de nuevo para evitar bucle infinito
+          console.warn('⚠️ Error de autenticación al verificar suscripción. Sesión puede haber expirado.');
+          setTieneSuscripcionActiva(false);
+          setSuscripcionVerificada(true); // Marcar como verificado para evitar reintentos
+        } else {
+          console.warn('Error al verificar suscripción:', error);
+          // En producción NO adivinar: si falla, tratamos como NO activa (evita accesos incorrectos)
+          if (!permitirFallbackLocal) {
             setTieneSuscripcionActiva(false);
-          }
-        } catch (error) {
-          // Manejar 404 específicamente (usuario sin suscripciones es válido)
-          if (error.message?.includes('404') || error.message?.includes('NOT_FOUND')) {
-            console.log('ℹ️ Usuario sin suscripciones (404 es válido para usuarios nuevos)');
-            setTieneSuscripcionActiva(false);
           } else {
-            console.warn('Error al verificar suscripción:', error);
-            // En producción NO adivinar: si falla, tratamos como NO activa (evita accesos incorrectos)
-            if (!permitirFallbackLocal) {
-              setTieneSuscripcionActiva(false);
-            } else {
-              // Fallback: considerar activa si tiene plan asignado (cualquier planId !== null)
-              setTieneSuscripcionActiva(usuario.planId !== null);
-            }
+            // Fallback: considerar activa si tiene plan asignado (cualquier planId !== null)
+            setTieneSuscripcionActiva(usuario.planId !== null);
           }
+          setSuscripcionVerificada(true);
         }
       }
     };
     
     verificarSuscripcion();
-  }, [usuario]);
+  }, [usuario?.id, suscripcionVerificada]);
 
   const limites = planActual ? obtenerLimitesDelPlan(planActual.id) : null;
   const planCrecimiento = planes.find((p) => p.nombre === 'Crecimiento');
