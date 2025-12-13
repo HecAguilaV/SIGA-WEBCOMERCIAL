@@ -209,6 +209,7 @@
     width: 270px; /* ✅ Aumentado de 210px a 270px */
     padding: 2rem; /* ✅ Aumentado padding */
     animation: floatIn 0.8s ease-out 0.6s both;
+    z-index: 12; /* Mayor z-index para "100% Seguro" para que esté por encima */
 }
 
 /* Iconos más grandes en desktop */
@@ -283,11 +284,28 @@
         max-width: 400px;
     }
 
-    .glass-card-1,
-    .glass-card-2,
-    .glass-card-3 {
+    .glass-card-1 {
+        top: 0;
+        left: 0;
         width: 180px;
-        padding: 1.5rem; /* ✅ Padding reducido en tablet */
+        padding: 1.5rem;
+        z-index: 10;
+    }
+
+    .glass-card-2 {
+        top: 120px;
+        right: 0;
+        width: 180px;
+        padding: 1.5rem;
+        z-index: 11;
+    }
+
+    .glass-card-3 {
+        top: 240px;
+        left: 0;
+        width: 180px;
+        padding: 1.5rem;
+        z-index: 12; /* Mayor z-index para "100% Seguro" */
     }
     
     .glass-card-icon {
@@ -310,14 +328,32 @@
     }
 
     .hero-cards {
-        height: 350px;
+        height: 400px; /* Aumentado para evitar solapamientos */
+        margin-bottom: 2rem; /* Espacio adicional en móvil */
     }
 
-    .glass-card-1,
-    .glass-card-2,
-    .glass-card-3 {
+    .glass-card-1 {
+        top: 0;
+        left: 0;
         width: 160px;
         padding: 1.25rem;
+        z-index: 10;
+    }
+
+    .glass-card-2 {
+        top: 130px;
+        right: 0;
+        width: 160px;
+        padding: 1.25rem;
+        z-index: 11;
+    }
+
+    .glass-card-3 {
+        top: 260px;
+        left: 0;
+        width: 160px;
+        padding: 1.25rem;
+        z-index: 12; /* Mayor z-index para "100% Seguro" - debe estar visible */
     }
 
     .glass-card-icon {
