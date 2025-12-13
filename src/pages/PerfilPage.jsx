@@ -184,16 +184,22 @@ export default function PerfilPage() {
     setErrorSSO('');
     
     try {
+      console.log('🔍 Iniciando SSO. Usuario:', usuario);
+      
       // Verificar que tenga suscripción activa
       const suscripcionesResponse = await getSuscripciones();
+      console.log('📋 Respuesta de suscripciones:', suscripcionesResponse);
       
       if (!suscripcionesResponse.success || !suscripcionesResponse.suscripciones || 
           suscripcionesResponse.suscripciones.length === 0) {
         // Fallback: verificar planId (cualquier planId !== null es válido)
         if (!usuario.planId) {
+          console.warn('⚠️ Usuario sin planId y sin suscripciones en backend');
           setErrorSSO('No tienes una suscripción activa. Por favor adquiere un plan primero.');
           setCargandoSSO(false);
           return;
+        } else {
+          console.warn('⚠️ Usuario tiene planId pero no suscripciones en backend. Intentando SSO de todas formas...');
         }
       } else {
         // Verificar que tenga al menos una suscripción activa
@@ -202,14 +208,19 @@ export default function PerfilPage() {
         );
         
         if (!suscripcionActiva) {
+          console.warn('⚠️ Usuario tiene suscripciones pero ninguna está activa:', suscripcionesResponse.suscripciones);
           setErrorSSO('Tu suscripción no está activa. Por favor renueva tu plan.');
           setCargandoSSO(false);
           return;
         }
+        
+        console.log('✅ Suscripción activa encontrada:', suscripcionActiva);
       }
       
       // Obtener token operativo mediante SSO
+      console.log('🔄 Obteniendo token operativo...');
       const ssoResponse = await obtenerTokenOperativo();
+      console.log('🔑 Respuesta SSO:', ssoResponse);
       
       if (!ssoResponse.success) {
         // Mejorar mensaje de error
@@ -219,23 +230,29 @@ export default function PerfilPage() {
           errorMsg = 'No tienes una suscripción activa. Por favor adquiere un plan primero.';
         } else if (ssoResponse.message?.includes('401') || ssoResponse.message?.includes('No autenticado')) {
           errorMsg = 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente.';
+        } else if (ssoResponse.message?.includes('404')) {
+          errorMsg = 'El endpoint de SSO no está disponible. Por favor, contacta al soporte.';
         }
         
+        console.error('❌ Error en SSO:', ssoResponse);
         throw new Error(errorMsg);
       }
       
       if (!ssoResponse.data?.accessToken) {
+        console.error('❌ SSO exitoso pero sin accessToken:', ssoResponse);
         throw new Error('No se recibió token de acceso. Por favor, intenta nuevamente.');
       }
       
       const tokenOperativo = ssoResponse.data.accessToken;
       const webAppUrl = ssoResponse.data.webAppUrl || 'https://app.siga.com';
       
+      console.log('✅ SSO exitoso. Redirigiendo a WebApp...');
+      
       // Redirigir a WebApp con token en URL
       window.location.href = `${webAppUrl}?token=${tokenOperativo}`;
       
     } catch (error) {
-      console.error('Error al acceder a WebApp:', error);
+      console.error('❌ Error al acceder a WebApp:', error);
       setErrorSSO(error.message || 'No se pudo acceder a WebApp. Verifica tu suscripción.');
       setCargandoSSO(false);
     }
