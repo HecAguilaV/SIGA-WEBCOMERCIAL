@@ -104,6 +104,11 @@ async function refreshAccessToken() {
 async function apiRequest(endpoint, options = {}) {
   const url = `${API_URL}${endpoint}`;
   const token = getAccessToken();
+  
+  // Log de debugging en desarrollo
+  if (import.meta.env.DEV) {
+    console.log(`🔍 API Request: ${options.method || 'GET'} ${url}`);
+  }
 
   // Configurar headers
   const headers = {
@@ -147,6 +152,10 @@ async function apiRequest(endpoint, options = {}) {
     }
 
     if (!response.ok) {
+      // Si es 404, dar mensaje más específico
+      if (response.status === 404) {
+        throw new Error(`Endpoint no encontrado (404): ${url}. Verifica que el endpoint exista en el backend.`);
+      }
       throw new Error(data.message || `Error ${response.status}: ${response.statusText}`);
     }
 
