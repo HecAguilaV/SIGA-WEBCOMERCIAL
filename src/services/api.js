@@ -153,7 +153,25 @@ async function apiRequest(endpoint, options = {}) {
     return data;
   } catch (error) {
     console.error('Error en petición API:', error);
-    throw error;
+    
+    // Mejorar mensajes de error para diferentes tipos de fallos
+    if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+      // Error de red: CORS, conexión rechazada, servidor no disponible
+      const esCors = error.message.includes('CORS') || error.message.includes('cors');
+      const mensaje = esCors 
+        ? 'Error de CORS: El servidor no permite la conexión desde este origen. Verifica la configuración del backend.'
+        : `Error de conexión: No se pudo conectar con el servidor en ${API_BASE_URL}. Verifica que el backend esté funcionando y que la URL sea correcta.`;
+      
+      throw new Error(mensaje);
+    }
+    
+    // Si el error ya tiene un mensaje descriptivo, mantenerlo
+    if (error.message && !error.message.includes('Failed to fetch')) {
+      throw error;
+    }
+    
+    // Error genérico
+    throw new Error(error.message || 'Error al conectar con el servidor');
   }
 }
 
