@@ -3,6 +3,11 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
+  "packageManager": "pnpm@10.24.0",
+  "engines": {
+    "node": ">=16.0.0",
+    "pnpm": ">=10.0.0"
+  },
   "scripts": {
     "dev": "vite",
     "dev:clean": "lsof -ti:5173 | xargs kill -9 2>/dev/null || true && rm -rf node_modules/.vite && pnpm run dev",
