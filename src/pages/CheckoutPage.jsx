@@ -153,6 +153,14 @@ export default function CheckoutPage() {
       }
       
       // GENERAR FACTURA después de la compra exitosa
+      // Validar que el usuario tenga email (requerido por el backend)
+      if (!usuario.email) {
+        const errorMsg = 'Error: El usuario no tiene un email registrado. Por favor, actualiza tu perfil con un email válido.';
+        setError(errorMsg);
+        setProcesando(false);
+        return;
+      }
+
       // Extraer últimos 4 dígitos de la tarjeta para la factura
       const numeroLimpio = numero.replace(/\s/g, '');
       const ultimos4Digitos = numeroLimpio.slice(-4);
@@ -166,13 +174,13 @@ export default function CheckoutPage() {
       try {
         const facturaData = {
           usuarioId: usuario.id,
-          usuarioNombre: usuario.nombre,
-          usuarioEmail: usuario.email,
+          usuarioNombre: usuario.nombre || 'Usuario',
+          usuarioEmail: usuario.email, // ✅ Validado arriba
           planId: plan.id,
           planNombre: plan.nombre,
-          precioUF: plan.precio,
-          precioCLP: precioCLP, // Precio convertido a CLP
-          unidad: plan.unidad,
+          precioUF: parseFloat(plan.precio) || 0,
+          precioCLP: precioCLP || null, // Precio convertido a CLP (puede ser null)
+          unidad: plan.unidad || 'UF',
           fechaVencimiento: fechaVencimiento.toISOString(),
           metodoPago: 'Tarjeta de crédito',
           ultimos4Digitos: ultimos4Digitos,
@@ -185,12 +193,27 @@ export default function CheckoutPage() {
           // Guardar el número de factura en localStorage para que CompraExitosaPage pueda mostrarla
           localStorage.setItem('siga_factura_actual', factura.numeroFactura || factura.numero);
         } else {
-          throw new Error('Error al crear factura en backend');
+          throw new Error(facturaResponse.message || 'Error al crear factura en backend');
         }
       } catch (error) {
         // En producción: NO simular. Si falla la factura en backend, debe verse.
         if (!permitirFallbackLocal) {
-          setError(error?.message || 'No se pudo generar la factura en el backend.');
+          // Extraer mensaje de error más descriptivo
+          let errorMsg = 'No se pudo generar la factura en el backend.';
+          
+          if (error.message) {
+            if (error.message.includes('usuarioEmail') || error.message.includes('usuario email')) {
+              errorMsg = 'Error: El email del usuario es requerido pero no está disponible. Por favor, actualiza tu perfil con un email válido.';
+            } else if (error.message.includes('JSON parse error')) {
+              errorMsg = 'Error: El formato de datos enviado al servidor es inválido. Por favor, contacta al soporte.';
+            } else if (error.message.includes('500')) {
+              errorMsg = 'Error del servidor: El backend no pudo procesar la solicitud. Por favor, intenta nuevamente o contacta al soporte.';
+            } else {
+              errorMsg = `Error: ${error.message}`;
+            }
+          }
+          
+          setError(errorMsg);
           setProcesando(false);
           return;
         }
