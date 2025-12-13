@@ -27,6 +27,10 @@ if (import.meta.env.PROD && API_BASE_URL.includes('localhost')) {
 
 const API_URL = `${API_BASE_URL}/api`;
 
+// Bandera para evitar múltiples intentos de refresh simultáneos
+let isRefreshing = false;
+let refreshPromise = null;
+
 /**
  * Obtiene el token de acceso desde localStorage
  */
@@ -59,47 +63,61 @@ function clearTokens() {
 
 /**
  * Renueva el token de acceso usando el refresh token
+ * Evita múltiples intentos simultáneos
  */
 async function refreshAccessToken() {
-  const refreshToken = getRefreshToken();
-  
-  if (!refreshToken) {
-    throw new Error('No hay refresh token disponible');
+  // Si ya hay un refresh en curso, esperar a que termine
+  if (isRefreshing && refreshPromise) {
+    return refreshPromise;
   }
+  
+  isRefreshing = true;
+  refreshPromise = (async () => {
+    try {
+      const refreshToken = getRefreshToken();
+      
+      if (!refreshToken) {
+        throw new Error('No hay refresh token disponible');
+      }
 
-  try {
-    const response = await fetch(`${API_URL}/comercial/auth/refresh`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ refreshToken }),
-    });
+      const response = await fetch(`${API_URL}/comercial/auth/refresh`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ refreshToken }),
+      });
 
-    const data = await response.json();
+      const data = await response.json();
 
-    if (!response.ok) {
-      // Si el refresh falla, limpiar tokens y redirigir a login
+      if (!response.ok) {
+        // Si el refresh falla, limpiar tokens y redirigir a login
+        clearTokens();
+        if (window.location.pathname !== '/login') {
+          window.location.href = '/login';
+        }
+        throw new Error(data.message || 'Error al renovar token');
+      }
+
+      if (data.success && data.accessToken) {
+        saveTokens(data.accessToken, data.refreshToken || refreshToken);
+        return data.accessToken;
+      }
+
+      throw new Error('Error al renovar token');
+    } catch (error) {
       clearTokens();
       if (window.location.pathname !== '/login') {
         window.location.href = '/login';
       }
-      throw new Error(data.message || 'Error al renovar token');
+      throw error;
+    } finally {
+      isRefreshing = false;
+      refreshPromise = null;
     }
-
-    if (data.success && data.accessToken) {
-      saveTokens(data.accessToken, null); // No actualizar refreshToken
-      return data.accessToken;
-    }
-
-    throw new Error('Error al renovar token');
-  } catch (error) {
-    clearTokens();
-    if (window.location.pathname !== '/login') {
-      window.location.href = '/login';
-    }
-    throw error;
-  }
+  })();
+  
+  return refreshPromise;
 }
 
 /**
