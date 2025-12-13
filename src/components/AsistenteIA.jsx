@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
-import { GoogleGenerativeAI } from '@google/generative-ai';
-import { obtenerContextoSIGA } from '../utils/contextoSIGA.js';
+import { chatComercial } from '../services/api.js';
 import '../styles/AsistenteIA.css';
 
 export default function AsistenteIA() {
@@ -171,55 +170,34 @@ export default function AsistenteIA() {
     setEstaPensando(true);
     setMensajeError('');
 
-    // Llamada a API Gemini
+    // Llamada al endpoint del backend (NO directamente a Gemini)
     try {
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-      if (!apiKey) {
-        const errorMsg = "⚠️ El asistente IA no está configurado. Por favor, contacta al administrador para configurar VITE_GEMINI_API_KEY en Vercel.";
-        setMensajeError(errorMsg);
+      // El backend maneja la comunicación con Gemini
+      const response = await chatComercial(contenido);
+      
+      if (response.success && response.response) {
         setMensajes(prev => [...prev, {
           id: crypto.randomUUID(),
           emisor: "siga",
           tipo: "texto",
-          contenido: errorMsg
+          contenido: response.response
         }]);
-        setEstaPensando(false);
-        return;
+      } else {
+        throw new Error(response.message || 'Error al obtener respuesta del asistente');
       }
-
-      const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
-      const contexto = obtenerContextoSIGA() + obtenerContextoActual();
-
-      const prompt = `${contexto}
-      
-      Usuario: ${contenido}
-      
-      INSTRUCCIONES CRÍTICAS:
-      - Este es el PORTAL COMERCIAL de SIGA, NO la aplicación operativa (WebApp)
-      - Solo puedes responder sobre: planes de suscripción, facturas, pagos, acceso a WebApp, información de la empresa
-      - PROHIBIDO: NO generes gráficos, NO hagas análisis de ventas, NO analices inventario, NO muestres datos operativos
-      - Si el usuario pide gráficos o análisis de datos operativos, explica que debe acceder a la WebApp para eso
-      - Responde de forma útil y concisa sobre temas COMERCIALES únicamente
-      
-      Responde ahora:`;
-
-      const result = await model.generateContent(prompt);
-      const response = await result.response;
-      const textoIA = response.text();
-
-      setMensajes(prev => [...prev, {
-        id: crypto.randomUUID(),
-        emisor: "siga",
-        tipo: "texto",
-        contenido: textoIA || "Aquí tienes la información solicitada."
-      }]);
 
     } catch (error) {
       console.error("Error IA:", error);
-      const errorMsg = error.message?.includes("API Key") || error.message?.includes("Falta API Key")
-        ? "⚠️ El asistente IA no está configurado correctamente. Por favor, contacta al administrador."
-        : `❌ Error al conectar con el asistente: ${error.message || "Error desconocido"}`;
+      let errorMsg = `❌ Error al conectar con el asistente: ${error.message || "Error desconocido"}`;
+      
+      // Mensajes de error más específicos
+      if (error.message?.includes('Failed to fetch') || error.message?.includes('Error de conexión')) {
+        errorMsg = '❌ No se pudo conectar con el servidor. Por favor, verifica tu conexión a internet e intenta nuevamente.';
+      } else if (error.message?.includes('404')) {
+        errorMsg = '❌ El endpoint del asistente no está disponible. Por favor, contacta al soporte.';
+      } else if (error.message?.includes('500')) {
+        errorMsg = '❌ Error del servidor. Por favor, intenta nuevamente en unos momentos.';
+      }
       
       setMensajeError(errorMsg);
       setMensajes(prev => [...prev, {

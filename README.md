@@ -403,12 +403,7 @@ VITE_GEMINI_API_KEY=tu_api_key_de_google_gemini
 2. Abre **Settings** → **Environment Variables**
 3. Agrega las siguientes variables:
 
-   **Variable 1: API Key de Gemini (opcional, para asistente IA)**
-   - **Name:** `VITE_GEMINI_API_KEY`
-   - **Value:** Tu API key de Google Gemini
-   - **Environment:** Selecciona todas (Production, Preview, Development)
-
-   **Variable 2: URL del Backend (CRÍTICA)**
+   **Variable 1: URL del Backend (CRÍTICA)**
    - **Name:** `VITE_API_BASE_URL`
    - **Value:** `https://siga-backend-production.up.railway.app`
    - **Environment:** Selecciona todas (Production, Preview, Development)
@@ -419,7 +414,7 @@ VITE_GEMINI_API_KEY=tu_api_key_de_google_gemini
 **Importante:**
 - El prefijo `VITE_` es necesario para que Vite exponga la variable al cliente
 - Sin `VITE_API_BASE_URL`, el frontend intentará conectarse a `localhost:8080` y fallará
-- Sin `VITE_GEMINI_API_KEY`, el asistente funcionará con respuestas simuladas como fallback
+- **NOTA:** El asistente IA usa el endpoint del backend (`/api/comercial/chat`), NO requiere `VITE_GEMINI_API_KEY` en Vercel. La API key de Gemini está configurada en el backend (Railway).
 - Nunca compartas tus API keys públicamente
 - **Después de agregar/modificar variables de entorno, SIEMPRE debes redesplegar**
 
