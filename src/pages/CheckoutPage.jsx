@@ -21,6 +21,16 @@ export default function CheckoutPage() {
   // Obtener el plan del carrito y el usuario autenticado desde localStorage
   const plan = obtenerPlanDelCarrito();
   const usuario = obtenerUsuarioAutenticado();
+  
+  // Log de debugging para verificar el usuario
+  useEffect(() => {
+    if (usuario) {
+      console.log('👤 Usuario en CheckoutPage:', usuario);
+      if (!usuario.email) {
+        console.error('⚠️ PROBLEMA: Usuario sin email en CheckoutPage:', usuario);
+      }
+    }
+  }, [usuario]);
 
   // Solo permitir “datos simulados” en desarrollo LOCAL
   const permitirFallbackLocal = import.meta.env.DEV && window.location.hostname === 'localhost';

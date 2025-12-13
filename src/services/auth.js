@@ -26,6 +26,9 @@ export async function iniciarSesion(email, password) {
     // Intentar login con el backend real
     const response = await loginUser(email, password);
     
+    // Log de debugging para ver qué retorna el backend
+    console.log('🔐 Respuesta del login:', response);
+    
     if (response.success) {
       // Guardar información del usuario en localStorage para compatibilidad
       // El backend puede retornar response.user o campos directamente
@@ -45,6 +48,9 @@ export async function iniciarSesion(email, password) {
         console.error('⚠️ ADVERTENCIA: Usuario logueado sin email. Response:', response);
         usuario.email = email; // Usar el email del login como fallback
       }
+      
+      // Log del usuario que se va a guardar
+      console.log('💾 Guardando usuario en localStorage:', usuario);
       
       guardarUsuarioAutenticado(usuario);
       return usuario;
@@ -85,6 +91,9 @@ export async function registrarUsuario(userData) {
     // Intentar registro con el backend real
     const response = await registerUser(userData);
     
+    // Log de debugging para ver qué retorna el backend
+    console.log('📝 Respuesta del registro:', response);
+    
     if (response.success) {
       // Guardar información del usuario
       // El backend puede retornar response.user o response.email/userId directamente
@@ -104,6 +113,9 @@ export async function registrarUsuario(userData) {
         console.error('⚠️ ADVERTENCIA: Usuario registrado sin email. Response:', response);
         usuario.email = userData.email; // Usar el email del formulario como fallback
       }
+      
+      // Log del usuario que se va a guardar
+      console.log('💾 Guardando usuario en localStorage:', usuario);
       
       guardarUsuarioAutenticado(usuario);
       return usuario;
