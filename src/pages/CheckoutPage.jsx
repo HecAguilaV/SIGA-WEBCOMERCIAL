@@ -120,7 +120,9 @@ export default function CheckoutPage() {
             ...usuario, 
             planId: plan.id, 
             enTrial: false,
-            suscripcionId: response.suscripcion.id 
+            suscripcionId: response.suscripcion.id,
+            // ✅ Asegurar que el email se mantenga
+            email: usuario.email || response.user?.email || usuario.email
           };
           guardarUsuarioAutenticado(usuarioActualizado);
         } else {

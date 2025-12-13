@@ -28,13 +28,23 @@ export async function iniciarSesion(email, password) {
     
     if (response.success) {
       // Guardar información del usuario en localStorage para compatibilidad
+      // El backend puede retornar response.user o campos directamente
+      const userFromBackend = response.user || {};
       const usuario = {
-        id: response.userId,
-        email: response.email,
-        nombre: response.nombre || email.split('@')[0],
-        rol: response.rol || 'cliente',
-        planId: response.planId || null,
+        id: response.userId || userFromBackend.id,
+        email: response.email || userFromBackend.email || email, // ✅ Asegurar que siempre tenga email
+        nombre: response.nombre || userFromBackend.nombre || email.split('@')[0],
+        apellido: response.apellido || userFromBackend.apellido,
+        nombreEmpresa: response.nombreEmpresa || userFromBackend.nombreEmpresa,
+        rol: response.rol || userFromBackend.rol || 'cliente',
+        planId: response.planId || userFromBackend.planId || null,
       };
+      
+      // Validar que el email esté presente
+      if (!usuario.email) {
+        console.error('⚠️ ADVERTENCIA: Usuario logueado sin email. Response:', response);
+        usuario.email = email; // Usar el email del login como fallback
+      }
       
       guardarUsuarioAutenticado(usuario);
       return usuario;
@@ -77,13 +87,23 @@ export async function registrarUsuario(userData) {
     
     if (response.success) {
       // Guardar información del usuario
+      // El backend puede retornar response.user o response.email/userId directamente
+      const userFromBackend = response.user || {};
       const usuario = {
-        id: response.userId,
-        email: response.email,
-        nombre: userData.nombre || userData.email.split('@')[0],
-        rol: 'cliente',
-        planId: null,
+        id: response.userId || userFromBackend.id,
+        email: response.email || userFromBackend.email || userData.email, // ✅ Asegurar que siempre tenga email
+        nombre: userFromBackend.nombre || userData.nombre || userData.email.split('@')[0],
+        apellido: userFromBackend.apellido || userData.apellido,
+        nombreEmpresa: userFromBackend.nombreEmpresa || userData.nombreEmpresa,
+        rol: userFromBackend.rol || 'cliente',
+        planId: userFromBackend.planId || null,
       };
+      
+      // Validar que el email esté presente
+      if (!usuario.email) {
+        console.error('⚠️ ADVERTENCIA: Usuario registrado sin email. Response:', response);
+        usuario.email = userData.email; // Usar el email del formulario como fallback
+      }
       
       guardarUsuarioAutenticado(usuario);
       return usuario;

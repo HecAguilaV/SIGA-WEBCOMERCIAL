@@ -211,8 +211,21 @@ export default function PerfilPage() {
       // Obtener token operativo mediante SSO
       const ssoResponse = await obtenerTokenOperativo();
       
-      if (!ssoResponse.success || !ssoResponse.data?.accessToken) {
-        throw new Error(ssoResponse.message || 'No se pudo obtener acceso a WebApp');
+      if (!ssoResponse.success) {
+        // Mejorar mensaje de error
+        let errorMsg = ssoResponse.message || 'No se pudo obtener acceso a WebApp';
+        
+        if (ssoResponse.message?.includes('suscripción') || ssoResponse.message?.includes('suscripcion')) {
+          errorMsg = 'No tienes una suscripción activa. Por favor adquiere un plan primero.';
+        } else if (ssoResponse.message?.includes('401') || ssoResponse.message?.includes('No autenticado')) {
+          errorMsg = 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente.';
+        }
+        
+        throw new Error(errorMsg);
+      }
+      
+      if (!ssoResponse.data?.accessToken) {
+        throw new Error('No se recibió token de acceso. Por favor, intenta nuevamente.');
       }
       
       const tokenOperativo = ssoResponse.data.accessToken;
