@@ -12,10 +12,15 @@ export default function PlanesPage() {
   const navigate = useNavigate();
   const [planes, setPlanes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  // Solo permitir “datos simulados” en desarrollo LOCAL
+  const permitirFallbackLocal = import.meta.env.DEV && window.location.hostname === 'localhost';
 
   useEffect(() => {
     const cargarPlanes = async () => {
       try {
+        setError('');
         // Intentar cargar desde el backend real
         const response = await getPlanes();
         if (response.success && response.planes) {
@@ -43,9 +48,15 @@ export default function PlanesPage() {
           throw new Error('No se pudieron cargar los planes');
         }
       } catch (error) {
-        console.warn('Error al cargar planes del backend, usando datos locales:', error);
-        // Fallback a datos locales
-        setPlanes(leerPlanes());
+        if (!permitirFallbackLocal) {
+          console.error('Error al cargar planes del backend:', error);
+          setPlanes([]);
+          setError(error?.message || 'No se pudieron cargar los planes desde el backend.');
+        } else {
+          console.warn('Error al cargar planes del backend, usando datos locales:', error);
+          // Fallback a datos locales
+          setPlanes(leerPlanes());
+        }
       } finally {
         setLoading(false);
       }
@@ -79,6 +90,10 @@ export default function PlanesPage() {
               <span className="visually-hidden">Cargando planes...</span>
             </div>
             <p className="mt-3 text-muted">Cargando planes disponibles...</p>
+          </div>
+        ) : error ? (
+          <div className="alert alert-danger text-center">
+            {error}
           </div>
         ) : planes.length === 0 ? (
           <div className="alert alert-info text-center">

@@ -4,6 +4,19 @@
 import { loginUser, registerUser, logout as apiLogout, isAuthenticated as apiIsAuthenticated } from './api.js';
 import { guardarUsuarioAutenticado, obtenerUsuarioAutenticado as obtenerUsuarioLocal, cerrarSesion as localCerrarSesion } from '../utils/auth.js';
 
+function permitirFallbackLocal() {
+  try {
+    // Solo permitir fallback en desarrollo LOCAL (evita “éxitos” falsos en producción)
+    return (
+      typeof window !== 'undefined' &&
+      import.meta?.env?.DEV &&
+      window.location.hostname === 'localhost'
+    );
+  } catch {
+    return false;
+  }
+}
+
 /**
  * Iniciar sesión con el backend real
  * Si falla, intenta con datos locales como fallback
@@ -26,9 +39,15 @@ export async function iniciarSesion(email, password) {
       guardarUsuarioAutenticado(usuario);
       return usuario;
     }
-    
-    return null;
+
+    // Si el backend respondió pero no fue exitoso, NO “silenciar” (en prod debe verse el error real)
+    throw new Error(response?.message || 'Credenciales inválidas');
   } catch (error) {
+    // En producción NO se permite fallback: necesitamos que la BD sea la fuente de verdad
+    if (!permitirFallbackLocal()) {
+      throw error;
+    }
+
     console.warn('Error al iniciar sesión con backend, intentando con datos locales:', error);
     
     // Fallback a autenticación local
@@ -69,9 +88,14 @@ export async function registrarUsuario(userData) {
       guardarUsuarioAutenticado(usuario);
       return usuario;
     }
-    
-    return null;
+
+    throw new Error(response?.message || 'No se pudo registrar el usuario');
   } catch (error) {
+    // En producción NO se permite fallback: el registro debe persistir en BD o fallar
+    if (!permitirFallbackLocal()) {
+      throw error;
+    }
+
     console.warn('Error al registrar con backend, usando datos locales:', error);
     
     // Fallback a registro local

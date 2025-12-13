@@ -12,6 +12,10 @@ export default function CompraExitosaPage() {
   const usuario = obtenerUsuarioAutenticado();
   const [factura, setFactura] = useState(null);
   const [mostrarFactura, setMostrarFactura] = useState(true);
+  const [errorFactura, setErrorFactura] = useState('');
+
+  // Solo permitir “datos simulados” en desarrollo LOCAL
+  const permitirFallbackLocal = import.meta.env.DEV && window.location.hostname === 'localhost';
 
   // Cargar la factura generada al montar el componente
   useEffect(() => {
@@ -29,10 +33,16 @@ export default function CompraExitosaPage() {
             throw new Error('Factura no encontrada en backend');
           }
         } catch (error) {
-          console.warn('Error al cargar factura desde backend, usando local:', error);
-          // Fallback a datos locales
-          const facturaEncontrada = obtenerFacturaPorNumero(numeroFactura);
-          setFactura(facturaEncontrada);
+          if (!permitirFallbackLocal) {
+            console.error('Error al cargar factura desde backend:', error);
+            setErrorFactura(error?.message || 'No se pudo cargar la factura desde el backend.');
+            setFactura(null);
+          } else {
+            console.warn('Error al cargar factura desde backend, usando local:', error);
+            // Fallback a datos locales
+            const facturaEncontrada = obtenerFacturaPorNumero(numeroFactura);
+            setFactura(facturaEncontrada);
+          }
         }
         
         // Limpiar el número de factura del localStorage después de cargarlo
@@ -118,6 +128,11 @@ export default function CompraExitosaPage() {
                     panel de usuario
                   </Link>.
                 </p>
+                {errorFactura && (
+                  <p className="mb-0 mt-2 text-danger">
+                    {errorFactura}
+                  </p>
+                )}
               </div>
             </div>
           </div>

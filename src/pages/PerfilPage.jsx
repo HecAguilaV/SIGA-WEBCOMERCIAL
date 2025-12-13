@@ -34,10 +34,14 @@ export default function PerfilPage() {
   const [cargandoSSO, setCargandoSSO] = useState(false); // Estado para manejar SSO
   const [errorSSO, setErrorSSO] = useState(''); // Mensaje de error SSO
   const [tieneSuscripcionActiva, setTieneSuscripcionActiva] = useState(false); // Estado de suscripción activa
+  const [errorFacturas, setErrorFacturas] = useState(''); // Error al cargar facturas
 
   if (!usuario) {
     return null;
   }
+
+  // Solo permitir “datos simulados” en desarrollo LOCAL
+  const permitirFallbackLocal = import.meta.env.DEV && window.location.hostname === 'localhost';
 
   // Obtener plan del usuario (primero desde localStorage, luego desde datos simulados)
   const planes = leerPlanes();
@@ -65,6 +69,7 @@ export default function PerfilPage() {
     const cargarFacturas = async () => {
       if (usuario && usuario.id) {
         try {
+          setErrorFacturas('');
           // Intentar cargar facturas desde el backend
           const response = await getFacturas();
           if (response.success && response.facturas) {
@@ -73,10 +78,16 @@ export default function PerfilPage() {
             throw new Error('Error al obtener facturas del backend');
           }
         } catch (error) {
-          console.warn('Error al cargar facturas desde backend, usando locales:', error);
-          // Fallback a datos locales
-          const facturasUsuario = obtenerFacturasDelUsuario(usuario.id);
-          setFacturas(facturasUsuario);
+          if (!permitirFallbackLocal) {
+            console.error('Error al cargar facturas desde backend:', error);
+            setFacturas([]);
+            setErrorFacturas(error?.message || 'No se pudieron cargar las facturas desde el backend.');
+          } else {
+            console.warn('Error al cargar facturas desde backend, usando locales:', error);
+            // Fallback a datos locales
+            const facturasUsuario = obtenerFacturasDelUsuario(usuario.id);
+            setFacturas(facturasUsuario);
+          }
         }
       }
     };
@@ -96,13 +107,23 @@ export default function PerfilPage() {
             );
             setTieneSuscripcionActiva(!!suscripcionActiva);
           } else {
-            // Si falla, verificar desde planId (fallback)
-            setTieneSuscripcionActiva(usuario.planId !== null && usuario.planId !== 1);
+            // En producción NO adivinar: si no hay datos válidos del backend, tratamos como NO activa
+            if (!permitirFallbackLocal) {
+              setTieneSuscripcionActiva(false);
+            } else {
+              // Fallback: verificar desde planId
+              setTieneSuscripcionActiva(usuario.planId !== null && usuario.planId !== 1);
+            }
           }
         } catch (error) {
           console.warn('Error al verificar suscripción, usando fallback:', error);
-          // Fallback: considerar activa si tiene plan asignado (excepto Kiosco)
-          setTieneSuscripcionActiva(usuario.planId !== null && usuario.planId !== 1);
+          // En producción NO adivinar: si falla, tratamos como NO activa (evita accesos incorrectos)
+          if (!permitirFallbackLocal) {
+            setTieneSuscripcionActiva(false);
+          } else {
+            // Fallback: considerar activa si tiene plan asignado (excepto Kiosco)
+            setTieneSuscripcionActiva(usuario.planId !== null && usuario.planId !== 1);
+          }
         }
       }
     };
@@ -500,6 +521,12 @@ export default function PerfilPage() {
               </h4>
             </div>
             <div className="card-body">
+              {errorFacturas && (
+                <div className="alert alert-warning" role="alert">
+                  <Warning size={18} className="me-2" style={{ verticalAlign: 'middle' }} />
+                  {errorFacturas}
+                </div>
+              )}
               {facturas.length === 0 ? (
                 <div className="alert alert-info mb-0">
                   <p className="mb-0">

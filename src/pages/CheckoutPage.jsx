@@ -22,6 +22,9 @@ export default function CheckoutPage() {
   const plan = obtenerPlanDelCarrito();
   const usuario = obtenerUsuarioAutenticado();
 
+  // Solo permitir “datos simulados” en desarrollo LOCAL
+  const permitirFallbackLocal = import.meta.env.DEV && window.location.hostname === 'localhost';
+
   // Validar formato de número de tarjeta
   const validarNumeroTarjeta = (numero) => {
     // Eliminar espacios y validar que sea solo números
@@ -124,6 +127,13 @@ export default function CheckoutPage() {
           throw new Error('Error al crear suscripción');
         }
       } catch (error) {
+        // En producción: NO simular éxito. Debe persistir en BD o fallar.
+        if (!permitirFallbackLocal) {
+          setError(error?.message || 'No se pudo crear la suscripción en el backend.');
+          setProcesando(false);
+          return;
+        }
+
         console.warn('Error al crear suscripción en backend, usando datos locales:', error);
         
         // Fallback a datos locales
@@ -178,6 +188,13 @@ export default function CheckoutPage() {
           throw new Error('Error al crear factura en backend');
         }
       } catch (error) {
+        // En producción: NO simular. Si falla la factura en backend, debe verse.
+        if (!permitirFallbackLocal) {
+          setError(error?.message || 'No se pudo generar la factura en el backend.');
+          setProcesando(false);
+          return;
+        }
+
         console.warn('Error al crear factura en backend, usando datos locales:', error);
         
         // Fallback a datos locales
