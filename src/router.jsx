@@ -7,6 +7,7 @@ import PerfilPage from './pages/PerfilPage.jsx';
 import AppPage from './pages/AppPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import RegistroPage from './pages/RegistroPage.jsx';
+import ResetPasswordPage from './pages/ResetPasswordPage.jsx';
 import CarritoPage from './pages/CarritoPage.jsx';
 import CheckoutPage from './pages/CheckoutPage.jsx';
 import CompraExitosaPage from './pages/CompraExitosaPage.jsx';
@@ -46,6 +47,7 @@ export function Rutas() {
       <Route path="/docs" element={<DocsPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/registro" element={<RegistroPage />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
       <Route path="/carrito" element={<CarritoPage />} />
       <Route path="/checkout" element={<CheckoutPage />} />
       <Route path="/exito" element={<CompraExitosaPage />} />
