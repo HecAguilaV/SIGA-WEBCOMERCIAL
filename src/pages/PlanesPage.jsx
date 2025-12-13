@@ -49,31 +49,21 @@ export default function PlanesPage() {
       } catch (error) {
         console.error('Error al cargar planes del backend:', error);
         
-        // Para planes, siempre permitir fallback si hay error de conexión
-        // (planes es información estática, no requiere persistencia en BD)
-        const esErrorConexion = error.message?.includes('Failed to fetch') || 
-                                error.message?.includes('NetworkError') ||
-                                error.message?.includes('Error de conexión') ||
-                                error.message?.includes('localhost');
+        // En producción: mostrar error claro, sin fallbacks
+        let mensajeError = 'No se pudieron cargar los planes desde el backend.';
         
-        if (permitirFallbackLocal || esErrorConexion) {
-          console.warn('Error al cargar planes del backend, usando datos locales como fallback:', error);
-          // Fallback a datos locales
-          setPlanes(leerPlanes());
-          setError(''); // No mostrar error, usar planes locales
-        } else {
-          // Otros errores (404, 500, etc): mostrar mensaje
-          let mensajeError = 'No se pudieron cargar los planes desde el backend.';
-          
-          if (error.message?.includes('CORS')) {
-            mensajeError = 'Error de CORS: El servidor no permite la conexión desde este origen.';
-          } else if (error.message) {
-            mensajeError = `Error: ${error.message}`;
-          }
-          
-          setPlanes([]);
-          setError(mensajeError);
+        if (error.message?.includes('Failed to fetch') || error.message?.includes('NetworkError')) {
+          mensajeError = 'Error de conexión: No se pudo conectar con el servidor. Verifica tu conexión a internet.';
+        } else if (error.message?.includes('CORS')) {
+          mensajeError = 'Error de CORS: El servidor no permite la conexión desde este origen.';
+        } else if (error.message?.includes('404')) {
+          mensajeError = 'Error 404: El endpoint de planes no fue encontrado en el backend.';
+        } else if (error.message) {
+          mensajeError = `Error: ${error.message}`;
         }
+        
+        setPlanes([]);
+        setError(mensajeError);
       } finally {
         setLoading(false);
       }
