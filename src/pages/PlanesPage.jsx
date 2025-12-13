@@ -13,9 +13,6 @@ export default function PlanesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // Solo permitir “datos simulados” en desarrollo LOCAL
-  const permitirFallbackLocal = import.meta.env.DEV && window.location.hostname === 'localhost';
-
   useEffect(() => {
     const cargarPlanes = async () => {
       try {
@@ -117,5 +114,3 @@ export default function PlanesPage() {
     </section>
   );
 }
-
-
