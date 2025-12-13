@@ -20,19 +20,19 @@ export default function PlanesPage() {
     const cargarPlanes = async () => {
       try {
         setError('');
-        // Intentar cargar desde el backend real
+        // Cargar desde el backend real (sin fallbacks en producción)
         const response = await getPlanes();
         if (response.success && response.planes) {
           // Mapear los planes del backend al formato esperado
           const planesMapeados = response.planes.map(plan => ({
             id: plan.id,
             nombre: plan.nombre,
-            precio: parseFloat(plan.precio) || 0, // ✅ CORREGIDO: usar 'precio' en lugar de 'precioMensual'
-            unidad: plan.unidad || 'UF', // ✅ CORREGIDO: usar unidad del backend (UF)
+            precio: parseFloat(plan.precio) || 0,
+            unidad: plan.unidad || 'UF',
             esFreemium: false, // Ya no hay planes gratuitos permanentes, solo free trial temporal
             caracteristicas: plan.caracteristicas && plan.caracteristicas.length > 0 
-              ? plan.caracteristicas // ✅ Usar características del backend si existen
-              : [ // Fallback: construir características desde otros campos
+              ? plan.caracteristicas
+              : [ // Construir características desde otros campos si no vienen del backend
                   plan.descripcion || 'Plan de suscripción',
                   plan.limiteBodegas !== null && plan.limiteBodegas !== undefined
                     ? `${plan.limiteBodegas === -1 ? 'Ilimitadas' : plan.limiteBodegas} bodega${plan.limiteBodegas !== 1 ? 's' : ''}`
@@ -44,7 +44,7 @@ export default function PlanesPage() {
           }));
           setPlanes(planesMapeados);
         } else {
-          throw new Error('No se pudieron cargar los planes');
+          throw new Error('No se pudieron cargar los planes desde el backend');
         }
       } catch (error) {
         console.error('Error al cargar planes del backend:', error);
