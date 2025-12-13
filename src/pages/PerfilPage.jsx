@@ -278,11 +278,29 @@ export default function PerfilPage() {
           window.location.reload();
         }, 2000);
       } else {
+        // El backend retorna mensajes claros, usarlos directamente
         throw new Error(response.message || 'Error al actualizar el email');
       }
     } catch (error) {
       console.error('Error al actualizar email:', error);
-      setMensajeEmail(error.message || 'Error al actualizar el email. Verifica tu contraseña.');
+      
+      // Manejar errores específicos según las instrucciones
+      let mensajeError = error.message || 'Error al actualizar el email';
+      
+      if (error.message?.includes('404') || error.message?.includes('Endpoint no encontrado')) {
+        mensajeError = '❌ Endpoint no encontrado. Verifica que el backend esté desplegado.';
+      } else if (error.message?.includes('401') || error.message?.includes('No autenticado') || error.message?.includes('Contraseña incorrecta')) {
+        mensajeError = '❌ Contraseña incorrecta. Por favor, verifica tu contraseña actual.';
+      } else if (error.message?.includes('409') || error.message?.includes('ya está en uso')) {
+        mensajeError = '❌ El email ya está en uso por otro usuario. Por favor, elige otro email.';
+      } else if (error.message?.includes('igual al actual')) {
+        mensajeError = '❌ El nuevo email debe ser diferente al actual.';
+      } else if (error.message) {
+        // Usar el mensaje del backend directamente si está disponible
+        mensajeError = error.message;
+      }
+      
+      setMensajeEmail(mensajeError);
     } finally {
       setCargandoEmail(false);
     }

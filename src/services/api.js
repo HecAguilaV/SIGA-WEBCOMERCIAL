@@ -182,6 +182,25 @@ async function apiRequest(endpoint, options = {}) {
         throw new Error(`Endpoint no encontrado (404): ${url}. Verifica que el endpoint exista en el backend.`);
       }
       
+      // Manejar errores específicos según las instrucciones del backend
+      if (response.status === 401) {
+        // Puede ser token inválido o contraseña incorrecta
+        const errorMsg = data.message || 'No autenticado o contraseña incorrecta';
+        throw new Error(errorMsg);
+      }
+      
+      if (response.status === 409) {
+        // Email ya en uso
+        const errorMsg = data.message || 'El email ya está en uso por otro usuario';
+        throw new Error(errorMsg);
+      }
+      
+      if (response.status === 400) {
+        // Email igual al actual u otro error de validación
+        const errorMsg = data.message || 'El nuevo email es igual al actual';
+        throw new Error(errorMsg);
+      }
+      
       // Para errores 500, intentar extraer mensaje más descriptivo
       if (response.status === 500) {
         let errorMsg = data.message || responseText || `Error del servidor (500): ${response.statusText}`;
@@ -200,6 +219,7 @@ async function apiRequest(endpoint, options = {}) {
         throw new Error(errorMsg);
       }
       
+      // Otros errores: usar mensaje del backend si está disponible
       throw new Error(data.message || responseText || `Error ${response.status}: ${response.statusText}`);
     }
 
