@@ -29,21 +29,8 @@ function guardarEnLocalStorage(clave, datos) {
 }
 
 // Planes de suscripción disponibles
+// NOTA: Ya NO hay plan gratuito permanente. Solo free trial de tiempo limitado + 2 planes de pago
 const planesPorDefecto = [
-  {
-    id: 1,
-    nombre: 'Kiosco',
-    precio: 0,
-    unidad: 'UF',
-    esFreemium: true,
-    caracteristicas: [
-      'Asistente SIGA con Inteligencia Artificial',
-      'Punto de venta básico',
-      'Gestión simple de inventario',
-      '1 bodega/sucursal',
-      '1 usuario',
-    ],
-  },
   {
     id: 2,
     nombre: 'Emprendedor Pro',
@@ -356,15 +343,16 @@ export function puedeIniciarTrial(usuarioId) {
     return false;
   }
 
-  // Verificar si el usuario tiene el plan Kiosco (solo pueden hacer trial usuarios con plan Kiosco)
+  // Cualquier usuario sin plan activo puede iniciar un trial (ya no hay plan gratuito permanente)
   usuarios = cargarDesdeLocalStorage(CLAVE_USUARIOS, usuariosPorDefecto);
   const usuario = usuarios.find((u) => u.id === usuarioId);
   if (!usuario) {
     return false;
   }
 
-  // Solo usuarios con plan Kiosco (id: 1) o sin plan pueden iniciar trial
-  return usuario.planId === 1 || usuario.planId === null;
+  // Solo usuarios sin plan (planId === null) pueden iniciar trial
+  // Los usuarios con planes de pago ya tienen acceso, no necesitan trial
+  return usuario.planId === null;
 }
 
 /**
@@ -433,6 +421,36 @@ export function convertirTrialAPagado(usuarioId) {
   if (usuario) {
     usuario.enTrial = false;
     // El planId se mantiene, solo se remueve el flag de trial
+    usuarios = usuarios.map((u) => (u.id === usuarioId ? usuario : u));
+    guardarEnLocalStorage(CLAVE_USUARIOS, usuarios);
+  }
+
+  return true;
+}
+
+/**
+ * Cuando un trial expira, el usuario vuelve a no tener plan (planId = null)
+ * Ya NO hay plan gratuito permanente (Kiosco)
+ */
+export function expirarTrial(usuarioId) {
+  const trials = cargarDesdeLocalStorage(CLAVE_TRIALS, []);
+  const trial = trials.find((t) => t.usuarioId === usuarioId && t.activo === true);
+
+  if (!trial) {
+    return false;
+  }
+
+  // Marcar el trial como expirado
+  trial.activo = false;
+  trial.expirado = true;
+  guardarEnLocalStorage(CLAVE_TRIALS, trials);
+
+  // Remover el plan del usuario (vuelve a planId = null, sin plan)
+  usuarios = cargarDesdeLocalStorage(CLAVE_USUARIOS, usuariosPorDefecto);
+  const usuario = usuarios.find((u) => u.id === usuarioId);
+  if (usuario) {
+    usuario.planId = null;
+    usuario.enTrial = false;
     usuarios = usuarios.map((u) => (u.id === usuarioId ? usuario : u));
     guardarEnLocalStorage(CLAVE_USUARIOS, usuarios);
   }

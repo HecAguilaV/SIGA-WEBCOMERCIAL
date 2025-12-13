@@ -46,34 +46,31 @@ SIGA (Sistema Inteligente de Gestión de Activos) es una solución SaaS completa
 
 ${planes.map(plan => `
 ### ${plan.nombre}
-- **Precio:** ${plan.precio === 0 ? 'Gratuito (Plan Freemium permanente)' : `${plan.precio} ${plan.unidad}/mes`}
+- **Precio:** ${plan.precio} ${plan.unidad}/mes
 - **Características:**
 ${plan.caracteristicas.map(car => `  - ${car}`).join('\n')}
 `).join('\n')}
 
 ## DIFERENCIAS ENTRE PLANES
 
-### Plan Kiosco (Gratuito)
-- Ideal para: Pequeños negocios o emprendedores que están comenzando
-- Incluye: Asistente SIGA con Inteligencia Artificial, punto de venta básico, gestión simple de inventario
-- Limitaciones: 1 bodega/sucursal, 1 usuario, productos limitados (100), reportes básicos, soporte por email
-
 ### Plan Emprendedor Pro (0.9 UF/mes)
 - Ideal para: Emprendedores que están creciendo y necesitan más funcionalidades
-- Incluye: Todo lo del plan Kiosco, más reportes avanzados
+- Incluye: Asistente SIGA con Inteligencia Artificial, reportes avanzados, gestión de inventario multi-sucursal
 - Limitaciones: 2 bodegas/sucursales, 3 usuarios, hasta 500 productos, soporte por email y chat
 
 ### Plan Crecimiento (1.9 UF/mes)
 - Ideal para: Empresas en crecimiento que necesitan escalabilidad
-- Incluye: Todo lo de los planes anteriores, más integraciones contables
+- Incluye: Todo lo del plan Emprendedor Pro, más integraciones contables
 - Limitaciones: Sin límites (bodegas ilimitadas, usuarios ilimitados, productos ilimitados)
 - Ventajas adicionales: Reportes completos con IA, soporte prioritario 24/7
 
 ## SISTEMA DE FREE TRIAL
 
-Ofrecemos un **trial gratuito de 14 días** para los planes Emprendedor Pro y Crecimiento:
+**IMPORTANTE:** Ya NO hay plan gratuito permanente. Ofrecemos un **trial gratuito de 14 días** para los planes Emprendedor Pro y Crecimiento:
+- Disponible para usuarios sin plan activo
 - Un solo trial por usuario
-- Conversión automática a suscripción pagada si no se cancela
+- Después del trial, el usuario pierde acceso hasta que contrate un plan de pago
+- Conversión automática a suscripción pagada si el usuario decide continuar
 - Notificaciones de días restantes durante el trial
 
 ## SERVICIOS Y FUNCIONALIDADES
@@ -91,7 +88,6 @@ Ofrecemos un **trial gratuito de 14 días** para los planes Emprendedor Pro y Cr
 - Historial completo de transacciones
 
 ### Reportes y Análisis
-- Reportes básicos (Plan Kiosco)
 - Reportes avanzados (Plan Emprendedor Pro)
 - Reportes completos con IA (Plan Crecimiento)
 - **Nota:** Los reportes y análisis de datos operativos (ventas, inventario, mermas) están disponibles en la WebApp operativa, no en este portal comercial.

@@ -124,8 +124,8 @@ export default function Navbar() {
                 <li className="nav-item">
                   <NavLink className="nav-link" to="/perfil" onClick={manejarClickNavLink}>Mi Perfil</NavLink>
                 </li>
-                {/* Mostrar acceso a WebApp solo si tiene suscripción activa (no Kiosco) */}
-                {usuario.planId && usuario.planId !== 1 && (
+                {/* Mostrar acceso a WebApp solo si tiene suscripción activa (plan de pago o trial activo) */}
+                {usuario.planId && (
                   <li className="nav-item">
                     <NavLink className="nav-link fw-bold" to="/perfil" onClick={manejarClickNavLink}>
                       <Rocket size={18} className="me-1" style={{ verticalAlign: 'middle' }} />

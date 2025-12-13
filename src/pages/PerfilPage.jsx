@@ -111,8 +111,8 @@ export default function PerfilPage() {
             if (!permitirFallbackLocal) {
               setTieneSuscripcionActiva(false);
             } else {
-              // Fallback: verificar desde planId
-              setTieneSuscripcionActiva(usuario.planId !== null && usuario.planId !== 1);
+            // Fallback: verificar desde planId (cualquier planId !== null es suscripción activa)
+            setTieneSuscripcionActiva(usuario.planId !== null);
             }
           }
         } catch (error) {
@@ -121,8 +121,8 @@ export default function PerfilPage() {
           if (!permitirFallbackLocal) {
             setTieneSuscripcionActiva(false);
           } else {
-            // Fallback: considerar activa si tiene plan asignado (excepto Kiosco)
-            setTieneSuscripcionActiva(usuario.planId !== null && usuario.planId !== 1);
+            // Fallback: considerar activa si tiene plan asignado (cualquier planId !== null)
+            setTieneSuscripcionActiva(usuario.planId !== null);
           }
         }
       }
@@ -143,7 +143,7 @@ export default function PerfilPage() {
   };
 
   const manejarIniciarTrial = (planId) => {
-    if (window.confirm('¿Deseas iniciar un trial gratuito de 14 días? Después del trial, volverás automáticamente al plan Kiosco.')) {
+    if (window.confirm('¿Deseas iniciar un trial gratuito de 14 días? Después del trial, perderás el acceso hasta que contrates un plan de pago.')) {
       if (iniciarFreeTrial(usuario.id, planId)) {
         // Recargar usuario actualizado
         const usuarioActualizado = obtenerUsuarioAutenticado();
@@ -184,8 +184,8 @@ export default function PerfilPage() {
       
       if (!suscripcionesResponse.success || !suscripcionesResponse.suscripciones || 
           suscripcionesResponse.suscripciones.length === 0) {
-        // Fallback: verificar planId
-        if (!usuario.planId || usuario.planId === 1) {
+        // Fallback: verificar planId (cualquier planId !== null es válido)
+        if (!usuario.planId) {
           setErrorSSO('No tienes una suscripción activa. Por favor adquiere un plan primero.');
           setCargandoSSO(false);
           return;
@@ -266,7 +266,7 @@ export default function PerfilPage() {
                         </strong>
                         <p className="mb-0 mt-2">
                           Tienes <strong>{trialInfo.diasRestantes} días restantes</strong> de tu trial gratuito de 14 días.
-                          Después del trial, volverás automáticamente al plan Kiosco.
+                          Después del trial, perderás el acceso hasta que contrates un plan de pago.
                         </p>
                       </div>
                       <button
@@ -283,18 +283,9 @@ export default function PerfilPage() {
                 <div className="row mb-4">
                   <div className="col-md-6">
                     <h5 className="fw-bold text-primario mb-3">
-                      {planActual.precio === 0 ? (
-                        <>
-                          <span className="badge bg-success me-2">GRATIS</span>
-                          Freemium
-                        </>
-                      ) : (
-                        <>
-                          {planActual.precio} {planActual.unidad}/mes
-                          {trialInfo && trialInfo.activo && (
-                            <span className="badge bg-warning ms-2">Trial</span>
-                          )}
-                        </>
+                      {planActual.precio} {planActual.unidad}/mes
+                      {trialInfo && trialInfo.activo && (
+                        <span className="badge bg-warning ms-2">Trial Activo</span>
                       )}
                     </h5>
                     <h6 className="text-muted mb-3">Beneficios incluidos:</h6>
@@ -385,8 +376,8 @@ export default function PerfilPage() {
                   </div>
                 )}
 
-                {/* Opción de free trial o actualizar plan */}
-                {planActual.nombre === 'Kiosco' && puedeTrial && (
+                {/* Opción de free trial para usuarios sin plan */}
+                {!planActual && puedeTrial && (
                   <div className="alert alert-primary mt-4" role="alert">
                     <div className="d-flex justify-content-between align-items-center flex-wrap">
                       <div>
@@ -423,7 +414,7 @@ export default function PerfilPage() {
                 )}
 
                 {/* Opción de actualizar al plan Crecimiento */}
-                {planActual.nombre !== 'Crecimiento' && planActual.nombre !== 'Kiosco' && planCrecimiento && (
+                {planActual && planActual.nombre !== 'Crecimiento' && planCrecimiento && (
                   <div className="alert alert-info mt-4" role="alert">
                     <div className="d-flex justify-content-between align-items-center flex-wrap">
                       <div>
