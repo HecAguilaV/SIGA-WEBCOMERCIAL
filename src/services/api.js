@@ -204,7 +204,7 @@ async function apiRequest(endpoint, options = {}) {
  * Registrar nuevo usuario
  */
 export async function registerUser(userData) {
-  return apiRequest('/auth/register', {
+  return apiRequest('/comercial/auth/register', {
     method: 'POST',
     body: JSON.stringify(userData),
     skipAuth: true,
@@ -254,6 +254,28 @@ export async function chatComercial(message) {
   return apiRequest('/comercial/chat', {
     method: 'POST',
     body: JSON.stringify({ message }),
+    skipAuth: true,
+  });
+}
+
+/**
+ * Solicitar reset de contraseña
+ */
+export async function solicitarResetPassword(email) {
+  return apiRequest('/comercial/auth/reset-password', {
+    method: 'POST',
+    body: JSON.stringify({ email }),
+    skipAuth: true,
+  });
+}
+
+/**
+ * Cambiar contraseña con token de reset
+ */
+export async function cambiarPasswordConToken(token, newPassword) {
+  return apiRequest('/comercial/auth/change-password', {
+    method: 'POST',
+    body: JSON.stringify({ token, newPassword }),
     skipAuth: true,
   });
 }

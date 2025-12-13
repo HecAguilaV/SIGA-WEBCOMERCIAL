@@ -9,6 +9,7 @@ export default function RegistroPage() {
   const [nombre, setNombre] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [nombreEmpresa, setNombreEmpresa] = useState(''); // ⬅️ NUEVO
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -36,7 +37,12 @@ export default function RegistroPage() {
     }
 
     try {
-      const nuevo = await registrarUsuario({ nombre, email, password });
+      const nuevo = await registrarUsuario({ 
+        nombre, 
+        email, 
+        password,
+        nombreEmpresa: nombreEmpresa.trim() || undefined // ⬅️ NUEVO (opcional)
+      });
       if (nuevo) {
         // Redirigir al perfil después del registro exitoso
         navigate('/perfil');
@@ -66,6 +72,18 @@ export default function RegistroPage() {
           <div className="mb-3">
             <label className="form-label">Contraseña</label>
             <input className="form-control" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+          </div>
+          <div className="mb-3">
+            <label className="form-label">
+              Nombre de Empresa <small className="text-muted">(opcional)</small>
+            </label>
+            <input 
+              className="form-control" 
+              type="text" 
+              value={nombreEmpresa} 
+              onChange={(e) => setNombreEmpresa(e.target.value)}
+              placeholder="Ej: Mi Empresa S.A."
+            />
           </div>
           {error && <div className="alert alert-danger">{error}</div>}
           <button type="submit" className="btn btn-acento w-100" disabled={loading}>
