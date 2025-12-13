@@ -68,7 +68,7 @@ async function refreshAccessToken() {
   }
 
   try {
-    const response = await fetch(`${API_URL}/auth/refresh`, {
+    const response = await fetch(`${API_URL}/comercial/auth/refresh`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -177,8 +177,14 @@ async function apiRequest(endpoint, options = {}) {
     }
 
     if (!response.ok) {
-      // Si es 404, dar mensaje más específico
+      // Si es 404, verificar si es un error de recurso no encontrado (válido para usuarios nuevos)
       if (response.status === 404) {
+        // Para endpoints que pueden retornar 404 cuando no hay datos (facturas, suscripciones)
+        // No lanzar error, retornar respuesta con success: false para que el componente lo maneje
+        if (endpoint.includes('/facturas') || endpoint.includes('/suscripciones')) {
+          return { success: false, facturas: [], suscripciones: [], message: 'No se encontraron datos' };
+        }
+        // Para otros endpoints, lanzar error
         throw new Error(`Endpoint no encontrado (404): ${url}. Verifica que el endpoint exista en el backend.`);
       }
       
@@ -250,7 +256,7 @@ async function apiRequest(endpoint, options = {}) {
     
     // Si el error ya tiene un mensaje descriptivo, mantenerlo
     if (error.message && !error.message.includes('Failed to fetch')) {
-      throw error;
+    throw error;
     }
     
     // Error genérico

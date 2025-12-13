@@ -80,10 +80,16 @@ export default function PerfilPage() {
           if (response.success && response.facturas) {
             setFacturas(response.facturas);
           } else {
-            throw new Error('Error al obtener facturas del backend');
+            // Si no hay facturas, es válido (usuario nuevo)
+            setFacturas([]);
           }
         } catch (error) {
-          if (!permitirFallbackLocal) {
+          // Manejar 404 específicamente (usuario sin facturas es válido)
+          if (error.message?.includes('404') || error.message?.includes('NOT_FOUND')) {
+            console.log('ℹ️ Usuario sin facturas (404 es válido para usuarios nuevos)');
+            setFacturas([]);
+            setErrorFacturas(''); // No mostrar error si es 404 (usuario nuevo)
+          } else if (!permitirFallbackLocal) {
             console.error('Error al cargar facturas desde backend:', error);
             setFacturas([]);
             setErrorFacturas(error?.message || 'No se pudieron cargar las facturas desde el backend.');
@@ -112,22 +118,23 @@ export default function PerfilPage() {
             );
             setTieneSuscripcionActiva(!!suscripcionActiva);
           } else {
-            // En producción NO adivinar: si no hay datos válidos del backend, tratamos como NO activa
+            // Si no hay suscripciones, es válido (usuario nuevo)
+            setTieneSuscripcionActiva(false);
+          }
+        } catch (error) {
+          // Manejar 404 específicamente (usuario sin suscripciones es válido)
+          if (error.message?.includes('404') || error.message?.includes('NOT_FOUND')) {
+            console.log('ℹ️ Usuario sin suscripciones (404 es válido para usuarios nuevos)');
+            setTieneSuscripcionActiva(false);
+          } else {
+            console.warn('Error al verificar suscripción:', error);
+            // En producción NO adivinar: si falla, tratamos como NO activa (evita accesos incorrectos)
             if (!permitirFallbackLocal) {
               setTieneSuscripcionActiva(false);
             } else {
-            // Fallback: verificar desde planId (cualquier planId !== null es suscripción activa)
-            setTieneSuscripcionActiva(usuario.planId !== null);
+              // Fallback: considerar activa si tiene plan asignado (cualquier planId !== null)
+              setTieneSuscripcionActiva(usuario.planId !== null);
             }
-          }
-        } catch (error) {
-          console.warn('Error al verificar suscripción, usando fallback:', error);
-          // En producción NO adivinar: si falla, tratamos como NO activa (evita accesos incorrectos)
-          if (!permitirFallbackLocal) {
-            setTieneSuscripcionActiva(false);
-          } else {
-            // Fallback: considerar activa si tiene plan asignado (cualquier planId !== null)
-            setTieneSuscripcionActiva(usuario.planId !== null);
           }
         }
       }
