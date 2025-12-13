@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { getPlanes } from '../services/api.js';
-import { leerPlanes } from '../datos/datosSimulados.js';
 import { guardarPlanEnCarrito } from '../utils/auth.js';
 import CardPlan from '../components/CardPlan.jsx';
 import { useNavigate } from 'react-router-dom';
 import '../styles/PlanesPage.css';
 
 // Página que lista los planes de suscripción
-// Integrada con backend real con fallback a datos locales
+// Integrada con backend real (sin fallbacks en producción)
 export default function PlanesPage() {
   const navigate = useNavigate();
   const [planes, setPlanes] = useState([]);

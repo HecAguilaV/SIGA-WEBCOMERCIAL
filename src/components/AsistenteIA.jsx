@@ -174,7 +174,18 @@ export default function AsistenteIA() {
     // Llamada a API Gemini
     try {
       const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-      if (!apiKey) throw new Error("Falta API Key");
+      if (!apiKey) {
+        const errorMsg = "⚠️ El asistente IA no está configurado. Por favor, contacta al administrador para configurar VITE_GEMINI_API_KEY en Vercel.";
+        setMensajeError(errorMsg);
+        setMensajes(prev => [...prev, {
+          id: crypto.randomUUID(),
+          emisor: "siga",
+          tipo: "texto",
+          contenido: errorMsg
+        }]);
+        setEstaPensando(false);
+        return;
+      }
 
       const genAI = new GoogleGenerativeAI(apiKey);
       const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
@@ -206,12 +217,16 @@ export default function AsistenteIA() {
 
     } catch (error) {
       console.error("Error IA:", error);
-      // Fallback simulado
+      const errorMsg = error.message?.includes("API Key") || error.message?.includes("Falta API Key")
+        ? "⚠️ El asistente IA no está configurado correctamente. Por favor, contacta al administrador."
+        : `❌ Error al conectar con el asistente: ${error.message || "Error desconocido"}`;
+      
+      setMensajeError(errorMsg);
       setMensajes(prev => [...prev, {
         id: crypto.randomUUID(),
         emisor: "siga",
         tipo: "texto",
-        contenido: "Lo siento, no pude conectar con mi cerebro digital. Pero estoy aquí para ayudarte con funciones básicas."
+        contenido: errorMsg
       }]);
     } finally {
       setEstaPensando(false);
