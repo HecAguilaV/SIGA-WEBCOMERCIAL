@@ -158,8 +158,10 @@ async function apiRequest(endpoint, options = {}) {
     if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
       // Error de red: CORS, conexión rechazada, servidor no disponible
       const esCors = error.message.includes('CORS') || error.message.includes('cors');
+      
+      // Detectar si es probablemente CORS (el backend responde pero bloquea por origen)
       const mensaje = esCors 
-        ? 'Error de CORS: El servidor no permite la conexión desde este origen. Verifica la configuración del backend.'
+        ? `Error de CORS: El backend en ${API_BASE_URL} no permite conexiones desde este origen (${window.location.origin}). El equipo backend debe configurar CORS para permitir este dominio.`
         : `Error de conexión: No se pudo conectar con el servidor en ${API_BASE_URL}. Verifica que el backend esté funcionando y que la URL sea correcta.`;
       
       throw new Error(mensaje);
