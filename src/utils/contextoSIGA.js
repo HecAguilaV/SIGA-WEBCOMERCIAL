@@ -94,17 +94,17 @@ Ofrecemos un **trial gratuito de 14 días** para los planes Emprendedor Pro y Cr
 - Reportes básicos (Plan Kiosco)
 - Reportes avanzados (Plan Emprendedor Pro)
 - Reportes completos con IA (Plan Crecimiento)
-- Visualización de mermas por categoría
-- Análisis de ventas y tendencias
+- **Nota:** Los reportes y análisis de datos operativos (ventas, inventario, mermas) están disponibles en la WebApp operativa, no en este portal comercial.
 
 ### Asistente SIGA con IA
 - Chatbot inteligente con Inteligencia Artificial
 - Disponible en todos los planes
-- Puede ayudar con:
-  - Información sobre inventario
-  - Visualización de datos y gráficos
-  - Preguntas sobre planes y suscripciones
-  - Información sobre la empresa
+- **IMPORTANTE:** Este asistente está en el PORTAL COMERCIAL y solo puede ayudar con:
+  - Información sobre planes y suscripciones
+  - Consultas sobre facturas y pagos
+  - Ayuda con acceso a la WebApp
+  - Preguntas sobre el portal comercial y la empresa
+  - **NO puede generar gráficos ni análisis de datos operativos** (eso es solo en la WebApp)
 
 ### Integraciones
 - API de indicadores económicos (mindicador.cl) para conversión UF a CLP

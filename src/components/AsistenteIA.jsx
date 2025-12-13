@@ -184,8 +184,14 @@ export default function AsistenteIA() {
       
       Usuario: ${contenido}
       
-      Responde de forma útil y concisa sobre planes, suscripciones, facturas y el portal comercial de SIGA. 
-      NO generes gráficos ni análisis de datos operativos. Este es el portal comercial, no la aplicación operativa.`;
+      INSTRUCCIONES CRÍTICAS:
+      - Este es el PORTAL COMERCIAL de SIGA, NO la aplicación operativa (WebApp)
+      - Solo puedes responder sobre: planes de suscripción, facturas, pagos, acceso a WebApp, información de la empresa
+      - PROHIBIDO: NO generes gráficos, NO hagas análisis de ventas, NO analices inventario, NO muestres datos operativos
+      - Si el usuario pide gráficos o análisis de datos operativos, explica que debe acceder a la WebApp para eso
+      - Responde de forma útil y concisa sobre temas COMERCIALES únicamente
+      
+      Responde ahora:`;
 
       const result = await model.generateContent(prompt);
       const response = await result.response;
