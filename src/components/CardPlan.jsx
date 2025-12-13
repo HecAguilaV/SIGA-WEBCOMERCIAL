@@ -28,7 +28,7 @@ export default function CardPlan({ plan, onSeleccionar }) {
   const isFeatured = plan.nombre === 'Emprendedor Pro';
 
   return (
-    <div className="col-md-4 mb-4">
+    <div className="col-lg-6 col-md-6 mb-4">
       <div className={`plan-card-glass ${isFeatured ? 'featured' : ''}`}>
         {/* Ya no hay planes gratuitos permanentes, solo free trial temporal */}
         

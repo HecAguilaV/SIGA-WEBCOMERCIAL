@@ -194,12 +194,18 @@
 }
 
 /* Responsive */
-@media (max-width: 768px) {
+@media (max-width: 992px) {
     .planes-title {
         font-size: 2.5rem;
     }
 
     .plan-card-glass {
         margin-bottom: 2rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .planes-title {
+        font-size: 2rem;
     }
 }

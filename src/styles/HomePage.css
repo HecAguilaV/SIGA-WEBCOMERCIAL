@@ -150,7 +150,7 @@
 /* Columna derecha - Tarjetas flotantes */
 .hero-cards {
     position: relative;
-    height: 600px; /* ✅ Aumentado de 500px a 600px para acomodar cards más grandes */
+    height: 700px; /* ✅ Aumentado de 600px a 700px para más espacio entre cards */
     animation: fadeInRight 0.8s ease-out;
 }
 
@@ -196,7 +196,7 @@
 }
 
 .glass-card-2 {
-    top: 140px;
+    top: 180px; /* ✅ Aumentado de 140px a 180px para más espacio */
     right: 20px;
     width: 260px; /* ✅ Aumentado de 200px a 260px */
     padding: 2rem; /* ✅ Aumentado padding */
@@ -204,7 +204,7 @@
 }
 
 .glass-card-3 {
-    top: 300px;
+    top: 380px; /* ✅ Aumentado de 300px a 380px para más espacio */
     left: 40px;
     width: 270px; /* ✅ Aumentado de 210px a 270px */
     padding: 2rem; /* ✅ Aumentado padding */

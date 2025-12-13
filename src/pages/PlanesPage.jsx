@@ -104,7 +104,7 @@ export default function PlanesPage() {
             No hay planes disponibles en este momento.
           </div>
         ) : (
-          <div className="row">
+          <div className="row justify-content-center">
             {planes.map((plan) => (
               <CardPlan key={plan.id} plan={plan} onSeleccionar={manejarSeleccion} />
             ))}
