@@ -1,5 +1,5 @@
-import React from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import React, { useEffect, useRef } from 'react';
+import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { obtenerUsuarioAutenticado, cerrarSesion } from '../utils/auth.js';
 import { Rocket, ShoppingCart } from 'phosphor-react';
 
@@ -7,11 +7,66 @@ import { Rocket, ShoppingCart } from 'phosphor-react';
 // Diseñada con la identidad visual de la marca
 export default function Navbar() {
   const navigate = useNavigate();
+  const location = useLocation();
   const usuario = obtenerUsuarioAutenticado();
+  const navbarCollapseRef = useRef(null);
 
   const manejarSalir = () => {
     cerrarSesion();
     navigate('/');
+  };
+
+  // Función para cerrar el menú hamburguesa
+  const cerrarMenu = () => {
+    if (navbarCollapseRef.current) {
+      // Usar Bootstrap Collapse API para cerrar el menú
+      const bsCollapse = window.bootstrap?.Collapse?.getInstance(navbarCollapseRef.current);
+      if (bsCollapse && bsCollapse._isShown()) {
+        bsCollapse.hide();
+      }
+    }
+  };
+
+  // Cerrar menú cuando cambia la ruta (al seleccionar una página)
+  useEffect(() => {
+    cerrarMenu();
+  }, [location.pathname]);
+
+  // Cerrar menú al hacer scroll hacia abajo
+  useEffect(() => {
+    let ultimaPosicionScroll = window.scrollY;
+    let ticking = false;
+
+    const manejarScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const posicionActual = window.scrollY;
+          
+          // Si el usuario hace scroll hacia abajo (más de 50px), cerrar el menú
+          if (posicionActual > ultimaPosicionScroll && posicionActual > 50) {
+            cerrarMenu();
+          }
+          
+          ultimaPosicionScroll = posicionActual;
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', manejarScroll, { passive: true });
+    
+    return () => {
+      window.removeEventListener('scroll', manejarScroll);
+    };
+  }, []);
+
+  // Cerrar menú al hacer click en cualquier NavLink
+  const manejarClickNavLink = () => {
+    // Pequeño delay para permitir que la navegación ocurra primero
+    setTimeout(() => {
+      cerrarMenu();
+    }, 100);
   };
 
   return (
@@ -35,28 +90,28 @@ export default function Navbar() {
         </button>
 
         {/* Menú de navegación */}
-        <div className="collapse navbar-collapse" id="navPrincipal">
+        <div className="collapse navbar-collapse" id="navPrincipal" ref={navbarCollapseRef}>
           {/* Enlaces principales */}
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
             <li className="nav-item">
-              <NavLink className="nav-link" to="/" end>Inicio</NavLink>
+              <NavLink className="nav-link" to="/" end onClick={manejarClickNavLink}>Inicio</NavLink>
             </li>
             <li className="nav-item">
-              <NavLink className="nav-link" to="/planes">Planes</NavLink>
+              <NavLink className="nav-link" to="/planes" onClick={manejarClickNavLink}>Planes</NavLink>
             </li>
             <li className="nav-item">
-              <NavLink className="nav-link" to="/acerca">Acerca de</NavLink>
+              <NavLink className="nav-link" to="/acerca" onClick={manejarClickNavLink}>Acerca de</NavLink>
             </li>
             {/* Mostrar acceso según el rol del usuario */}
             {usuario && (
               <>
                 <li className="nav-item">
-                  <NavLink className="nav-link" to="/perfil">Mi Perfil</NavLink>
+                  <NavLink className="nav-link" to="/perfil" onClick={manejarClickNavLink}>Mi Perfil</NavLink>
                 </li>
                 {/* Mostrar acceso a WebApp solo si tiene suscripción activa (no Kiosco) */}
                 {usuario.planId && usuario.planId !== 1 && (
                   <li className="nav-item">
-                    <NavLink className="nav-link fw-bold" to="/perfil">
+                    <NavLink className="nav-link fw-bold" to="/perfil" onClick={manejarClickNavLink}>
                       <Rocket size={18} className="me-1" style={{ verticalAlign: 'middle' }} />
                       Acceder a WebApp
                     </NavLink>
@@ -66,7 +121,7 @@ export default function Navbar() {
             )}
             {usuario?.rol === 'admin' && (
               <li className="nav-item">
-                <NavLink className="nav-link" to="/admin">Administrador</NavLink>
+                <NavLink className="nav-link" to="/admin" onClick={manejarClickNavLink}>Administrador</NavLink>
               </li>
             )}
           </ul>
@@ -74,7 +129,7 @@ export default function Navbar() {
           {/* Enlaces de usuario */}
           <ul className="navbar-nav ms-auto">
             <li className="nav-item">
-              <NavLink className="nav-link" to="/carrito">
+              <NavLink className="nav-link" to="/carrito" onClick={manejarClickNavLink}>
                 <ShoppingCart size={18} className="me-1" style={{ verticalAlign: 'middle' }} />
                 Carrito
               </NavLink>
@@ -82,10 +137,10 @@ export default function Navbar() {
             {!usuario ? (
               <>
                 <li className="nav-item">
-                  <NavLink className="nav-link" to="/login">Iniciar Sesión</NavLink>
+                  <NavLink className="nav-link" to="/login" onClick={manejarClickNavLink}>Iniciar Sesión</NavLink>
                 </li>
                 <li className="nav-item">
-                  <NavLink className="nav-link" to="/registro">Registro</NavLink>
+                  <NavLink className="nav-link" to="/registro" onClick={manejarClickNavLink}>Registro</NavLink>
                 </li>
               </>
             ) : (
@@ -101,13 +156,13 @@ export default function Navbar() {
                 </a>
                 <ul className="dropdown-menu dropdown-menu-end">
                   <li>
-                    <Link className="dropdown-item" to="/perfil">
+                    <Link className="dropdown-item" to="/perfil" onClick={manejarClickNavLink}>
                       Mi Perfil
                     </Link>
                   </li>
                   {usuario?.rol === 'admin' && (
                     <li>
-                      <Link className="dropdown-item" to="/admin">
+                      <Link className="dropdown-item" to="/admin" onClick={manejarClickNavLink}>
                         Panel Administrador
                       </Link>
                     </li>

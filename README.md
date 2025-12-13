@@ -397,18 +397,31 @@ VITE_GEMINI_API_KEY=tu_api_key_de_google_gemini
 
 #### Para Despliegue en Vercel
 
+**Variables de Entorno Requeridas:**
+
 1. Ve a tu proyecto en **Vercel Dashboard**
 2. Abre **Settings** → **Environment Variables**
-3. Agrega la variable:
+3. Agrega las siguientes variables:
+
+   **Variable 1: API Key de Gemini (opcional, para asistente IA)**
    - **Name:** `VITE_GEMINI_API_KEY`
    - **Value:** Tu API key de Google Gemini
    - **Environment:** Selecciona todas (Production, Preview, Development)
-4. Guarda y vuelve a desplegar
+
+   **Variable 2: URL del Backend (CRÍTICA)**
+   - **Name:** `VITE_API_BASE_URL`
+   - **Value:** `https://siga-backend-production.up.railway.app`
+   - **Environment:** Selecciona todas (Production, Preview, Development)
+
+4. **Guarda** las variables
+5. **Vuelve a desplegar** el proyecto para que las variables surtan efecto
 
 **Importante:**
 - El prefijo `VITE_` es necesario para que Vite exponga la variable al cliente
-- Sin esta variable, el asistente funcionará con respuestas simuladas como fallback
-- Nunca compartas tu API key públicamente
+- Sin `VITE_API_BASE_URL`, el frontend intentará conectarse a `localhost:8080` y fallará
+- Sin `VITE_GEMINI_API_KEY`, el asistente funcionará con respuestas simuladas como fallback
+- Nunca compartas tus API keys públicamente
+- **Después de agregar/modificar variables de entorno, SIEMPRE debes redesplegar**
 
 ### Puerto del Servidor
 El servidor de desarrollo está configurado para usar el puerto `5173` de forma fija. Puedes cambiarlo en `vite.config.js`:

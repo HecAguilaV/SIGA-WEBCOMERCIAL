@@ -14,6 +14,13 @@ try {
   // En entorno de tests o si import.meta no está disponible, usar valor por defecto
   API_BASE_URL = 'http://localhost:8080';
 }
+
+// Log para debugging (solo en desarrollo)
+if (import.meta.env.DEV) {
+  console.log('🔧 API_BASE_URL configurada:', API_BASE_URL);
+  console.log('🔧 VITE_API_BASE_URL desde env:', import.meta.env.VITE_API_BASE_URL);
+}
+
 const API_URL = `${API_BASE_URL}/api`;
 
 /**
