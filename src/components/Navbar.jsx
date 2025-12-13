@@ -19,10 +19,26 @@ export default function Navbar() {
   // Función para cerrar el menú hamburguesa
   const cerrarMenu = () => {
     if (navbarCollapseRef.current) {
-      // Usar Bootstrap Collapse API para cerrar el menú
-      const bsCollapse = window.bootstrap?.Collapse?.getInstance(navbarCollapseRef.current);
-      if (bsCollapse && bsCollapse._isShown()) {
-        bsCollapse.hide();
+      // Verificar si el menú está visible (tiene la clase 'show')
+      const estaAbierto = navbarCollapseRef.current.classList.contains('show');
+      
+      if (estaAbierto) {
+        // Intentar usar Bootstrap Collapse API si está disponible
+        if (window.bootstrap?.Collapse) {
+          const bsCollapse = window.bootstrap.Collapse.getInstance(navbarCollapseRef.current);
+          if (bsCollapse) {
+            bsCollapse.hide();
+            return;
+          }
+        }
+        
+        // Fallback: cerrar manualmente removiendo clases y atributos
+        navbarCollapseRef.current.classList.remove('show');
+        const toggler = document.querySelector('[data-bs-target="#navPrincipal"]');
+        if (toggler) {
+          toggler.setAttribute('aria-expanded', 'false');
+          toggler.classList.add('collapsed');
+        }
       }
     }
   };
