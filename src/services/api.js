@@ -15,10 +15,14 @@ try {
   API_BASE_URL = 'http://localhost:8080';
 }
 
-// Log para debugging (solo en desarrollo)
-if (import.meta.env.DEV) {
-  console.log('🔧 API_BASE_URL configurada:', API_BASE_URL);
-  console.log('🔧 VITE_API_BASE_URL desde env:', import.meta.env.VITE_API_BASE_URL);
+// Log para debugging (siempre, para identificar problemas en producción)
+console.log('🔧 API_BASE_URL configurada:', API_BASE_URL);
+console.log('🔧 VITE_API_BASE_URL desde env:', import.meta.env.VITE_API_BASE_URL);
+console.log('🔧 Entorno:', import.meta.env.MODE, import.meta.env.PROD ? '(PRODUCCIÓN)' : '(DESARROLLO)');
+
+// Advertencia si estamos en producción pero usando localhost
+if (import.meta.env.PROD && API_BASE_URL.includes('localhost')) {
+  console.error('⚠️ ADVERTENCIA: Estás en PRODUCCIÓN pero usando localhost. Configura VITE_API_BASE_URL en Vercel.');
 }
 
 const API_URL = `${API_BASE_URL}/api`;
@@ -167,11 +171,19 @@ async function apiRequest(endpoint, options = {}) {
     if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
       // Error de red: CORS, conexión rechazada, servidor no disponible
       const esCors = error.message.includes('CORS') || error.message.includes('cors');
+      const esLocalhost = API_BASE_URL.includes('localhost');
+      const esProduccion = import.meta.env.PROD;
       
-      // Detectar si es probablemente CORS (el backend responde pero bloquea por origen)
-      const mensaje = esCors 
-        ? `Error de CORS: El backend en ${API_BASE_URL} no permite conexiones desde este origen (${window.location.origin}). El equipo backend debe configurar CORS para permitir este dominio.`
-        : `Error de conexión: No se pudo conectar con el servidor en ${API_BASE_URL}. Verifica que el backend esté funcionando y que la URL sea correcta.`;
+      let mensaje = '';
+      
+      // Si estamos en producción pero usando localhost, el problema es la variable de entorno
+      if (esProduccion && esLocalhost) {
+        mensaje = `⚠️ Variable de entorno faltante: VITE_API_BASE_URL no está configurada en Vercel. El frontend está intentando conectarse a ${API_BASE_URL} en lugar de la URL de producción. Ve a Vercel Dashboard → Settings → Environment Variables y agrega VITE_API_BASE_URL=https://siga-backend-production.up.railway.app`;
+      } else if (esCors) {
+        mensaje = `Error de CORS: El backend en ${API_BASE_URL} no permite conexiones desde este origen (${window.location.origin}). El equipo backend debe configurar CORS para permitir este dominio.`;
+      } else {
+        mensaje = `Error de conexión: No se pudo conectar con el servidor en ${API_BASE_URL}. Verifica que el backend esté funcionando y que la URL sea correcta.`;
+      }
       
       throw new Error(mensaje);
     }
