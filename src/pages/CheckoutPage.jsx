@@ -110,13 +110,24 @@ export default function CheckoutPage() {
 
     // Procesar pago y crear suscripción
     if (plan && usuario) {
+      // ✅ Validar email ANTES de crear suscripción
+      if (!usuario.email) {
+        console.error('⚠️ Usuario sin email en checkout:', usuario);
+        const errorMsg = 'Error: El usuario no tiene un email registrado. Por favor, cierra sesión e inicia sesión nuevamente, o actualiza tu perfil con un email válido.';
+        setError(errorMsg);
+        setProcesando(false);
+        return;
+      }
+
+      let usuarioActualizado = { ...usuario };
+      
       try {
         // Intentar crear suscripción en el backend real
         const response = await createSuscripcion(plan.id, 'MENSUAL');
         
         if (response.success && response.suscripcion) {
           // Suscripción creada exitosamente en el backend
-          const usuarioActualizado = { 
+          usuarioActualizado = { 
             ...usuario, 
             planId: plan.id, 
             enTrial: false,
@@ -147,7 +158,7 @@ export default function CheckoutPage() {
         // Asignar el plan comprado al usuario en datos simulados
         asignarPlanAUsuario(usuario.id, plan.id);
         // Actualizar usuario en localStorage con el nuevo plan
-        const usuarioActualizado = { ...usuario, planId: plan.id, enTrial: false };
+        usuarioActualizado = { ...usuario, planId: plan.id, enTrial: false };
         guardarUsuarioAutenticado(usuarioActualizado);
         
         // Actualizar también en el array de usuarios
@@ -155,9 +166,10 @@ export default function CheckoutPage() {
       }
       
       // GENERAR FACTURA después de la compra exitosa
-      // Validar que el usuario tenga email (requerido por el backend)
-      if (!usuario.email) {
-        const errorMsg = 'Error: El usuario no tiene un email registrado. Por favor, actualiza tu perfil con un email válido.';
+      // ✅ Usar usuarioActualizado que tiene el email garantizado
+      if (!usuarioActualizado.email) {
+        console.error('⚠️ Usuario actualizado sin email:', usuarioActualizado);
+        const errorMsg = 'Error: No se pudo obtener el email del usuario. Por favor, actualiza tu perfil con un email válido.';
         setError(errorMsg);
         setProcesando(false);
         return;
@@ -175,9 +187,9 @@ export default function CheckoutPage() {
       let factura = null;
       try {
         const facturaData = {
-          usuarioId: usuario.id,
-          usuarioNombre: usuario.nombre || 'Usuario',
-          usuarioEmail: usuario.email, // ✅ Validado arriba
+          usuarioId: usuarioActualizado.id,
+          usuarioNombre: usuarioActualizado.nombre || 'Usuario',
+          usuarioEmail: usuarioActualizado.email, // ✅ Validado arriba, usando usuarioActualizado
           planId: plan.id,
           planNombre: plan.nombre,
           precioUF: parseFloat(plan.precio) || 0,
