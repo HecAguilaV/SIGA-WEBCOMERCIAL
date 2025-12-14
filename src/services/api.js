@@ -394,6 +394,19 @@ export async function updateEmail(newEmail, password) {
   });
 }
 
+/**
+ * Actualizar perfil del usuario autenticado
+ * Permite actualizar: nombre, apellido, rut, telefono, nombreEmpresa
+ * Todos los campos son opcionales
+ * Requiere autenticación (JWT token)
+ */
+export async function updatePerfil(perfilData) {
+  return apiRequest('/comercial/auth/perfil', {
+    method: 'PUT',
+    body: JSON.stringify(perfilData),
+  });
+}
+
 // ========== ENDPOINTS PROTEGIDOS ==========
 
 /**

@@ -6,7 +6,7 @@ import {
   Warning, FileText, ClipboardText, CheckCircle, Users, Storefront, Robot,
   ChatCircle, UserCircle, ChartBar
 } from 'phosphor-react';
-import { getFacturas, getSuscripciones, obtenerTokenOperativo, updateEmail, saveTokens, getPlanes } from '../services/api.js';
+import { getFacturas, getSuscripciones, obtenerTokenOperativo, updateEmail, updatePerfil, saveTokens, getPlanes } from '../services/api.js';
 import { formatearPrecioCLP } from '../utils/indicadoresEconomicos.js';
 import FacturaComponent from '../components/FacturaComponent.jsx';
 import '../styles/PerfilPage.css';
@@ -28,6 +28,18 @@ export default function PerfilPage() {
   const [passwordEmail, setPasswordEmail] = useState(''); // Contraseña para confirmar cambio de email
   const [cargandoEmail, setCargandoEmail] = useState(false); // Loading al actualizar email
   const [mensajeEmail, setMensajeEmail] = useState(''); // Mensaje de éxito/error al actualizar email
+  
+  // Estados para edición de perfil completo
+  const [mostrarEditarPerfil, setMostrarEditarPerfil] = useState(false); // Mostrar formulario de editar perfil
+  const [perfilEditado, setPerfilEditado] = useState({
+    nombre: '',
+    apellido: '',
+    rut: '',
+    telefono: '',
+    nombreEmpresa: ''
+  });
+  const [cargandoPerfil, setCargandoPerfil] = useState(false); // Loading al actualizar perfil
+  const [mensajePerfil, setMensajePerfil] = useState(''); // Mensaje de éxito/error al actualizar perfil
 
   if (!usuario) {
     return null;
@@ -356,6 +368,83 @@ export default function PerfilPage() {
       setMensajeEmail(mensajeError);
     } finally {
       setCargandoEmail(false);
+    }
+  };
+
+  // Inicializar formulario de perfil con datos actuales del usuario
+  useEffect(() => {
+    if (mostrarEditarPerfil && usuario) {
+      setPerfilEditado({
+        nombre: usuario.nombre || '',
+        apellido: usuario.apellido || '',
+        rut: usuario.rut || '',
+        telefono: usuario.telefono || '',
+        nombreEmpresa: usuario.nombreEmpresa || ''
+      });
+    }
+  }, [mostrarEditarPerfil, usuario]);
+
+  const manejarActualizarPerfil = async (e) => {
+    e.preventDefault();
+    setMensajePerfil('');
+    setCargandoPerfil(true);
+
+    try {
+      // Solo enviar campos que han cambiado o que tienen valor
+      const datosActualizados = {};
+      if (perfilEditado.nombre && perfilEditado.nombre !== usuario.nombre) {
+        datosActualizados.nombre = perfilEditado.nombre;
+      }
+      if (perfilEditado.apellido && perfilEditado.apellido !== usuario.apellido) {
+        datosActualizados.apellido = perfilEditado.apellido;
+      }
+      if (perfilEditado.rut && perfilEditado.rut !== usuario.rut) {
+        datosActualizados.rut = perfilEditado.rut;
+      }
+      if (perfilEditado.telefono && perfilEditado.telefono !== usuario.telefono) {
+        datosActualizados.telefono = perfilEditado.telefono;
+      }
+      if (perfilEditado.nombreEmpresa !== usuario.nombreEmpresa) {
+        datosActualizados.nombreEmpresa = perfilEditado.nombreEmpresa || null;
+      }
+
+      // Si no hay cambios, no hacer nada
+      if (Object.keys(datosActualizados).length === 0) {
+        setMensajePerfil('No hay cambios para guardar');
+        setCargandoPerfil(false);
+        return;
+      }
+
+      const response = await updatePerfil(datosActualizados);
+      
+      if (response.success && response.user) {
+        // Actualizar tokens si vienen en la respuesta
+        if (response.accessToken && response.refreshToken) {
+          saveTokens(response.accessToken, response.refreshToken);
+        }
+        
+        // Actualizar usuario en localStorage con todos los datos actualizados
+        const usuarioActualizado = {
+          ...usuario,
+          ...response.user,
+        };
+        guardarUsuarioAutenticado(usuarioActualizado);
+        
+        setMensajePerfil('✅ Perfil actualizado exitosamente');
+        setMostrarEditarPerfil(false);
+        
+        // Recargar la página después de 1.5 segundos para reflejar los cambios
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+      } else {
+        throw new Error(response.message || 'Error al actualizar el perfil');
+      }
+    } catch (error) {
+      console.error('Error al actualizar perfil:', error);
+      setMensajePerfil(error.message || 'Error al actualizar el perfil');
+    } finally {
+      setCargandoPerfil(false);
     }
   };
 
@@ -736,53 +825,197 @@ export default function PerfilPage() {
       <div className="row">
         <div className="col-lg-8 mx-auto">
           <div className="card shadow-sm border-0">
-            <div className="card-header bg-light">
+            <div className="card-header bg-light d-flex justify-content-between align-items-center">
               <h4 className="mb-0 text-primario">
                 <ClipboardText size={20} weight="fill" className="me-2" style={{ verticalAlign: 'middle' }} />
                 Información de tu Cuenta
               </h4>
+              <button
+                type="button"
+                className="btn btn-sm btn-outline-primary"
+                onClick={() => {
+                  setMostrarEditarPerfil(!mostrarEditarPerfil);
+                  setMensajePerfil('');
+                }}
+              >
+                {mostrarEditarPerfil ? 'Cancelar' : 'Editar Perfil'}
+              </button>
             </div>
             <div className="card-body">
-              <div className="row g-3">
-                <div className="col-md-6">
-                  <strong className="text-muted d-block mb-1">Nombre:</strong>
-                  <p className="mb-0">{usuario.nombre}</p>
-                </div>
-                <div className="col-md-6">
-                  <strong className="text-muted d-block mb-1">Email:</strong>
-                  <div className="d-flex align-items-center gap-2">
-                    <p className="mb-0">{usuario.email}</p>
-                    <button
-                      type="button"
-                      className="btn btn-sm btn-outline-primary"
-                      onClick={() => {
-                        setMostrarActualizarEmail(!mostrarActualizarEmail);
-                        setMensajeEmail('');
-                        setNuevoEmail('');
-                        setPasswordEmail('');
-                      }}
-                    >
-                      {mostrarActualizarEmail ? 'Cancelar' : 'Cambiar'}
-                    </button>
-                  </div>
-                </div>
-                {usuario.nombreEmpresa && (
+              {!mostrarEditarPerfil ? (
+                <div className="row g-3">
                   <div className="col-md-6">
-                    <strong className="text-muted d-block mb-1">Empresa:</strong>
-                    <p className="mb-0">{usuario.nombreEmpresa}</p>
+                    <strong className="text-muted d-block mb-1">Nombre:</strong>
+                    <p className="mb-0">{usuario.nombre || 'No especificado'}</p>
                   </div>
-                )}
-                <div className="col-md-6">
-                  <strong className="text-muted d-block mb-1">Rol:</strong>
-                  <span className="badge bg-info text-dark px-3 py-2">
-                    {usuario.rol}
-                  </span>
+                  {usuario.apellido && (
+                    <div className="col-md-6">
+                      <strong className="text-muted d-block mb-1">Apellido:</strong>
+                      <p className="mb-0">{usuario.apellido}</p>
+                    </div>
+                  )}
+                  <div className="col-md-6">
+                    <strong className="text-muted d-block mb-1">Email:</strong>
+                    <div className="d-flex align-items-center gap-2">
+                      <p className="mb-0">{usuario.email}</p>
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-outline-primary"
+                        onClick={() => {
+                          setMostrarActualizarEmail(!mostrarActualizarEmail);
+                          setMensajeEmail('');
+                          setNuevoEmail('');
+                          setPasswordEmail('');
+                        }}
+                      >
+                        {mostrarActualizarEmail ? 'Cancelar' : 'Cambiar'}
+                      </button>
+                    </div>
+                  </div>
+                  {usuario.rut && (
+                    <div className="col-md-6">
+                      <strong className="text-muted d-block mb-1">RUT:</strong>
+                      <p className="mb-0">{usuario.rut}</p>
+                    </div>
+                  )}
+                  {usuario.telefono && (
+                    <div className="col-md-6">
+                      <strong className="text-muted d-block mb-1">Teléfono:</strong>
+                      <p className="mb-0">{usuario.telefono}</p>
+                    </div>
+                  )}
+                  {usuario.nombreEmpresa && (
+                    <div className="col-md-6">
+                      <strong className="text-muted d-block mb-1">Empresa:</strong>
+                      <p className="mb-0">{usuario.nombreEmpresa}</p>
+                    </div>
+                  )}
+                  <div className="col-md-6">
+                    <strong className="text-muted d-block mb-1">Rol:</strong>
+                    <span className="badge bg-info text-dark px-3 py-2">
+                      {usuario.rol}
+                    </span>
+                  </div>
+                  <div className="col-md-6">
+                    <strong className="text-muted d-block mb-1">ID de Usuario:</strong>
+                    <p className="mb-0 text-muted">#{usuario.id}</p>
+                  </div>
                 </div>
-                <div className="col-md-6">
-                  <strong className="text-muted d-block mb-1">ID de Usuario:</strong>
-                  <p className="mb-0 text-muted">#{usuario.id}</p>
+              ) : (
+                <div>
+                  <h5 className="mb-3 text-primario">Editar Perfil</h5>
+                  
+                  {mensajePerfil && (
+                    <div className={`alert ${mensajePerfil.includes('✅') ? 'alert-success' : 'alert-danger'}`} role="alert">
+                      {mensajePerfil}
+                    </div>
+                  )}
+
+                  <form onSubmit={manejarActualizarPerfil}>
+                    <div className="row g-3">
+                      <div className="col-md-6">
+                        <label htmlFor="perfilNombre" className="form-label">
+                          Nombre
+                        </label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          id="perfilNombre"
+                          value={perfilEditado.nombre}
+                          onChange={(e) => setPerfilEditado({ ...perfilEditado, nombre: e.target.value })}
+                          placeholder="Tu nombre"
+                          disabled={cargandoPerfil}
+                        />
+                      </div>
+                      <div className="col-md-6">
+                        <label htmlFor="perfilApellido" className="form-label">
+                          Apellido
+                        </label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          id="perfilApellido"
+                          value={perfilEditado.apellido}
+                          onChange={(e) => setPerfilEditado({ ...perfilEditado, apellido: e.target.value })}
+                          placeholder="Tu apellido"
+                          disabled={cargandoPerfil}
+                        />
+                      </div>
+                      <div className="col-md-6">
+                        <label htmlFor="perfilRut" className="form-label">
+                          RUT
+                        </label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          id="perfilRut"
+                          value={perfilEditado.rut}
+                          onChange={(e) => setPerfilEditado({ ...perfilEditado, rut: e.target.value })}
+                          placeholder="12345678-9"
+                          disabled={cargandoPerfil}
+                        />
+                      </div>
+                      <div className="col-md-6">
+                        <label htmlFor="perfilTelefono" className="form-label">
+                          Teléfono
+                        </label>
+                        <input
+                          type="tel"
+                          className="form-control"
+                          id="perfilTelefono"
+                          value={perfilEditado.telefono}
+                          onChange={(e) => setPerfilEditado({ ...perfilEditado, telefono: e.target.value })}
+                          placeholder="+56912345678"
+                          disabled={cargandoPerfil}
+                        />
+                      </div>
+                      <div className="col-md-12">
+                        <label htmlFor="perfilNombreEmpresa" className="form-label">
+                          Nombre de Empresa
+                        </label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          id="perfilNombreEmpresa"
+                          value={perfilEditado.nombreEmpresa}
+                          onChange={(e) => setPerfilEditado({ ...perfilEditado, nombreEmpresa: e.target.value })}
+                          placeholder="Mi Empresa S.A."
+                          disabled={cargandoPerfil}
+                        />
+                        <small className="text-muted">Puedes actualizar el nombre de tu empresa aquí</small>
+                      </div>
+                    </div>
+
+                    <div className="d-flex gap-2 mt-4">
+                      <button
+                        type="submit"
+                        className="btn btn-primary"
+                        disabled={cargandoPerfil}
+                      >
+                        {cargandoPerfil ? (
+                          <>
+                            <span className="spinner-border spinner-border-sm me-2" role="status"></span>
+                            Guardando...
+                          </>
+                        ) : (
+                          'Guardar Cambios'
+                        )}
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-outline-secondary"
+                        onClick={() => {
+                          setMostrarEditarPerfil(false);
+                          setMensajePerfil('');
+                        }}
+                        disabled={cargandoPerfil}
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  </form>
                 </div>
-              </div>
+              )}
 
               {/* Formulario de actualizar email */}
               {mostrarActualizarEmail && (
