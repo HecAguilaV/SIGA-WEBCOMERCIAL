@@ -61,6 +61,10 @@ export default function CheckoutPage() {
     const valor = e.target.value.replace(/\D/g, ''); // Solo números
     if (valor.length <= 19) {
       setNumero(formatearNumeroTarjeta(valor));
+      // Si se completaron 16 dígitos (número de tarjeta completo), saltar al mes
+      if (valor.length === 16 && mesRef.current) {
+        mesRef.current.focus();
+      }
     }
   };
 
