@@ -34,8 +34,27 @@ export function obtenerUsuarioAutenticado() {
   return dato ? JSON.parse(dato) : null;
 }
 
-export function cerrarSesion() {
+/**
+ * Limpia TODOS los datos relacionados al usuario actual
+ * Debe llamarse antes de login/registro y al hacer logout
+ */
+export function limpiarDatosUsuario() {
+  // Limpiar usuario y tokens
   localStorage.removeItem(CLAVE_USUARIO);
+  localStorage.removeItem('accessToken');
+  localStorage.removeItem('refreshToken');
+  
+  // Limpiar datos específicos del usuario
+  localStorage.removeItem('siga_factura_actual'); // Factura del usuario anterior
+  localStorage.removeItem('siga_portal_comercial_url'); // URL del portal
+  localStorage.removeItem('siga_redirect_after_login'); // Redirect path
+  localStorage.removeItem('siga_carrito_plan'); // Carrito (limpiar al cambiar usuario)
+  
+  // NO limpiar siga_theme ya que es una preferencia del navegador, no del usuario
+}
+
+export function cerrarSesion() {
+  limpiarDatosUsuario();
 }
 
 export function guardarPlanEnCarrito(plan) {

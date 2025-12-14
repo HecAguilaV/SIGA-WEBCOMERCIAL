@@ -2,7 +2,7 @@
 // El backend es la ÚNICA fuente de verdad - NO hay fallback a datos simulados
 
 import { loginUser, registerUser, logout as apiLogout, isAuthenticated as apiIsAuthenticated } from './api.js';
-import { guardarUsuarioAutenticado, obtenerUsuarioAutenticado as obtenerUsuarioLocal, cerrarSesion as localCerrarSesion } from '../utils/auth.js';
+import { guardarUsuarioAutenticado, obtenerUsuarioAutenticado as obtenerUsuarioLocal, cerrarSesion as localCerrarSesion, limpiarDatosUsuario } from '../utils/auth.js';
 
 /**
  * Iniciar sesión con el backend real
