@@ -29,7 +29,7 @@ export default function AppPage() {
     if (portalComercialUrl !== window.location.origin) {
       window.location.href = portalComercialUrl;
     } else {
-      navigate('/');
+    navigate('/');
     }
   };
 

@@ -63,7 +63,7 @@ export async function iniciarSesion(email, password) {
       guardarUsuarioAutenticado(usuario);
       return usuario;
     }
-
+    
     // Si el backend respondió pero no fue exitoso, NO “silenciar” (en prod debe verse el error real)
     throw new Error(response?.message || 'Credenciales inválidas');
   } catch (error) {
@@ -136,7 +136,7 @@ export async function registrarUsuario(userData) {
       guardarUsuarioAutenticado(usuario);
       return usuario;
     }
-
+    
     throw new Error(response?.message || 'No se pudo registrar el usuario');
   } catch (error) {
     // En producción NO se permite fallback: el registro debe persistir en BD o fallar
