@@ -154,24 +154,23 @@ export default function PerfilPage() {
   const [suscripcionVerificada, setSuscripcionVerificada] = useState(false);
   const [suscripcionActivaData, setSuscripcionActivaData] = useState(null); // Guardar datos de suscripción activa
   
-  useEffect(() => {
-    // Si el usuario cambia (por ejemplo, después del login), resetear la verificación
-    if (usuario && usuario.id) {
-      setSuscripcionVerificada(false);
-      setTieneSuscripcionActiva(false);
-      setSuscripcionActivaData(null);
-    }
-  }, [usuario?.id]);
-  
+  // Verificar suscripción activa - se ejecuta cuando el usuario está disponible
   useEffect(() => {
     // Evitar múltiples verificaciones
-    if (suscripcionVerificada || !usuario || !usuario.id) {
+    if (!usuario || !usuario.id) {
+      return;
+    }
+    
+    // Si ya está verificado para este usuario, no verificar de nuevo
+    if (suscripcionVerificada) {
       return;
     }
     
     const verificarSuscripcion = async () => {
       try {
+        console.log('🔍 Verificando suscripción para usuario:', usuario.id);
         const response = await getSuscripciones();
+        
         // Log sanitizado (sin tokens) solo en desarrollo
         if (import.meta.env.DEV) {
           const responseSanitized = { ...response };
@@ -180,29 +179,35 @@ export default function PerfilPage() {
           if (responseSanitized.token) delete responseSanitized.token;
           console.log('📋 Respuesta de getSuscripciones (sanitizada):', responseSanitized);
         }
-        if (response.success && response.suscripciones) {
+        
+        if (response.success && response.suscripciones && response.suscripciones.length > 0) {
           const suscripcionActiva = response.suscripciones.find(
             s => s.estado === 'ACTIVA'
           );
-          console.log('✅ Suscripción activa encontrada:', suscripcionActiva);
-          setTieneSuscripcionActiva(!!suscripcionActiva);
-          setSuscripcionActivaData(suscripcionActiva || null);
           
-          // Si hay suscripción activa pero el usuario no tiene planId en localStorage,
-          // actualizar el usuario con el planId de la suscripción
-          if (suscripcionActiva && suscripcionActiva.planId && (!usuario.planId || usuario.planId !== suscripcionActiva.planId)) {
-            console.log('🔄 Actualizando usuario con planId de suscripción activa:', suscripcionActiva.planId);
-            const usuarioActualizado = {
-              ...usuario,
-              planId: suscripcionActiva.planId
-            };
-            guardarUsuarioAutenticado(usuarioActualizado);
-            // Actualizar el estado del usuario sin recargar la página
-            setUsuario(usuarioActualizado);
+          if (suscripcionActiva) {
+            console.log('✅ Suscripción activa encontrada:', suscripcionActiva);
+            setTieneSuscripcionActiva(true);
+            setSuscripcionActivaData(suscripcionActiva);
+            
+            // Actualizar usuario con planId de la suscripción activa (fuente de verdad)
+            if (suscripcionActiva.planId) {
+              const usuarioActualizado = {
+                ...usuario,
+                planId: suscripcionActiva.planId
+              };
+              guardarUsuarioAutenticado(usuarioActualizado);
+              setUsuario(usuarioActualizado);
+              console.log('🔄 Usuario actualizado con planId:', suscripcionActiva.planId);
+            }
+          } else {
+            console.log('ℹ️ Usuario tiene suscripciones pero ninguna está activa');
+            setTieneSuscripcionActiva(false);
+            setSuscripcionActivaData(null);
           }
         } else {
           // Si no hay suscripciones, es válido (usuario nuevo)
-          console.log('ℹ️ No hay suscripciones o respuesta sin suscripciones');
+          console.log('ℹ️ No hay suscripciones para este usuario');
           setTieneSuscripcionActiva(false);
           setSuscripcionActivaData(null);
         }
@@ -215,24 +220,21 @@ export default function PerfilPage() {
           setSuscripcionActivaData(null);
           setSuscripcionVerificada(true);
         } else if (error.message?.includes('401') || error.message?.includes('Sesión expirada') || error.message?.includes('No autenticado')) {
-          // Si es 401, el refresh token ya intentó renovar. Si falló, se redirigió a login.
-          // No intentar verificar de nuevo para evitar bucle infinito
           console.warn('⚠️ Error de autenticación al verificar suscripción. Sesión puede haber expirado.');
           setTieneSuscripcionActiva(false);
           setSuscripcionActivaData(null);
-          setSuscripcionVerificada(true); // Marcar como verificado para evitar reintentos
-          } else {
-            console.warn('Error al verificar suscripción:', error);
-            // Si falla, tratamos como NO activa (evita accesos incorrectos)
-            setTieneSuscripcionActiva(false);
-            setSuscripcionActivaData(null);
-            setSuscripcionVerificada(true);
-          }
+          setSuscripcionVerificada(true);
+        } else {
+          console.error('❌ Error al verificar suscripción:', error);
+          setTieneSuscripcionActiva(false);
+          setSuscripcionActivaData(null);
+          setSuscripcionVerificada(true);
+        }
       }
     };
     
     verificarSuscripcion();
-  }, [usuario?.id, suscripcionVerificada]);
+  }, [usuario?.id]); // Solo depende del ID del usuario, no del estado de verificación
 
   const limites = planActual ? {
     usuarios: planActual.limiteUsuarios,
@@ -441,27 +443,26 @@ export default function PerfilPage() {
   // Inicializar formulario de perfil con datos actuales del usuario
   // Solo cuando se abre el formulario (cuando mostrarEditarPerfil cambia a true)
   const formularioInicializado = useRef(false);
-  const usuarioInicialRef = useRef(null); // Guardar referencia del usuario cuando se abre el formulario
   
   useEffect(() => {
+    // Solo inicializar cuando se abre el formulario Y no está inicializado
     if (mostrarEditarPerfil && usuario && !formularioInicializado.current) {
       // Capturar los valores actuales del usuario solo cuando se abre el formulario
-      const valoresIniciales = {
+      setPerfilEditado({
         nombre: usuario.nombre || '',
         apellido: usuario.apellido || '',
         rut: usuario.rut || '',
         telefono: usuario.telefono || '',
         nombreEmpresa: usuario.nombreEmpresa || ''
-      };
-      setPerfilEditado(valoresIniciales);
-      usuarioInicialRef.current = valoresIniciales; // Guardar valores iniciales
+      });
       formularioInicializado.current = true;
-    } else if (!mostrarEditarPerfil) {
-      // Resetear el flag cuando se cierra el formulario
-      formularioInicializado.current = false;
-      usuarioInicialRef.current = null;
     }
-  }, [mostrarEditarPerfil]); // SOLO depende de mostrarEditarPerfil, NO de usuario
+    
+    // Resetear el flag cuando se cierra el formulario
+    if (!mostrarEditarPerfil) {
+      formularioInicializado.current = false;
+    }
+  }, [mostrarEditarPerfil]); // SOLO depende de mostrarEditarPerfil
 
   const manejarActualizarPerfil = async (e) => {
     e.preventDefault();
@@ -508,15 +509,13 @@ export default function PerfilPage() {
           ...response.user,
         };
         guardarUsuarioAutenticado(usuarioActualizado);
+        setUsuario(usuarioActualizado); // Actualizar estado sin recargar
         
         setMensajePerfil('✅ Perfil actualizado exitosamente');
         setMostrarEditarPerfil(false);
         formularioInicializado.current = false; // Resetear flag al guardar
         
-        // Recargar la página después de 1.5 segundos para reflejar los cambios
-        setTimeout(() => {
-        window.location.reload();
-        }, 1500);
+        // No recargar la página, solo actualizar el estado
       } else {
         throw new Error(response.message || 'Error al actualizar el perfil');
       }
