@@ -48,21 +48,39 @@ export default function PerfilPage() {
   }
 
   // Solo permitir “datos simulados” en desarrollo LOCAL
-  const permitirFallbackLocal = import.meta.env.DEV && window.location.hostname === 'localhost';
+  // ❌ ELIMINADO: Ya no usamos datos simulados - TODO viene del backend
 
-  // Obtener plan del usuario (primero desde localStorage, luego desde datos simulados)
-  const planes = leerPlanes();
-  let planActual = null;
-  if (usuario.planId) {
-    planActual = planes.find((p) => p.id === usuario.planId);
-  } else {
-    planActual = obtenerPlanDelUsuario(usuario.id);
-    // Si hay plan en datos simulados pero no en localStorage, sincronizar
-    if (planActual && !usuario.planId) {
-      usuario.planId = planActual.id;
-      guardarUsuarioAutenticado(usuario);
-    }
-  }
+  // Obtener plan del usuario desde el backend
+  const [planActual, setPlanActual] = useState(null);
+  const [planes, setPlanes] = useState([]);
+  
+  // Cargar planes desde el backend
+  useEffect(() => {
+    const cargarPlanes = async () => {
+      try {
+        const response = await getPlanes();
+        if (response.success && response.planes) {
+          setPlanes(response.planes);
+          // Si el usuario tiene planId, buscar el plan correspondiente
+          if (usuario.planId) {
+            const plan = response.planes.find((p) => p.id === usuario.planId);
+            setPlanActual(plan || null);
+          } else {
+            setPlanActual(null);
+          }
+        } else {
+          setPlanes([]);
+          setPlanActual(null);
+        }
+      } catch (error) {
+        console.error('Error al cargar planes:', error);
+        setPlanes([]);
+        setPlanActual(null);
+      }
+    };
+    
+    cargarPlanes();
+  }, [usuario.planId]);
 
   // ❌ ELIMINADO: Trial management ahora es responsabilidad del backend
   // Ya no usamos datos simulados para trials - el backend maneja los trials automáticamente
