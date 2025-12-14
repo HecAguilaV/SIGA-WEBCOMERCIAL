@@ -153,7 +153,14 @@ export default function PerfilPage() {
     const verificarSuscripcion = async () => {
       try {
         const response = await getSuscripciones();
-        console.log('📋 Respuesta de getSuscripciones:', response);
+        // Log sanitizado (sin tokens) solo en desarrollo
+        if (import.meta.env.DEV) {
+          const responseSanitized = { ...response };
+          if (responseSanitized.accessToken) delete responseSanitized.accessToken;
+          if (responseSanitized.refreshToken) delete responseSanitized.refreshToken;
+          if (responseSanitized.token) delete responseSanitized.token;
+          console.log('📋 Respuesta de getSuscripciones (sanitizada):', responseSanitized);
+        }
         if (response.success && response.suscripciones) {
           const suscripcionActiva = response.suscripciones.find(
             s => s.estado === 'ACTIVA'
@@ -281,7 +288,15 @@ export default function PerfilPage() {
       // Obtener token operativo mediante SSO
       console.log('🔄 Obteniendo token operativo...');
       const ssoResponse = await obtenerTokenOperativo();
-      console.log('🔑 Respuesta SSO:', ssoResponse);
+      // Log sanitizado (sin tokens) solo en desarrollo
+      if (import.meta.env.DEV) {
+        const responseSanitized = { ...ssoResponse };
+        if (responseSanitized.accessToken) delete responseSanitized.accessToken;
+        if (responseSanitized.refreshToken) delete responseSanitized.refreshToken;
+        if (responseSanitized.token) delete responseSanitized.token;
+        if (responseSanitized.data?.accessToken) delete responseSanitized.data.accessToken;
+        console.log('🔑 Respuesta SSO (sanitizada):', responseSanitized);
+      }
       
       if (!ssoResponse.success) {
         // Mejorar mensaje de error

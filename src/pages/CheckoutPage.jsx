@@ -207,7 +207,14 @@ export default function CheckoutPage() {
         
         const facturaResponse = await createFactura(facturaData);
         
-        console.log('📄 Respuesta completa de createFactura:', facturaResponse);
+        // Log sanitizado (sin tokens) solo en desarrollo
+        if (import.meta.env.DEV) {
+          const responseSanitized = { ...facturaResponse };
+          if (responseSanitized.accessToken) delete responseSanitized.accessToken;
+          if (responseSanitized.refreshToken) delete responseSanitized.refreshToken;
+          if (responseSanitized.token) delete responseSanitized.token;
+          console.log('📄 Respuesta completa de createFactura (sanitizada):', responseSanitized);
+        }
         
         // El backend puede devolver la factura de diferentes formas:
         // 1. { success: true, factura: {...} }
