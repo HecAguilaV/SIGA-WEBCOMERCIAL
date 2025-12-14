@@ -3,14 +3,54 @@
  * Este contexto se envía a Gemini para que pueda responder preguntas sobre la empresa
  */
 
-import { leerPlanes } from '../datos/datosSimulados.js';
+import { getPlanes } from '../services/api.js';
 
 /**
  * Obtiene el contexto completo de SIGA incluyendo información de la empresa,
  * planes, contacto y características del servicio
+ * Obtiene los planes desde el backend (fuente de verdad)
  */
-export function obtenerContextoSIGA() {
-  const planes = leerPlanes();
+export async function obtenerContextoSIGA() {
+  // Obtener planes desde el backend
+  let planes = [];
+  try {
+    const response = await getPlanes();
+    if (response.success && response.planes) {
+      planes = response.planes;
+    }
+  } catch (error) {
+    console.error('Error al obtener planes para contexto:', error);
+    // Si falla, usar planes por defecto básicos para el contexto
+    planes = [
+      {
+        id: 2,
+        nombre: 'Emprendedor Pro',
+        precio: 0.9,
+        unidad: 'UF',
+        caracteristicas: [
+          'Asistente SIGA con Inteligencia Artificial',
+          'Reportes avanzados',
+          '2 bodegas/sucursales',
+          '3 usuarios',
+          'Gestión de inventario multi-sucursal',
+        ],
+      },
+      {
+        id: 3,
+        nombre: 'Crecimiento',
+        precio: 1.9,
+        unidad: 'UF',
+        caracteristicas: [
+          'Todo lo del plan Emprendedor Pro',
+          'Bodegas ilimitadas',
+          'Usuarios ilimitados',
+          'Productos ilimitados',
+          'Reportes completos con IA',
+          'Soporte prioritario 24/7',
+        ],
+      },
+    ];
+  }
   
   const contexto = `
 # CONTEXTO DE SIGA - Sistema Inteligente de Gestión de Activos
@@ -46,9 +86,9 @@ SIGA (Sistema Inteligente de Gestión de Activos) es una solución SaaS completa
 
 ${planes.map(plan => `
 ### ${plan.nombre}
-- **Precio:** ${plan.precio} ${plan.unidad}/mes
+- **Precio:** ${plan.precio || plan.precioMensual || 'N/A'} ${plan.unidad || 'UF'}/mes
 - **Características:**
-${plan.caracteristicas.map(car => `  - ${car}`).join('\n')}
+${(plan.caracteristicas || []).map(car => `  - ${car}`).join('\n')}
 `).join('\n')}
 
 ## DIFERENCIAS ENTRE PLANES

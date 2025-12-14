@@ -215,15 +215,16 @@ async function apiRequest(endpoint, options = {}) {
     }
 
     if (!response.ok) {
-      // Log de error en desarrollo
-      if (import.meta.env.DEV) {
-        console.error(`❌ API Error: ${response.status} ${response.statusText}`, {
-          endpoint,
-          url,
-          responseData: data,
-          hasToken: !!token
-        });
-      }
+      // Log de error SIEMPRE para diagnosticar problemas
+      console.error(`❌ API Error: ${response.status} ${response.statusText}`, {
+        endpoint,
+        url,
+        fullUrl: url,
+        responseData: data,
+        hasToken: !!token,
+        method: options.method || 'GET',
+        requestBody: options.body ? JSON.parse(options.body) : null
+      });
       
       // Si es 404, verificar si es un error de recurso no encontrado (válido para usuarios nuevos)
       if (response.status === 404) {

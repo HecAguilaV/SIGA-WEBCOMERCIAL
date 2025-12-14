@@ -139,24 +139,8 @@ export async function registrarUsuario(userData) {
     
     throw new Error(response?.message || 'No se pudo registrar el usuario');
   } catch (error) {
-    // En producción NO se permite fallback: el registro debe persistir en BD o fallar
-    if (!permitirFallbackLocal()) {
-      throw error;
-    }
-
-    console.warn('Error al registrar con backend, usando datos locales:', error);
-    
-    // Fallback a registro local
-    const { crearUsuario } = await import('../datos/datosSimulados.js');
-    const nuevoUsuario = crearUsuario({
-      nombre: userData.nombre || userData.email.split('@')[0],
-      email: userData.email,
-      password: userData.password,
-      rol: 'cliente',
-    });
-    
-    guardarUsuarioAutenticado(nuevoUsuario);
-    return nuevoUsuario;
+    // NO hay fallback a datos simulados - el registro debe funcionar con el backend o fallar
+    throw error;
   }
 }
 

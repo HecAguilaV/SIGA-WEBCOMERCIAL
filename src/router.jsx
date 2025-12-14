@@ -70,7 +70,9 @@ export function Rutas() {
         }
       />
 
-      {/* Vistas privadas (administrador) */}
+      {/* Vistas privadas (administrador) - DESHABILITADAS: usan datos simulados */}
+      {/* TODO: Migrar páginas admin al backend antes de habilitarlas */}
+      {/* 
       <Route
         path="/admin"
         element={
@@ -84,6 +86,7 @@ export function Rutas() {
         <Route path="suscripciones" element={<AdminSuscripcionesPage />} />
         <Route path="planes" element={<AdminPlanesPage />} />
       </Route>
+      */}
 
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
