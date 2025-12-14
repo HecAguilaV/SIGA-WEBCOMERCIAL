@@ -31,7 +31,7 @@ export default function CardPlan({ plan, onSeleccionar }) {
     <div className="col-lg-6 col-md-6 mb-4">
       <div className={`plan-card-glass ${isFeatured ? 'featured' : ''}`}>
         {/* Ya no hay planes gratuitos permanentes, solo free trial temporal */}
-        
+
         <h3 className="plan-name">{plan.nombre}</h3>
 
         <div className="mb-3">

@@ -126,12 +126,12 @@ export default function Navbar() {
                 </li>
                 {/* Mostrar acceso a WebApp solo si tiene suscripción activa (plan de pago o trial activo) */}
                 {usuario.planId && (
-                  <li className="nav-item">
+                <li className="nav-item">
                     <NavLink className="nav-link fw-bold" to="/perfil" onClick={manejarClickNavLink}>
-                      <Rocket size={18} className="me-1" style={{ verticalAlign: 'middle' }} />
+                    <Rocket size={18} className="me-1" style={{ verticalAlign: 'middle' }} />
                       Acceder a WebApp
-                    </NavLink>
-                  </li>
+                  </NavLink>
+                </li>
                 )}
               </>
             )}

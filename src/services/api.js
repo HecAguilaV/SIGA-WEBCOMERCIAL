@@ -309,7 +309,14 @@ export async function registerUser(userData) {
   });
   
   // Log de respuesta del backend
-  console.log('📥 Respuesta del backend en registerUser:', response);
+  // Log sanitizado (sin tokens) solo en desarrollo
+  if (import.meta.env.DEV) {
+    const responseSanitized = { ...response };
+    if (responseSanitized.accessToken) delete responseSanitized.accessToken;
+    if (responseSanitized.refreshToken) delete responseSanitized.refreshToken;
+    if (responseSanitized.token) delete responseSanitized.token;
+    console.log('📥 Respuesta del backend en registerUser (sanitizada):', responseSanitized);
+  }
   
   return response;
 }

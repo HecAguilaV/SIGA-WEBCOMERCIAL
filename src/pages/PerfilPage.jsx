@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { obtenerUsuarioAutenticado, guardarPlanEnCarrito, guardarUsuarioAutenticado } from '../utils/auth.js';
 import {
@@ -406,8 +406,10 @@ export default function PerfilPage() {
 
   // Inicializar formulario de perfil con datos actuales del usuario
   // Solo cuando se abre el formulario (cuando mostrarEditarPerfil cambia a true)
+  const formularioInicializado = useRef(false);
+  
   useEffect(() => {
-    if (mostrarEditarPerfil && usuario) {
+    if (mostrarEditarPerfil && usuario && !formularioInicializado.current) {
       // Capturar los valores actuales del usuario solo cuando se abre el formulario
       setPerfilEditado({
         nombre: usuario.nombre || '',
@@ -416,8 +418,12 @@ export default function PerfilPage() {
         telefono: usuario.telefono || '',
         nombreEmpresa: usuario.nombreEmpresa || ''
       });
+      formularioInicializado.current = true;
+    } else if (!mostrarEditarPerfil) {
+      // Resetear el flag cuando se cierra el formulario
+      formularioInicializado.current = false;
     }
-  }, [mostrarEditarPerfil]); // Solo depende de mostrarEditarPerfil, NO de usuario
+  }, [mostrarEditarPerfil, usuario]); // Incluir usuario pero protegido con useRef
 
   const manejarActualizarPerfil = async (e) => {
     e.preventDefault();
@@ -467,6 +473,7 @@ export default function PerfilPage() {
         
         setMensajePerfil('✅ Perfil actualizado exitosamente');
         setMostrarEditarPerfil(false);
+        formularioInicializado.current = false; // Resetear flag al guardar
         
         // Recargar la página después de 1.5 segundos para reflejar los cambios
         setTimeout(() => {
@@ -1042,6 +1049,7 @@ export default function PerfilPage() {
                         onClick={() => {
                           setMostrarEditarPerfil(false);
                           setMensajePerfil('');
+                          formularioInicializado.current = false; // Resetear flag al cancelar
                         }}
                         disabled={cargandoPerfil}
                       >

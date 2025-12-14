@@ -30,14 +30,14 @@ export default function PlanesPage() {
             caracteristicas: plan.caracteristicas && plan.caracteristicas.length > 0 
               ? plan.caracteristicas
               : [ // Construir características desde otros campos si no vienen del backend
-                  plan.descripcion || 'Plan de suscripción',
+              plan.descripcion || 'Plan de suscripción',
                   plan.limiteBodegas !== null && plan.limiteBodegas !== undefined
                     ? `${plan.limiteBodegas === -1 ? 'Ilimitadas' : plan.limiteBodegas} bodega${plan.limiteBodegas !== 1 ? 's' : ''}`
                     : 'Bodegas ilimitadas',
                   plan.limiteUsuarios !== null && plan.limiteUsuarios !== undefined
                     ? `${plan.limiteUsuarios === -1 ? 'Ilimitados' : plan.limiteUsuarios} usuario${plan.limiteUsuarios !== 1 ? 's' : ''}`
                     : 'Usuarios ilimitados',
-                ],
+            ],
           }));
           setPlanes(planesMapeados);
         } else {

@@ -26,8 +26,14 @@ export async function iniciarSesion(email, password) {
     // Intentar login con el backend real
     const response = await loginUser(email, password);
     
-    // Log de debugging para ver qué retorna el backend
-    console.log('🔐 Respuesta del login:', response);
+    // Log de debugging (sin exponer tokens)
+    if (import.meta.env.DEV) {
+      const responseSanitized = { ...response };
+      if (responseSanitized.accessToken) delete responseSanitized.accessToken;
+      if (responseSanitized.refreshToken) delete responseSanitized.refreshToken;
+      if (responseSanitized.token) delete responseSanitized.token;
+      console.log('🔐 Respuesta del login (sanitizada):', responseSanitized);
+    }
     
     if (response.success) {
       // Guardar información del usuario en localStorage para compatibilidad
@@ -45,12 +51,14 @@ export async function iniciarSesion(email, password) {
       
       // Validar que el email esté presente
       if (!usuario.email) {
-        console.error('⚠️ ADVERTENCIA: Usuario logueado sin email. Response:', response);
+        console.error('⚠️ ADVERTENCIA: Usuario logueado sin email');
         usuario.email = email; // Usar el email del login como fallback
       }
       
-      // Log del usuario que se va a guardar
-      console.log('💾 Guardando usuario en localStorage:', usuario);
+      // Log del usuario que se va a guardar (sin tokens)
+      if (import.meta.env.DEV) {
+        console.log('💾 Guardando usuario en localStorage:', { ...usuario, email: usuario.email ? '***' : undefined });
+      }
       
       guardarUsuarioAutenticado(usuario);
       return usuario;
@@ -91,8 +99,14 @@ export async function registrarUsuario(userData) {
     // Intentar registro con el backend real
     const response = await registerUser(userData);
     
-    // Log de debugging para ver qué retorna el backend
-    console.log('📝 Respuesta del registro:', response);
+    // Log de debugging (sin exponer tokens)
+    if (import.meta.env.DEV) {
+      const responseSanitized = { ...response };
+      if (responseSanitized.accessToken) delete responseSanitized.accessToken;
+      if (responseSanitized.refreshToken) delete responseSanitized.refreshToken;
+      if (responseSanitized.token) delete responseSanitized.token;
+      console.log('📝 Respuesta del registro (sanitizada):', responseSanitized);
+    }
     
     if (response.success) {
       // Guardar información del usuario
@@ -110,12 +124,14 @@ export async function registrarUsuario(userData) {
       
       // Validar que el email esté presente
       if (!usuario.email) {
-        console.error('⚠️ ADVERTENCIA: Usuario registrado sin email. Response:', response);
+        console.error('⚠️ ADVERTENCIA: Usuario registrado sin email');
         usuario.email = userData.email; // Usar el email del formulario como fallback
       }
       
-      // Log del usuario que se va a guardar
-      console.log('💾 Guardando usuario en localStorage:', usuario);
+      // Log del usuario que se va a guardar (sin tokens)
+      if (import.meta.env.DEV) {
+        console.log('💾 Guardando usuario en localStorage:', { ...usuario, email: usuario.email ? '***' : undefined });
+      }
       
       guardarUsuarioAutenticado(usuario);
       return usuario;
