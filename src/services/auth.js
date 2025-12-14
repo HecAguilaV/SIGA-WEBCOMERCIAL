@@ -2,21 +2,7 @@
 // El backend es la ÚNICA fuente de verdad - NO hay fallback a datos simulados
 
 import { loginUser, registerUser, logout as apiLogout, isAuthenticated as apiIsAuthenticated } from './api.js';
-
-// Importaciones dinámicas para evitar problemas de inicialización circular
-let guardarUsuarioAutenticado, obtenerUsuarioLocal, localCerrarSesion, limpiarDatosUsuario;
-
-// Lazy load de funciones de utils/auth.js para evitar problemas de inicialización
-function getAuthUtils() {
-  if (!guardarUsuarioAutenticado) {
-    const authUtils = require('../utils/auth.js');
-    guardarUsuarioAutenticado = authUtils.guardarUsuarioAutenticado;
-    obtenerUsuarioLocal = authUtils.obtenerUsuarioAutenticado;
-    localCerrarSesion = authUtils.cerrarSesion;
-    limpiarDatosUsuario = authUtils.limpiarDatosUsuario;
-  }
-  return { guardarUsuarioAutenticado, obtenerUsuarioLocal, localCerrarSesion, limpiarDatosUsuario };
-}
+import { guardarUsuarioAutenticado, obtenerUsuarioAutenticado as obtenerUsuarioLocal, cerrarSesion as localCerrarSesion, limpiarDatosUsuario } from '../utils/auth.js';
 
 /**
  * Iniciar sesión con el backend real
@@ -71,7 +57,7 @@ export async function iniciarSesion(email, password) {
         console.log('💾 Guardando usuario en localStorage:', { ...usuario, email: usuario.email ? '***' : undefined });
       }
       
-      guardarUsuario(usuario);
+      guardarUsuarioAutenticado(usuario);
       return usuario;
     }
     
@@ -89,10 +75,8 @@ export async function iniciarSesion(email, password) {
  */
 export async function registrarUsuario(userData) {
   try {
-    const { limpiarDatosUsuario: limpiarDatos, guardarUsuarioAutenticado: guardarUsuario } = getAuthUtils();
-    
     // CRÍTICO: Limpiar datos del usuario anterior antes de registrar nuevo usuario
-    limpiarDatos();
+    limpiarDatosUsuario();
     
     // Intentar registro con el backend real
     const response = await registerUser(userData);
@@ -131,7 +115,7 @@ export async function registrarUsuario(userData) {
         console.log('💾 Guardando usuario en localStorage:', { ...usuario, email: usuario.email ? '***' : undefined });
       }
       
-      guardarUsuario(usuario);
+      guardarUsuarioAutenticado(usuario);
       return usuario;
     }
     
@@ -156,8 +140,7 @@ export function cerrarSesion() {
  */
 export function obtenerUsuarioAutenticado() {
   // Usar la función del utils/auth.js que ya maneja localStorage
-  const { obtenerUsuarioLocal: obtenerUsuario } = getAuthUtils();
-  return obtenerUsuario();
+  return obtenerUsuarioLocal();
 }
 
 /**
