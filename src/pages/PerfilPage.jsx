@@ -282,9 +282,14 @@ export default function PerfilPage() {
         throw new Error('No se recibió token de acceso. Por favor, intenta nuevamente.');
       }
       
-      const webAppUrl = ssoResponse.webAppUrl || ssoResponse.data?.webAppUrl || 'https://app.siga.com';
+      // URL de WebApp: usar la del backend si viene, sino usar la URL de producción
+      const webAppUrl = ssoResponse.webAppUrl || ssoResponse.data?.webAppUrl || 'https://siga-appweb.vercel.app';
       
-      console.log('✅ SSO exitoso. Redirigiendo a WebApp...');
+      console.log('✅ SSO exitoso. Redirigiendo a WebApp:', webAppUrl);
+      
+      // Guardar URL del portal comercial para que WebApp pueda redirigir de vuelta
+      const portalComercialUrl = window.location.origin;
+      localStorage.setItem('siga_portal_comercial_url', portalComercialUrl);
       
       // Redirigir a WebApp con token en URL
       window.location.href = `${webAppUrl}?token=${tokenOperativo}`;

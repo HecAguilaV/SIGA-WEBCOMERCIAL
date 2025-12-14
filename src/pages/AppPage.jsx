@@ -21,7 +21,16 @@ export default function AppPage() {
   };
 
   const manejarVolver = () => {
-    navigate('/');
+    // Si estamos en WebApp externa (iframe), redirigir a la URL del portal comercial
+    // Si estamos en /app local, usar navigate
+    const portalComercialUrl = localStorage.getItem('siga_portal_comercial_url') || window.location.origin;
+    
+    // Si la URL guardada es diferente a la actual, estamos en WebApp externa
+    if (portalComercialUrl !== window.location.origin) {
+      window.location.href = portalComercialUrl;
+    } else {
+      navigate('/');
+    }
   };
 
   return (
