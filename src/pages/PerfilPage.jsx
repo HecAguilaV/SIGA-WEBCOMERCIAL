@@ -57,26 +57,33 @@ export default function PerfilPage() {
         const response = await getPlanes();
         if (response.success && response.planes) {
           setPlanes(response.planes);
-          // Si el usuario tiene planId, buscar el plan correspondiente
-          if (usuario.planId) {
-            const plan = response.planes.find((p) => p.id === usuario.planId);
-            setPlanActual(plan || null);
-          } else {
-            setPlanActual(null);
-          }
         } else {
           setPlanes([]);
-          setPlanActual(null);
         }
       } catch (error) {
         console.error('Error al cargar planes:', error);
         setPlanes([]);
-        setPlanActual(null);
       }
     };
     
     cargarPlanes();
-  }, [usuario.planId]);
+  }, []);
+
+  // Determinar plan actual basado en suscripción activa (no solo planId en localStorage)
+  useEffect(() => {
+    const determinarPlanActual = async () => {
+      // Solo mostrar plan si hay suscripción activa verificada
+      if (tieneSuscripcionActiva && usuario.planId && planes.length > 0) {
+        const plan = planes.find((p) => p.id === usuario.planId);
+        setPlanActual(plan || null);
+      } else {
+        // Si no hay suscripción activa, no mostrar plan (aunque tenga planId en localStorage)
+        setPlanActual(null);
+      }
+    };
+    
+    determinarPlanActual();
+  }, [tieneSuscripcionActiva, usuario.planId, planes]);
 
   // ❌ ELIMINADO: Trial management ahora es responsabilidad del backend
   // Ya no usamos datos simulados para trials - el backend maneja los trials automáticamente
