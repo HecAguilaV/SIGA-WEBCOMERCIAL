@@ -16,7 +16,7 @@ import '../styles/PerfilPage.css';
 // Incluye gestión de free trial de 14 días
 export default function PerfilPage() {
   const navigate = useNavigate();
-  const usuario = obtenerUsuarioAutenticado();
+  const [usuario, setUsuario] = useState(obtenerUsuarioAutenticado());
   const [facturas, setFacturas] = useState([]); // Estado para almacenar las facturas del usuario
   const [facturaSeleccionada, setFacturaSeleccionada] = useState(null); // Factura seleccionada para ver/imprimir
   const [cargandoSSO, setCargandoSSO] = useState(false); // Estado para manejar SSO
@@ -69,21 +69,25 @@ export default function PerfilPage() {
     cargarPlanes();
   }, []);
 
-  // Determinar plan actual basado en suscripción activa (no solo planId en localStorage)
+  // Determinar plan actual basado en suscripción activa
   useEffect(() => {
     const determinarPlanActual = async () => {
-      // Solo mostrar plan si hay suscripción activa verificada
-      if (tieneSuscripcionActiva && usuario.planId && planes.length > 0) {
-        const plan = planes.find((p) => p.id === usuario.planId);
+      // Si hay suscripción activa, usar el planId de la suscripción (fuente de verdad del backend)
+      const planIdParaBuscar = suscripcionActivaData?.planId || usuario?.planId;
+      
+      if (tieneSuscripcionActiva && planIdParaBuscar && planes.length > 0) {
+        const plan = planes.find((p) => p.id === planIdParaBuscar);
+        console.log('📦 Plan encontrado para mostrar:', plan);
         setPlanActual(plan || null);
       } else {
-        // Si no hay suscripción activa, no mostrar plan (aunque tenga planId en localStorage)
+        // Si no hay suscripción activa, no mostrar plan
+        console.log('❌ No se muestra plan - tieneSuscripcionActiva:', tieneSuscripcionActiva, 'planId:', planIdParaBuscar, 'planes:', planes.length);
         setPlanActual(null);
       }
     };
     
     determinarPlanActual();
-  }, [tieneSuscripcionActiva, usuario.planId, planes]);
+  }, [tieneSuscripcionActiva, suscripcionActivaData, usuario?.planId, planes]);
 
   // ❌ ELIMINADO: Trial management ahora es responsabilidad del backend
   // Ya no usamos datos simulados para trials - el backend maneja los trials automáticamente
@@ -138,6 +142,7 @@ export default function PerfilPage() {
 
   // Verificar suscripción activa al montar el componente (solo una vez)
   const [suscripcionVerificada, setSuscripcionVerificada] = useState(false);
+  const [suscripcionActivaData, setSuscripcionActivaData] = useState(null); // Guardar datos de suscripción activa
   
   useEffect(() => {
     // Evitar múltiples verificaciones
@@ -148,14 +153,32 @@ export default function PerfilPage() {
     const verificarSuscripcion = async () => {
       try {
         const response = await getSuscripciones();
+        console.log('📋 Respuesta de getSuscripciones:', response);
         if (response.success && response.suscripciones) {
           const suscripcionActiva = response.suscripciones.find(
             s => s.estado === 'ACTIVA'
           );
+          console.log('✅ Suscripción activa encontrada:', suscripcionActiva);
           setTieneSuscripcionActiva(!!suscripcionActiva);
+          setSuscripcionActivaData(suscripcionActiva || null);
+          
+          // Si hay suscripción activa pero el usuario no tiene planId en localStorage,
+          // actualizar el usuario con el planId de la suscripción
+          if (suscripcionActiva && suscripcionActiva.planId && (!usuario.planId || usuario.planId !== suscripcionActiva.planId)) {
+            console.log('🔄 Actualizando usuario con planId de suscripción activa:', suscripcionActiva.planId);
+            const usuarioActualizado = {
+              ...usuario,
+              planId: suscripcionActiva.planId
+            };
+            guardarUsuarioAutenticado(usuarioActualizado);
+            // Actualizar el estado del usuario sin recargar la página
+            setUsuario(usuarioActualizado);
+          }
         } else {
           // Si no hay suscripciones, es válido (usuario nuevo)
+          console.log('ℹ️ No hay suscripciones o respuesta sin suscripciones');
           setTieneSuscripcionActiva(false);
+          setSuscripcionActivaData(null);
         }
         setSuscripcionVerificada(true);
       } catch (error) {
@@ -163,17 +186,20 @@ export default function PerfilPage() {
         if (error.message?.includes('404') || error.message?.includes('NOT_FOUND')) {
           console.log('ℹ️ Usuario sin suscripciones (404 es válido para usuarios nuevos)');
           setTieneSuscripcionActiva(false);
+          setSuscripcionActivaData(null);
           setSuscripcionVerificada(true);
         } else if (error.message?.includes('401') || error.message?.includes('Sesión expirada') || error.message?.includes('No autenticado')) {
           // Si es 401, el refresh token ya intentó renovar. Si falló, se redirigió a login.
           // No intentar verificar de nuevo para evitar bucle infinito
           console.warn('⚠️ Error de autenticación al verificar suscripción. Sesión puede haber expirado.');
           setTieneSuscripcionActiva(false);
+          setSuscripcionActivaData(null);
           setSuscripcionVerificada(true); // Marcar como verificado para evitar reintentos
           } else {
             console.warn('Error al verificar suscripción:', error);
             // Si falla, tratamos como NO activa (evita accesos incorrectos)
             setTieneSuscripcionActiva(false);
+            setSuscripcionActivaData(null);
             setSuscripcionVerificada(true);
           }
       }
