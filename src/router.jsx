@@ -56,7 +56,6 @@ export function Rutas() {
         }
       />
 
-      {/* Vistas privadas (administrador) - ELIMINADAS: usaban datos simulados */}
 
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
