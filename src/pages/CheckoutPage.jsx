@@ -147,8 +147,19 @@ export default function CheckoutPage() {
       let usuarioActualizado = { ...usuario };
       
       try {
+        // Verificar que el usuario tenga token antes de crear suscripción
+        const token = localStorage.getItem('accessToken');
+        if (!token) {
+          throw new Error('No estás autenticado. Por favor, inicia sesión nuevamente.');
+        }
+        
+        console.log('🔄 Creando suscripción para plan:', plan.id);
+        console.log('👤 Usuario ID:', usuario.id, 'Email:', usuario.email);
+        
         // Intentar crear suscripción en el backend real
         const response = await createSuscripcion(plan.id, 'MENSUAL');
+        
+        console.log('📋 Respuesta de createSuscripcion:', response);
         
         if (response.success && response.suscripcion) {
           // Suscripción creada exitosamente en el backend
@@ -167,7 +178,20 @@ export default function CheckoutPage() {
           throw new Error(response.message || 'Error al crear suscripción');
         }
       } catch (error) {
-        setError(error?.message || 'No se pudo crear la suscripción en el backend.');
+        console.error('❌ Error al crear suscripción:', error);
+        
+        // Mensajes de error más específicos
+        let errorMsg = error?.message || 'No se pudo crear la suscripción en el backend.';
+        
+        if (error.message?.includes('403') || error.message?.includes('Forbidden') || error.message?.includes('permisos')) {
+          errorMsg = 'Error: No tienes permisos para crear suscripciones. Verifica que tu cuenta esté activa y que tengas un email registrado. Si el problema persiste, contacta al soporte.';
+        } else if (error.message?.includes('401') || error.message?.includes('autenticado')) {
+          errorMsg = 'Error: Tu sesión ha expirado. Por favor, inicia sesión nuevamente.';
+        } else if (error.message?.includes('email')) {
+          errorMsg = 'Error: Tu cuenta no tiene un email registrado. Por favor, actualiza tu perfil con un email válido antes de realizar el pago.';
+        }
+        
+        setError(errorMsg);
         setProcesando(false);
         return;
       }
@@ -227,7 +251,7 @@ export default function CheckoutPage() {
           factura = facturaResponse.factura || facturaResponse.data || facturaResponse;
           
           if (factura && (factura.id || factura.numero || factura.numeroFactura)) {
-            // Guardar el número de factura en localStorage para que CompraExitosaPage pueda mostrarla
+          // Guardar el número de factura en localStorage para que CompraExitosaPage pueda mostrarla
             const numeroFactura = factura.numeroFactura || factura.numero || factura.id;
             localStorage.setItem('siga_factura_actual', numeroFactura);
             console.log('✅ Factura creada y guardada:', numeroFactura);

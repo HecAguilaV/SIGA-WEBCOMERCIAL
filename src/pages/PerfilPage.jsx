@@ -310,7 +310,7 @@ export default function PerfilPage() {
     
     try {
       console.log('🔍 Iniciando SSO. Usuario:', usuario);
-      
+
       // Verificar que tenga suscripción activa
       const suscripcionesResponse = await getSuscripciones();
       console.log('📋 Respuesta de suscripciones:', suscripcionesResponse);
@@ -323,7 +323,7 @@ export default function PerfilPage() {
           setErrorSSO('No tienes una suscripción activa. Por favor adquiere un plan primero.');
           setCargandoSSO(false);
           return;
-        } else {
+      } else {
           console.warn('⚠️ Usuario tiene planId pero no suscripciones en backend. Intentando SSO de todas formas...');
         }
       } else {
@@ -445,7 +445,7 @@ export default function PerfilPage() {
 
         // Recargar la página después de 2 segundos para reflejar los cambios
         setTimeout(() => {
-          window.location.reload();
+        window.location.reload();
         }, 2000);
       } else {
         // El backend retorna mensajes claros, usarlos directamente

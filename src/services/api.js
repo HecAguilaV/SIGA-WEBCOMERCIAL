@@ -74,47 +74,47 @@ async function refreshAccessToken() {
   isRefreshing = true;
   refreshPromise = (async () => {
     try {
-      const refreshToken = getRefreshToken();
-      
-      if (!refreshToken) {
-        throw new Error('No hay refresh token disponible');
-      }
+  const refreshToken = getRefreshToken();
+  
+  if (!refreshToken) {
+    throw new Error('No hay refresh token disponible');
+  }
 
       const response = await fetch(`${API_URL}/comercial/auth/refresh`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ refreshToken }),
-      });
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ refreshToken }),
+    });
 
-      const data = await response.json();
+    const data = await response.json();
 
-      if (!response.ok) {
-        // Si el refresh falla, limpiar tokens y redirigir a login
-        clearTokens();
-        if (window.location.pathname !== '/login') {
-          window.location.href = '/login';
-        }
-        throw new Error(data.message || 'Error al renovar token');
-      }
-
-      if (data.success && data.accessToken) {
-        saveTokens(data.accessToken, data.refreshToken || refreshToken);
-        return data.accessToken;
-      }
-
-      throw new Error('Error al renovar token');
-    } catch (error) {
+    if (!response.ok) {
+      // Si el refresh falla, limpiar tokens y redirigir a login
       clearTokens();
       if (window.location.pathname !== '/login') {
         window.location.href = '/login';
       }
-      throw error;
+      throw new Error(data.message || 'Error al renovar token');
+    }
+
+    if (data.success && data.accessToken) {
+        saveTokens(data.accessToken, data.refreshToken || refreshToken);
+      return data.accessToken;
+    }
+
+    throw new Error('Error al renovar token');
+  } catch (error) {
+    clearTokens();
+    if (window.location.pathname !== '/login') {
+      window.location.href = '/login';
+    }
+    throw error;
     } finally {
       isRefreshing = false;
       refreshPromise = null;
-    }
+  }
   })();
   
   return refreshPromise;
@@ -216,6 +216,26 @@ async function apiRequest(endpoint, options = {}) {
       if (response.status === 401) {
         // Puede ser token inválido o contraseña incorrecta
         const errorMsg = data.message || 'No autenticado o contraseña incorrecta';
+        throw new Error(errorMsg);
+      }
+      
+      if (response.status === 403) {
+        // Forbidden - Usuario no tiene permisos o falta validación
+        let errorMsg = data.message || 'No tienes permisos para realizar esta acción';
+        
+        // Mensajes más específicos según el contexto
+        if (endpoint.includes('/suscripciones')) {
+          errorMsg = data.message || 'No tienes permisos para crear suscripciones. Verifica que tu cuenta esté activa y que tengas un email registrado.';
+        } else if (endpoint.includes('/facturas')) {
+          errorMsg = data.message || 'No tienes permisos para crear facturas. Verifica que tu cuenta esté activa y que tengas un email registrado.';
+        }
+        
+        console.error('❌ Error 403 (Forbidden):', {
+          endpoint,
+          message: errorMsg,
+          responseData: data
+        });
+        
         throw new Error(errorMsg);
       }
       
