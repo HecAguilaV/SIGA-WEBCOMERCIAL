@@ -28,8 +28,9 @@ import '../styles/PerfilPage.css';
 export default function PerfilPage() {
   const navigate = useNavigate();
   const usuario = obtenerUsuarioAutenticado();
-  const [trialInfo, setTrialInfo] = useState(null);
-  const [puedeTrial, setPuedeTrial] = useState(false);
+  // ❌ ELIMINADO: Trial management ahora es responsabilidad del backend
+  // const [trialInfo, setTrialInfo] = useState(null);
+  // const [puedeTrial, setPuedeTrial] = useState(false);
   const [facturas, setFacturas] = useState([]); // Estado para almacenar las facturas del usuario
   const [facturaSeleccionada, setFacturaSeleccionada] = useState(null); // Factura seleccionada para ver/imprimir
   const [cargandoSSO, setCargandoSSO] = useState(false); // Estado para manejar SSO
@@ -395,30 +396,8 @@ export default function PerfilPage() {
                 </div>
               </div>
               <div className="plan-actual-body">
-                {/* Alerta de trial activo */}
-                {trialInfo && trialInfo.activo && (
-                  <div className="alert alert-warning mb-4" role="alert">
-                    <div className="d-flex justify-content-between align-items-center flex-wrap">
-                      <div>
-                        <strong>
-                          <Clock size={18} weight="fill" className="me-1" style={{ verticalAlign: 'middle' }} />
-                          Free Trial Activo
-                        </strong>
-                        <p className="mb-0 mt-2">
-                          Tienes <strong>{trialInfo.diasRestantes} días restantes</strong> de tu trial gratuito de 14 días.
-                          Después del trial, perderás el acceso hasta que contrates un plan de pago.
-                        </p>
-                      </div>
-                      <button
-                        className="btn btn-success mt-3 mt-md-0"
-                        onClick={manejarConvertirTrialAPagado}
-                      >
-                        <CreditCard size={18} weight="fill" className="me-1" style={{ verticalAlign: 'middle' }} />
-                        Convertir a Suscripción
-                      </button>
-                    </div>
-                  </div>
-                )}
+                {/* ❌ ELIMINADO: Trial info ahora viene del backend en las suscripciones */}
+                {/* El backend maneja los trials automáticamente */}
 
                 <div className="row mb-4">
                   <div className="col-md-6">
