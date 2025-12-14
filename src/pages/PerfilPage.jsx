@@ -274,13 +274,15 @@ export default function PerfilPage() {
         throw new Error(errorMsg);
       }
       
-      if (!ssoResponse.data?.accessToken) {
+      // El accessToken puede estar en ssoResponse.accessToken o ssoResponse.data.accessToken
+      const tokenOperativo = ssoResponse.accessToken || ssoResponse.data?.accessToken;
+      
+      if (!tokenOperativo) {
         console.error('❌ SSO exitoso pero sin accessToken:', ssoResponse);
         throw new Error('No se recibió token de acceso. Por favor, intenta nuevamente.');
       }
       
-      const tokenOperativo = ssoResponse.data.accessToken;
-      const webAppUrl = ssoResponse.data.webAppUrl || 'https://app.siga.com';
+      const webAppUrl = ssoResponse.webAppUrl || ssoResponse.data?.webAppUrl || 'https://app.siga.com';
       
       console.log('✅ SSO exitoso. Redirigiendo a WebApp...');
       

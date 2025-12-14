@@ -18,6 +18,10 @@ export default function CheckoutPage() {
   const [procesando, setProcesando] = useState(false);
   const [precioCLP, setPrecioCLP] = useState(null);
   const [cargandoPrecio, setCargandoPrecio] = useState(true);
+  // Refs para auto-focus entre campos
+  const mesRef = useRef(null);
+  const anioRef = useRef(null);
+  const cvvRef = useRef(null);
   // Obtener el plan del carrito y el usuario autenticado desde localStorage
   const plan = obtenerPlanDelCarrito();
   const usuario = obtenerUsuarioAutenticado();
@@ -73,8 +77,15 @@ export default function CheckoutPage() {
 
   const manejarCambioMes = (e) => {
     const valor = e.target.value.replace(/\D/g, '');
-    if (valor.length <= 2 && parseInt(valor) <= 12) {
-      setMes(valor);
+    if (valor.length <= 2) {
+      const mesNum = parseInt(valor);
+      if (valor === '' || (mesNum >= 1 && mesNum <= 12)) {
+        setMes(valor);
+        // Si se completaron 2 dígitos, saltar al año
+        if (valor.length === 2 && anioRef.current) {
+          anioRef.current.focus();
+        }
+      }
     }
   };
 
@@ -82,6 +93,10 @@ export default function CheckoutPage() {
     const valor = e.target.value.replace(/\D/g, '');
     if (valor.length <= 4) {
       setAnio(valor);
+      // Si se completaron 4 dígitos, saltar al CVV
+      if (valor.length === 4 && cvvRef.current) {
+        cvvRef.current.focus();
+      }
     }
   };
 
@@ -217,7 +232,17 @@ export default function CheckoutPage() {
           // Guardar el número de factura en localStorage para que CompraExitosaPage pueda mostrarla
           localStorage.setItem('siga_factura_actual', factura.numeroFactura || factura.numero);
         } else {
-          throw new Error(facturaResponse.message || 'Error al crear factura en backend');
+          // Si success es false pero hay mensaje, puede ser un mensaje informativo, no necesariamente error
+          // Solo lanzar error si realmente falló
+          const errorMsg = facturaResponse.message || 'Error al crear factura en backend';
+          // Si el mensaje dice "exitosamente", no es un error
+          if (!errorMsg.toLowerCase().includes('exitosamente') && !errorMsg.toLowerCase().includes('success')) {
+            throw new Error(errorMsg);
+          }
+          // Si llegamos aquí y no hay factura, intentar usar el mensaje como información
+          if (!facturaResponse.factura) {
+            throw new Error('No se recibió la factura del backend');
+          }
         }
       } catch (error) {
         // En producción: NO simular. Si falla la factura en backend, debe verse.
@@ -489,7 +514,8 @@ export default function CheckoutPage() {
                         CVV <span className="text-danger">*</span>
                       </label>
                       <input
-                        type="text"
+                        ref={cvvRef}
+                        type="password"
                         className="form-control form-control-lg"
                         placeholder="123"
                         value={cvv}
