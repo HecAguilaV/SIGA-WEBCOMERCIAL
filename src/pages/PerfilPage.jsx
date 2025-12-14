@@ -49,28 +49,19 @@ export default function PerfilPage() {
   // También verificar cuando la página se vuelve visible (por ejemplo, después de volver del pago)
   useEffect(() => {
     const actualizarUsuario = () => {
-      try {
-        const usuarioActual = obtenerUsuarioAutenticado();
-        if (usuarioActual) {
-          // Si el usuario cambió o tiene un planId nuevo, actualizar y resetear verificación
-          if (!usuario || usuarioActual.id !== usuario.id || usuarioActual.planId !== usuario?.planId) {
-            setUsuario(usuarioActual);
-            // Si el usuario tiene un planId nuevo, resetear la verificación de suscripción
-            if (usuarioActual.planId && usuarioActual.planId !== usuario?.planId) {
-              console.log('🔄 PlanId cambió, reseteando verificación de suscripción');
-              setSuscripcionVerificada(false);
-              setTieneSuscripcionActiva(false);
-              setSuscripcionActivaData(null);
-            }
+      const usuarioActual = obtenerUsuarioAutenticado();
+      if (usuarioActual) {
+        // Si el usuario cambió o tiene un planId nuevo, actualizar y resetear verificación
+        if (!usuario || usuarioActual.id !== usuario.id || usuarioActual.planId !== usuario?.planId) {
+          setUsuario(usuarioActual);
+          // Si el usuario tiene un planId nuevo, resetear la verificación de suscripción
+          if (usuarioActual.planId && usuarioActual.planId !== usuario?.planId) {
+            console.log('🔄 PlanId cambió, reseteando verificación de suscripción');
+            setSuscripcionVerificada(false);
+            setTieneSuscripcionActiva(false);
+            setSuscripcionActivaData(null);
           }
-        } else if (!usuarioActual && usuario) {
-          // Si no hay usuario pero había uno antes, redirigir al login
-          navigate('/login', { replace: true });
         }
-      } catch (error) {
-        console.error('Error al actualizar usuario:', error);
-        // Si hay error, redirigir al login
-        navigate('/login', { replace: true });
       }
     };
     

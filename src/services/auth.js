@@ -134,13 +134,8 @@ export function cerrarSesion() {
   localCerrarSesion();
 }
 
-/**
- * Obtener usuario autenticado (compatibilidad con utils/auth.js)
- */
-export function obtenerUsuarioAutenticado() {
-  // Usar la función del utils/auth.js que ya maneja localStorage
-  return obtenerUsuarioLocal();
-}
+// NOTA: obtenerUsuarioAutenticado está en utils/auth.js
+// No re-exportar aquí para evitar confusión y problemas de inicialización
 
 /**
  * Verificar si hay sesión activa (backend o local)
