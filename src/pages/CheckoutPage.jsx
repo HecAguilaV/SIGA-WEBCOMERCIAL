@@ -259,14 +259,25 @@ export default function CheckoutPage() {
       }
     }
     
-    vaciarCarrito();
+    // ✅ Navegar PRIMERO a /exito antes de vaciar el carrito
+    // Esto evita que el useEffect detecte que no hay plan y redirija a /planes
     setProcesando(false);
     navigate('/exito');
+    
+    // Vaciar el carrito después de navegar (con un pequeño delay para asegurar la navegación)
+    setTimeout(() => {
+      vaciarCarrito();
+    }, 100);
   };
 
   // useEffect se ejecuta cuando el componente se monta o cuando cambian plan/usuario/navigate
   // Este efecto valida que existan los requisitos necesarios para mostrar el checkout
   useEffect(() => {
+    // ✅ No redirigir si estamos procesando el pago (evita redirección prematura)
+    if (procesando) {
+      return;
+    }
+    
     // VALIDACIÓN 1: Si no hay plan en el carrito, redirigir a la página de planes
     // Esto evita que alguien acceda directamente a /checkout sin tener un plan seleccionado
     if (!plan) {
@@ -305,7 +316,7 @@ export default function CheckoutPage() {
     };
 
     cargarPrecioCLP();
-  }, [plan, usuario, navigate]); // Se ejecuta cuando cambian estos valores
+  }, [plan, usuario, navigate, procesando]); // Se ejecuta cuando cambian estos valores
 
   // Si no hay plan o usuario, no renderizar nada (ya se está redirigiendo)
   // Esto evita que se muestre contenido mientras se procesa la redirección
