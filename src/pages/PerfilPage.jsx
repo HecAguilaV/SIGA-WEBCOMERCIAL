@@ -379,11 +379,10 @@ export default function PerfilPage() {
   };
 
   // Inicializar formulario de perfil con datos actuales del usuario
-  // Solo cuando se abre el formulario, no cada vez que usuario cambia
-  const formularioInicializado = useRef(false);
-  
+  // Solo cuando se abre el formulario (cuando mostrarEditarPerfil cambia a true)
   useEffect(() => {
-    if (mostrarEditarPerfil && usuario && !formularioInicializado.current) {
+    if (mostrarEditarPerfil && usuario) {
+      // Capturar los valores actuales del usuario solo cuando se abre el formulario
       setPerfilEditado({
         nombre: usuario.nombre || '',
         apellido: usuario.apellido || '',
@@ -391,12 +390,8 @@ export default function PerfilPage() {
         telefono: usuario.telefono || '',
         nombreEmpresa: usuario.nombreEmpresa || ''
       });
-      formularioInicializado.current = true;
-    } else if (!mostrarEditarPerfil) {
-      // Resetear el flag cuando se cierra el formulario
-      formularioInicializado.current = false;
     }
-  }, [mostrarEditarPerfil, usuario]);
+  }, [mostrarEditarPerfil]); // Solo depende de mostrarEditarPerfil, NO de usuario
 
   const manejarActualizarPerfil = async (e) => {
     e.preventDefault();
