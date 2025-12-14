@@ -84,12 +84,12 @@ SIGA (Sistema Inteligente de Gestión de Activos) es una solución SaaS completa
 
 ## PLANES DE SUSCRIPCIÓN
 
-${planes.map(plan => `
+${planes.length > 0 ? planes.map(plan => `
 ### ${plan.nombre}
 - **Precio:** ${plan.precio || plan.precioMensual || 'N/A'} ${plan.unidad || 'UF'}/mes
 - **Características:**
 ${(plan.caracteristicas || []).map(car => `  - ${car}`).join('\n')}
-`).join('\n')}
+`).join('\n') : 'No hay planes disponibles en este momento.'}
 
 ## DIFERENCIAS ENTRE PLANES
 
