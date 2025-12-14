@@ -11,6 +11,21 @@ export default defineConfig({
     host: true, // Permite acceso desde la red local
     strictPort: true, // Falla si el puerto está ocupado en lugar de usar otro
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Separar vendor libraries grandes
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          // Separar servicios de API
+          'api-services': ['./src/services/api.js', './src/services/auth.js'],
+          // Separar componentes grandes
+          'perfil-page': ['./src/pages/PerfilPage.jsx'],
+        },
+      },
+    },
+    chunkSizeWarningLimit: 1000, // Aumentar límite temporalmente mientras optimizamos
+  },
   // Exponer variables de entorno con prefijo VITE_
   // Las variables se pueden acceder con import.meta.env.VITE_GEMINI_API_KEY
 });
