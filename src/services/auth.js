@@ -24,8 +24,6 @@ function getAuthUtils() {
  */
 export async function iniciarSesion(email, password) {
   try {
-    const { limpiarDatosUsuario: limpiarDatos, guardarUsuarioAutenticado: guardarUsuario } = getAuthUtils();
-    
     // CRÍTICO: Limpiar datos del usuario anterior antes de iniciar nueva sesión
     // Preservar redirect path si existe (se necesita después del login)
     let redirectPath = null;
@@ -34,7 +32,7 @@ export async function iniciarSesion(email, password) {
     } catch (e) {
       // Ignorar errores de localStorage durante inicialización
     }
-    limpiarDatos(!!redirectPath);
+    limpiarDatosUsuario(!!redirectPath);
     
     // Intentar login con el backend real
     const response = await loginUser(email, password);
@@ -149,7 +147,8 @@ export async function registrarUsuario(userData) {
  */
 export function cerrarSesion() {
   apiLogout();
-  localCerrarSesion();
+  const { localCerrarSesion: cerrarLocal } = getAuthUtils();
+  cerrarLocal();
 }
 
 /**
@@ -157,7 +156,8 @@ export function cerrarSesion() {
  */
 export function obtenerUsuarioAutenticado() {
   // Usar la función del utils/auth.js que ya maneja localStorage
-  return obtenerUsuarioLocal();
+  const { obtenerUsuarioLocal: obtenerUsuario } = getAuthUtils();
+  return obtenerUsuario();
 }
 
 /**
