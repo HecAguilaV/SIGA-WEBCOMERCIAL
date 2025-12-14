@@ -124,17 +124,24 @@ async function refreshAccessToken() {
  * Realiza una petición a la API con manejo automático de autenticación y refresh tokens
  */
 async function apiRequest(endpoint, options = {}) {
+  // Validar que el endpoint no tenga errores comunes
+  if (endpoint.includes('suscripcion') && !endpoint.includes('suscripciones')) {
+    console.error('❌ ERROR CRÍTICO: Endpoint incorrecto detectado');
+    console.error('❌ Endpoint recibido:', endpoint);
+    console.error('❌ Debe ser: /comercial/suscripciones (plural)');
+    throw new Error(`Endpoint incorrecto: ${endpoint}. Debe ser /comercial/suscripciones (plural)`);
+  }
+  
   const url = `${API_URL}${endpoint}`;
   const token = getAccessToken();
   
-  // Log de debugging en desarrollo
-  if (import.meta.env.DEV) {
-    console.log(`🔍 API Request: ${options.method || 'GET'} ${url}`);
-    if (token && !options.skipAuth) {
-      console.log('🔑 Token presente:', token.substring(0, 20) + '...');
-    } else if (!options.skipAuth) {
-      console.warn('⚠️ No hay token disponible para esta petición');
-    }
+  // Log de debugging SIEMPRE para diagnosticar problemas
+  console.log(`🔍 API Request: ${options.method || 'GET'} ${url}`);
+  console.log(`📍 Endpoint: ${endpoint}`);
+  if (token && !options.skipAuth) {
+    console.log('🔑 Token presente:', token.substring(0, 20) + '...');
+  } else if (!options.skipAuth) {
+    console.warn('⚠️ No hay token disponible para esta petición');
   }
 
   // Configurar headers
@@ -208,15 +215,16 @@ async function apiRequest(endpoint, options = {}) {
     }
 
     if (!response.ok) {
-      // Log de error en desarrollo
-      if (import.meta.env.DEV) {
-        console.error(`❌ API Error: ${response.status} ${response.statusText}`, {
-          endpoint,
-          url,
-          responseData: data,
-          hasToken: !!token
-        });
-      }
+      // Log de error SIEMPRE para diagnosticar problemas
+      console.error(`❌ API Error: ${response.status} ${response.statusText}`, {
+        endpoint,
+        url,
+        fullUrl: url,
+        responseData: data,
+        hasToken: !!token,
+        method: options.method || 'GET',
+        requestBody: options.body ? JSON.parse(options.body) : null
+      });
       
       // Si es 404, verificar si es un error de recurso no encontrado (válido para usuarios nuevos)
       if (response.status === 404) {
@@ -464,7 +472,11 @@ export async function getSuscripciones() {
  * Crear nueva suscripción
  */
 export async function createSuscripcion(planId, periodo = 'MENSUAL') {
-  return apiRequest('/comercial/suscripciones', {
+  // IMPORTANTE: El endpoint correcto es /comercial/suscripciones (plural)
+  const endpoint = '/comercial/suscripciones';
+  console.log('📤 createSuscripcion llamado:', { planId, periodo, endpoint });
+  
+  return apiRequest(endpoint, {
     method: 'POST',
     body: JSON.stringify({ planId, periodo }),
   });
