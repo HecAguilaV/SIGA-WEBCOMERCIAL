@@ -41,11 +41,13 @@ export default function PerfilPage() {
   const [cargandoPerfil, setCargandoPerfil] = useState(false); // Loading al actualizar perfil
   const [mensajePerfil, setMensajePerfil] = useState(''); // Mensaje de éxito/error al actualizar perfil
 
-  // Actualizar usuario desde localStorage cuando el componente se monta o cuando cambia
+  // Actualizar usuario desde localStorage cuando el componente se monta
   useEffect(() => {
     const usuarioActual = obtenerUsuarioAutenticado();
-    if (usuarioActual && usuarioActual.id !== usuario?.id) {
-      setUsuario(usuarioActual);
+    if (usuarioActual) {
+      if (!usuario || usuarioActual.id !== usuario.id) {
+        setUsuario(usuarioActual);
+      }
     }
   }, []); // Solo al montar
 
@@ -156,6 +158,8 @@ export default function PerfilPage() {
     // Si el usuario cambia (por ejemplo, después del login), resetear la verificación
     if (usuario && usuario.id) {
       setSuscripcionVerificada(false);
+      setTieneSuscripcionActiva(false);
+      setSuscripcionActivaData(null);
     }
   }, [usuario?.id]);
   
