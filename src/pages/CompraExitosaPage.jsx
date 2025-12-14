@@ -13,7 +13,6 @@ export default function CompraExitosaPage() {
   const [mostrarFactura, setMostrarFactura] = useState(true);
   const [errorFactura, setErrorFactura] = useState('');
 
-
   // Cargar la factura generada al montar el componente
   useEffect(() => {
     const cargarFactura = async () => {

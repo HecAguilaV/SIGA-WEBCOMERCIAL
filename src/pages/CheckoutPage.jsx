@@ -35,7 +35,6 @@ export default function CheckoutPage() {
     }
   }, [usuario]);
 
-
   // Validar formato de número de tarjeta
   const validarNumeroTarjeta = (numero) => {
     // Eliminar espacios y validar que sea solo números
