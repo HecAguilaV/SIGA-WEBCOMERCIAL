@@ -130,6 +130,11 @@ async function apiRequest(endpoint, options = {}) {
   // Log de debugging en desarrollo
   if (import.meta.env.DEV) {
     console.log(`🔍 API Request: ${options.method || 'GET'} ${url}`);
+    if (token && !options.skipAuth) {
+      console.log('🔑 Token presente:', token.substring(0, 20) + '...');
+    } else if (!options.skipAuth) {
+      console.warn('⚠️ No hay token disponible para esta petición');
+    }
   }
 
   // Configurar headers
@@ -141,6 +146,8 @@ async function apiRequest(endpoint, options = {}) {
   // Agregar token de autenticación si existe
   if (token && !options.skipAuth) {
     headers['Authorization'] = `Bearer ${token}`;
+  } else if (!options.skipAuth) {
+    console.warn('⚠️ Petición requiere autenticación pero no hay token disponible');
   }
 
   // Configurar opciones de la petición
@@ -201,6 +208,16 @@ async function apiRequest(endpoint, options = {}) {
     }
 
     if (!response.ok) {
+      // Log de error en desarrollo
+      if (import.meta.env.DEV) {
+        console.error(`❌ API Error: ${response.status} ${response.statusText}`, {
+          endpoint,
+          url,
+          responseData: data,
+          hasToken: !!token
+        });
+      }
+      
       // Si es 404, verificar si es un error de recurso no encontrado (válido para usuarios nuevos)
       if (response.status === 404) {
         // Para endpoints que pueden retornar 404 cuando no hay datos (facturas, suscripciones)

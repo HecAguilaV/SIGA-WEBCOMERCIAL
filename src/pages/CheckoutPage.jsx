@@ -25,12 +25,18 @@ export default function CheckoutPage() {
   const plan = obtenerPlanDelCarrito();
   const usuario = obtenerUsuarioAutenticado();
   
-  // Log de debugging para verificar el usuario
+  // Log de debugging para verificar el usuario y token
   useEffect(() => {
     if (usuario) {
       console.log('👤 Usuario en CheckoutPage:', usuario);
+      const token = localStorage.getItem('accessToken');
+      console.log('🔑 Token disponible:', token ? 'Sí (' + token.substring(0, 20) + '...)' : 'No');
+      
       if (!usuario.email) {
         console.error('⚠️ PROBLEMA: Usuario sin email en CheckoutPage:', usuario);
+      }
+      if (!token) {
+        console.error('⚠️ PROBLEMA: No hay token de acceso disponible');
       }
     }
   }, [usuario]);
@@ -265,16 +271,22 @@ export default function CheckoutPage() {
           throw new Error(errorMsg);
         }
       } catch (error) {
+        console.error('❌ Error al crear factura:', error);
+        
         // Extraer mensaje de error más descriptivo
         let errorMsg = 'No se pudo generar la factura en el backend.';
         
         if (error.message) {
-          if (error.message.includes('usuarioEmail') || error.message.includes('usuario email')) {
+          if (error.message.includes('403') || error.message?.includes('Forbidden') || error.message?.includes('permisos')) {
+            errorMsg = 'Error: No tienes permisos para crear facturas. Verifica que tu cuenta esté activa y que tengas un email registrado. Si el problema persiste, contacta al soporte.';
+          } else if (error.message.includes('usuarioEmail') || error.message.includes('usuario email')) {
             errorMsg = 'Error: El email del usuario es requerido pero no está disponible. Por favor, actualiza tu perfil con un email válido.';
           } else if (error.message.includes('JSON parse error')) {
             errorMsg = 'Error: El formato de datos enviado al servidor es inválido. Por favor, contacta al soporte.';
           } else if (error.message.includes('500')) {
             errorMsg = 'Error del servidor: El backend no pudo procesar la solicitud. Por favor, intenta nuevamente o contacta al soporte.';
+          } else if (error.message.includes('401') || error.message.includes('autenticado')) {
+            errorMsg = 'Error: Tu sesión ha expirado. Por favor, inicia sesión nuevamente.';
           } else {
             errorMsg = `Error: ${error.message}`;
           }
