@@ -294,11 +294,24 @@ async function apiRequest(endpoint, options = {}) {
  * Registrar nuevo usuario
  */
 export async function registerUser(userData) {
-  return apiRequest('/comercial/auth/register', {
+  // Log de debugging para ver qué se envía al backend
+  console.log('📤 Enviando datos de registro al backend:', {
+    nombre: userData.nombre,
+    email: userData.email,
+    nombreEmpresa: userData.nombreEmpresa,
+    tienePassword: !!userData.password
+  });
+  
+  const response = await apiRequest('/comercial/auth/register', {
     method: 'POST',
     body: JSON.stringify(userData),
     skipAuth: true,
   });
+  
+  // Log de respuesta del backend
+  console.log('📥 Respuesta del backend en registerUser:', response);
+  
+  return response;
 }
 
 /**

@@ -817,6 +817,12 @@ export default function PerfilPage() {
                     </button>
                   </div>
                 </div>
+                {usuario.nombreEmpresa && (
+                  <div className="col-md-6">
+                    <strong className="text-muted d-block mb-1">Empresa:</strong>
+                    <p className="mb-0">{usuario.nombreEmpresa}</p>
+                  </div>
+                )}
                 <div className="col-md-6">
                   <strong className="text-muted d-block mb-1">Rol:</strong>
                   <span className="badge bg-info text-dark px-3 py-2">
