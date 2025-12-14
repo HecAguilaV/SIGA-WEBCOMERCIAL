@@ -35,8 +35,6 @@ export default function CheckoutPage() {
     }
   }, [usuario]);
 
-  // Solo permitir “datos simulados” en desarrollo LOCAL
-  const permitirFallbackLocal = import.meta.env.DEV && window.location.hostname === 'localhost';
 
   // Validar formato de número de tarjeta
   const validarNumeroTarjeta = (numero) => {

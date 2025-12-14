@@ -13,8 +13,6 @@ export default function CompraExitosaPage() {
   const [mostrarFactura, setMostrarFactura] = useState(true);
   const [errorFactura, setErrorFactura] = useState('');
 
-  // Solo permitir “datos simulados” en desarrollo LOCAL
-  const permitirFallbackLocal = import.meta.env.DEV && window.location.hostname === 'localhost';
 
   // Cargar la factura generada al montar el componente
   useEffect(() => {
