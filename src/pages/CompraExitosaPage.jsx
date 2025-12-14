@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { obtenerUsuarioAutenticado } from '../utils/auth.js';
-import { obtenerFacturaPorNumero } from '../datos/datosSimulados.js';
 import { getFacturaByNumero } from '../services/api.js';
 import FacturaComponent from '../components/FacturaComponent.jsx';
 import { CheckCircle, FileText } from 'phosphor-react';
