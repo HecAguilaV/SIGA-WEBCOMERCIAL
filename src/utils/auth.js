@@ -1,29 +1,8 @@
-// Utilidades de autenticación usando localStorage (simulación)
+// Utilidades de autenticación usando localStorage
+// NOTA: Las funciones de login/registro reales están en src/services/auth.js
 
 const CLAVE_USUARIO = 'siga_usuario_actual';
 const CLAVE_CARRITO = 'siga_carrito_plan';
-
-export function iniciarSesion(email, password) {
-  try {
-    const usuariosStr = localStorage.getItem('siga_usuarios');
-    if (!usuariosStr) {
-      return null;
-    }
-    
-    const usuarios = JSON.parse(usuariosStr);
-    const usuario = usuarios.find((u) => u.email === email && u.password === password);
-    
-    if (usuario) {
-      guardarUsuarioAutenticado(usuario);
-      return usuario;
-    }
-    
-    return null;
-  } catch (error) {
-    console.error('Error al iniciar sesión:', error);
-    return null;
-  }
-}
 
 export function guardarUsuarioAutenticado(usuario) {
   localStorage.setItem(CLAVE_USUARIO, JSON.stringify(usuario));

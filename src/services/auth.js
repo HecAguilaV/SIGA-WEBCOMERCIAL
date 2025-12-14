@@ -2,7 +2,21 @@
 // El backend es la ÚNICA fuente de verdad - NO hay fallback a datos simulados
 
 import { loginUser, registerUser, logout as apiLogout, isAuthenticated as apiIsAuthenticated } from './api.js';
-import { guardarUsuarioAutenticado, obtenerUsuarioAutenticado as obtenerUsuarioLocal, cerrarSesion as localCerrarSesion, limpiarDatosUsuario } from '../utils/auth.js';
+
+// Importaciones dinámicas para evitar problemas de inicialización circular
+let guardarUsuarioAutenticado, obtenerUsuarioLocal, localCerrarSesion, limpiarDatosUsuario;
+
+// Lazy load de funciones de utils/auth.js para evitar problemas de inicialización
+function getAuthUtils() {
+  if (!guardarUsuarioAutenticado) {
+    const authUtils = require('../utils/auth.js');
+    guardarUsuarioAutenticado = authUtils.guardarUsuarioAutenticado;
+    obtenerUsuarioLocal = authUtils.obtenerUsuarioAutenticado;
+    localCerrarSesion = authUtils.cerrarSesion;
+    limpiarDatosUsuario = authUtils.limpiarDatosUsuario;
+  }
+  return { guardarUsuarioAutenticado, obtenerUsuarioLocal, localCerrarSesion, limpiarDatosUsuario };
+}
 
 /**
  * Iniciar sesión con el backend real
@@ -10,10 +24,17 @@ import { guardarUsuarioAutenticado, obtenerUsuarioAutenticado as obtenerUsuarioL
  */
 export async function iniciarSesion(email, password) {
   try {
+    const { limpiarDatosUsuario: limpiarDatos, guardarUsuarioAutenticado: guardarUsuario } = getAuthUtils();
+    
     // CRÍTICO: Limpiar datos del usuario anterior antes de iniciar nueva sesión
     // Preservar redirect path si existe (se necesita después del login)
-    const redirectPath = localStorage.getItem('siga_redirect_after_login');
-    limpiarDatosUsuario(!!redirectPath);
+    let redirectPath = null;
+    try {
+      redirectPath = localStorage.getItem('siga_redirect_after_login');
+    } catch (e) {
+      // Ignorar errores de localStorage durante inicialización
+    }
+    limpiarDatos(!!redirectPath);
     
     // Intentar login con el backend real
     const response = await loginUser(email, password);
@@ -52,7 +73,7 @@ export async function iniciarSesion(email, password) {
         console.log('💾 Guardando usuario en localStorage:', { ...usuario, email: usuario.email ? '***' : undefined });
       }
       
-      guardarUsuarioAutenticado(usuario);
+      guardarUsuario(usuario);
       return usuario;
     }
     
@@ -70,8 +91,10 @@ export async function iniciarSesion(email, password) {
  */
 export async function registrarUsuario(userData) {
   try {
+    const { limpiarDatosUsuario: limpiarDatos, guardarUsuarioAutenticado: guardarUsuario } = getAuthUtils();
+    
     // CRÍTICO: Limpiar datos del usuario anterior antes de registrar nuevo usuario
-    limpiarDatosUsuario();
+    limpiarDatos();
     
     // Intentar registro con el backend real
     const response = await registerUser(userData);
@@ -110,7 +133,7 @@ export async function registrarUsuario(userData) {
         console.log('💾 Guardando usuario en localStorage:', { ...usuario, email: usuario.email ? '***' : undefined });
       }
       
-      guardarUsuarioAutenticado(usuario);
+      guardarUsuario(usuario);
       return usuario;
     }
     

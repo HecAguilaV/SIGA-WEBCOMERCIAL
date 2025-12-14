@@ -16,7 +16,14 @@ import { obtenerUsuarioAutenticado } from './utils/auth.js';
 
 // Ruta protegida para usuarios autenticados (clientes y admins)
 function RutaAutenticada({ children }) {
-  const usuario = obtenerUsuarioAutenticado();
+  let usuario = null;
+  try {
+    usuario = obtenerUsuarioAutenticado();
+  } catch (error) {
+    console.error('Error al obtener usuario autenticado:', error);
+    return <Navigate to="/login" replace />;
+  }
+  
   if (!usuario) {
     return <Navigate to="/login" replace />;
   }
