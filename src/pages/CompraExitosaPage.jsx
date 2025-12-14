@@ -33,16 +33,9 @@ export default function CompraExitosaPage() {
             throw new Error('Factura no encontrada en backend');
           }
         } catch (error) {
-          if (!permitirFallbackLocal) {
-            console.error('Error al cargar factura desde backend:', error);
-            setErrorFactura(error?.message || 'No se pudo cargar la factura desde el backend.');
-            setFactura(null);
-          } else {
-            console.warn('Error al cargar factura desde backend, usando local:', error);
-            // Fallback a datos locales
-            const facturaEncontrada = obtenerFacturaPorNumero(numeroFactura);
-            setFactura(facturaEncontrada);
-          }
+          console.error('Error al cargar factura desde backend:', error);
+          setErrorFactura(error?.message || 'No se pudo cargar la factura desde el backend.');
+          setFactura(null);
         }
         
         // Limpiar el número de factura del localStorage después de cargarlo

@@ -2,8 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { vaciarCarrito, obtenerUsuarioAutenticado, obtenerPlanDelCarrito, guardarUsuarioAutenticado } from '../utils/auth.js';
 import { ClipboardText, CheckCircle, Lightbulb, CreditCard, Lock, ShieldCheck, Warning } from 'phosphor-react';
-// ❌ ELIMINADO: Ya no usamos datos simulados - TODO viene del backend
-// import { asignarPlanAUsuario, actualizarUsuario, convertirTrialAPagado, crearFactura } from '../datos/datosSimulados.js';
 import { convertirUFaCLP, formatearPrecioCLP } from '../utils/indicadoresEconomicos.js';
 import { createSuscripcion, createFactura } from '../services/api.js';
 
@@ -166,8 +164,6 @@ export default function CheckoutPage() {
           throw new Error('Error al crear suscripción');
         }
       } catch (error) {
-        // ❌ ELIMINADO: Ya no hay fallback a datos simulados
-        // En producción: NO simular éxito. Debe persistir en BD o fallar.
         setError(error?.message || 'No se pudo crear la suscripción en el backend.');
         setProcesando(false);
         return;
@@ -228,8 +224,6 @@ export default function CheckoutPage() {
           }
         }
       } catch (error) {
-        // ❌ ELIMINADO: Ya no hay fallback a datos simulados
-        // En producción: NO simular. Si falla la factura en backend, debe verse.
         // Extraer mensaje de error más descriptivo
         let errorMsg = 'No se pudo generar la factura en el backend.';
         

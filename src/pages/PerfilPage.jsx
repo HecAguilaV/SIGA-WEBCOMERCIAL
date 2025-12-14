@@ -6,17 +6,6 @@ import {
   Warning, FileText, ClipboardText, CheckCircle, Users, Storefront, Robot,
   ChatCircle, UserCircle, ChartBar
 } from 'phosphor-react';
-// ❌ ELIMINADO: Ya no usamos datos simulados en producción
-// import {
-//   obtenerPlanDelUsuario,
-//   obtenerLimitesDelPlan,
-//   leerPlanes,
-//   verificarTrialActivo,
-//   iniciarFreeTrial,
-//   puedeIniciarTrial,
-//   convertirTrialAPagado,
-//   obtenerFacturasDelUsuario,
-// } from '../datos/datosSimulados.js';
 import { getFacturas, getSuscripciones, obtenerTokenOperativo, updateEmail, saveTokens, getPlanes } from '../services/api.js';
 import { formatearPrecioCLP } from '../utils/indicadoresEconomicos.js';
 import FacturaComponent from '../components/FacturaComponent.jsx';
@@ -28,9 +17,6 @@ import '../styles/PerfilPage.css';
 export default function PerfilPage() {
   const navigate = useNavigate();
   const usuario = obtenerUsuarioAutenticado();
-  // ❌ ELIMINADO: Trial management ahora es responsabilidad del backend
-  // const [trialInfo, setTrialInfo] = useState(null);
-  // const [puedeTrial, setPuedeTrial] = useState(false);
   const [facturas, setFacturas] = useState([]); // Estado para almacenar las facturas del usuario
   const [facturaSeleccionada, setFacturaSeleccionada] = useState(null); // Factura seleccionada para ver/imprimir
   const [cargandoSSO, setCargandoSSO] = useState(false); // Estado para manejar SSO
@@ -48,8 +34,6 @@ export default function PerfilPage() {
   }
 
   // Solo permitir “datos simulados” en desarrollo LOCAL
-  // ❌ ELIMINADO: Ya no usamos datos simulados - TODO viene del backend
-
   // Obtener plan del usuario desde el backend
   const [planActual, setPlanActual] = useState(null);
   const [planes, setPlanes] = useState([]);
@@ -122,7 +106,6 @@ export default function PerfilPage() {
           setFacturas([]);
           setFacturasCargadas(true); // Marcar como cargado para evitar reintentos
         } else {
-          // ❌ ELIMINADO: Ya no hay fallback a datos simulados
           console.error('Error al cargar facturas desde backend:', error);
           setFacturas([]);
           setErrorFacturas(error?.message || 'No se pudieron cargar las facturas desde el backend.');
@@ -169,7 +152,6 @@ export default function PerfilPage() {
           setTieneSuscripcionActiva(false);
           setSuscripcionVerificada(true); // Marcar como verificado para evitar reintentos
           } else {
-            // ❌ ELIMINADO: Ya no hay fallback a datos simulados
             console.warn('Error al verificar suscripción:', error);
             // Si falla, tratamos como NO activa (evita accesos incorrectos)
             setTieneSuscripcionActiva(false);
@@ -181,8 +163,6 @@ export default function PerfilPage() {
     verificarSuscripcion();
   }, [usuario?.id, suscripcionVerificada]);
 
-  // ❌ ELIMINADO: Los límites ahora vienen del backend en el plan
-  // const limites = planActual ? obtenerLimitesDelPlan(planActual.id) : null;
   const limites = planActual ? {
     usuarios: planActual.limiteUsuarios,
     bodegas: planActual.limiteBodegas,
@@ -201,9 +181,6 @@ export default function PerfilPage() {
     }
   };
 
-  // ❌ ELIMINADO: Trial management ahora es responsabilidad del backend
-  // Los trials se manejan automáticamente cuando un usuario nuevo se registra
-  // No hay funciones manuales para iniciar/convertir trials
   const manejarIniciarTrial = (planId) => {
     // El trial se inicia automáticamente al registrarse
     // Para adquirir un plan, debe ir a /planes y comprarlo
