@@ -16,13 +16,15 @@ import { obtenerUsuarioAutenticado } from './utils/auth.js';
 
 // Ruta protegida para usuarios autenticados (clientes y admins)
 function RutaAutenticada({ children }) {
-  let usuario = null;
-  try {
-    usuario = obtenerUsuarioAutenticado();
-  } catch (error) {
-    console.error('Error al obtener usuario autenticado:', error);
-    return <Navigate to="/login" replace />;
-  }
+  // Usar useMemo para evitar llamadas múltiples y problemas de inicialización
+  const usuario = React.useMemo(() => {
+    try {
+      return obtenerUsuarioAutenticado();
+    } catch (error) {
+      console.error('Error al obtener usuario autenticado:', error);
+      return null;
+    }
+  }, []);
   
   if (!usuario) {
     return <Navigate to="/login" replace />;

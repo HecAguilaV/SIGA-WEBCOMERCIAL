@@ -16,7 +16,14 @@ import '../styles/PerfilPage.css';
 // Incluye gestión de free trial de 14 días
 export default function PerfilPage() {
   const navigate = useNavigate();
-  const [usuario, setUsuario] = useState(obtenerUsuarioAutenticado());
+  const [usuario, setUsuario] = useState(() => {
+    try {
+      return obtenerUsuarioAutenticado();
+    } catch (error) {
+      console.error('Error al obtener usuario en PerfilPage:', error);
+      return null;
+    }
+  });
   const [facturas, setFacturas] = useState([]); // Estado para almacenar las facturas del usuario
   const [facturaSeleccionada, setFacturaSeleccionada] = useState(null); // Factura seleccionada para ver/imprimir
   const [cargandoSSO, setCargandoSSO] = useState(false); // Estado para manejar SSO

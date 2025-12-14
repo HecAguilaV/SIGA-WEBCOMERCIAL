@@ -131,8 +131,7 @@ export async function registrarUsuario(userData) {
  */
 export function cerrarSesion() {
   apiLogout();
-  const { localCerrarSesion: cerrarLocal } = getAuthUtils();
-  cerrarLocal();
+  localCerrarSesion();
 }
 
 /**
