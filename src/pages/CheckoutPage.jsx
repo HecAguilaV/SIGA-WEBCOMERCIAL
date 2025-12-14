@@ -207,20 +207,33 @@ export default function CheckoutPage() {
         
         const facturaResponse = await createFactura(facturaData);
         
-        if (facturaResponse.success && facturaResponse.factura) {
-          factura = facturaResponse.factura;
-          // Guardar el número de factura en localStorage para que CompraExitosaPage pueda mostrarla
-          localStorage.setItem('siga_factura_actual', factura.numeroFactura || factura.numero);
+        console.log('📄 Respuesta completa de createFactura:', facturaResponse);
+        
+        // El backend puede devolver la factura de diferentes formas:
+        // 1. { success: true, factura: {...} }
+        // 2. { success: true, data: {...} }
+        // 3. La factura directamente
+        if (facturaResponse.success) {
+          // Intentar obtener la factura de diferentes posibles ubicaciones
+          factura = facturaResponse.factura || facturaResponse.data || facturaResponse;
+          
+          if (factura && (factura.id || factura.numero || factura.numeroFactura)) {
+            // Guardar el número de factura en localStorage para que CompraExitosaPage pueda mostrarla
+            localStorage.setItem('siga_factura_actual', factura.numeroFactura || factura.numero || factura.id);
+            console.log('✅ Factura guardada:', factura.numeroFactura || factura.numero);
+          } else {
+            console.error('⚠️ La respuesta tiene success=true pero no contiene una factura válida:', facturaResponse);
+            throw new Error('No se recibió la factura del backend (formato inesperado)');
+          }
         } else {
           // Si success es false pero hay mensaje, puede ser un mensaje informativo, no necesariamente error
-          // Solo lanzar error si realmente falló
           const errorMsg = facturaResponse.message || 'Error al crear factura en backend';
           // Si el mensaje dice "exitosamente", no es un error
           if (!errorMsg.toLowerCase().includes('exitosamente') && !errorMsg.toLowerCase().includes('success')) {
             throw new Error(errorMsg);
           }
           // Si llegamos aquí y no hay factura, intentar usar el mensaje como información
-          if (!facturaResponse.factura) {
+          if (!facturaResponse.factura && !facturaResponse.data) {
             throw new Error('No se recibió la factura del backend');
           }
         }
@@ -444,6 +457,7 @@ export default function CheckoutPage() {
                       <div className="row g-2">
                         <div className="col-6">
                           <input
+                            ref={mesRef}
                             type="text"
                             className="form-control form-control-lg"
                             placeholder="MM"
@@ -455,6 +469,7 @@ export default function CheckoutPage() {
                         </div>
                         <div className="col-6">
                           <input
+                            ref={anioRef}
                             type="text"
                             className="form-control form-control-lg"
                             placeholder="AAAA"
