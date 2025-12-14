@@ -16,14 +16,7 @@ import '../styles/PerfilPage.css';
 // Incluye gestión de free trial de 14 días
 export default function PerfilPage() {
   const navigate = useNavigate();
-  const [usuario, setUsuario] = useState(() => {
-    try {
-      return obtenerUsuarioAutenticado();
-    } catch (error) {
-      console.error('Error al obtener usuario en PerfilPage:', error);
-      return null;
-    }
-  });
+  const [usuario, setUsuario] = useState(obtenerUsuarioAutenticado);
   const [facturas, setFacturas] = useState([]); // Estado para almacenar las facturas del usuario
   const [facturaSeleccionada, setFacturaSeleccionada] = useState(null); // Factura seleccionada para ver/imprimir
   const [cargandoSSO, setCargandoSSO] = useState(false); // Estado para manejar SSO
@@ -107,17 +100,7 @@ export default function PerfilPage() {
   }, []); // Solo al montar
 
   if (!usuario) {
-    // Redirigir al login si no hay usuario
-    useEffect(() => {
-      navigate('/login', { replace: true });
-    }, [navigate]);
-    return (
-      <div className="container py-5">
-        <div className="text-center">
-          <p>Redirigiendo al login...</p>
-        </div>
-      </div>
-    );
+    return null;
   }
 
   // Solo permitir “datos simulados” en desarrollo LOCAL
@@ -218,10 +201,8 @@ export default function PerfilPage() {
   }, [usuario?.id, facturasCargadas]);
 
   // Verificar suscripción activa al montar el componente y cuando el usuario cambia
-  const [suscripcionVerificada, setSuscripcionVerificada] = useState(false);
-  const [suscripcionActivaData, setSuscripcionActivaData] = useState(null); // Guardar datos de suscripción activa
-  
   // Verificar suscripción activa - se ejecuta cuando el usuario está disponible
+  // NOTA: suscripcionVerificada y suscripcionActivaData ya están definidos arriba (líneas 52-53)
   // También se ejecuta cuando el usuario cambia (por ejemplo, después del pago)
   useEffect(() => {
     // Evitar múltiples verificaciones
