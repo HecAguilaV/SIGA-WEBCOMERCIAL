@@ -424,8 +424,7 @@ export default function CheckoutPage() {
                     <strong>
                       <Lightbulb size={16} weight="fill" className="me-1" style={{ verticalAlign: 'middle' }} />
                       Recuerda:
-                    </strong> Tu pago será procesado de forma segura. 
-                    No se realizará ningún cargo real.
+                    </strong> Tu pago será procesado de forma segura.
                   </small>
                 </div>
               </div>

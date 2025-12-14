@@ -317,7 +317,7 @@ export default function PerfilPage() {
       
       if (!suscripcionesResponse.success || !suscripcionesResponse.suscripciones || 
           suscripcionesResponse.suscripciones.length === 0) {
-        // Fallback: verificar planId (cualquier planId !== null es válido)
+        // Verificar planId como alternativa si no hay suscripciones en backend
         if (!usuario.planId) {
           console.warn('⚠️ Usuario sin planId y sin suscripciones en backend');
           setErrorSSO('No tienes una suscripción activa. Por favor adquiere un plan primero.');
