@@ -125,7 +125,7 @@ export default function PerfilPage() {
   const [planActual, setPlanActual] = useState(null);
   const [planes, setPlanes] = useState([]);
   
-  // NOTA: suscripcionVerificada y suscripcionActivaData ya están definidos arriba
+  // NOTA: suscripcionVerificada y suscripcionActivaData ya están definidos arriba (líneas 52-53)
   
   // Cargar planes desde el backend
   useEffect(() => {
