@@ -379,8 +379,11 @@ export default function PerfilPage() {
   };
 
   // Inicializar formulario de perfil con datos actuales del usuario
+  // Solo cuando se abre el formulario, no cada vez que usuario cambia
+  const formularioInicializado = useRef(false);
+  
   useEffect(() => {
-    if (mostrarEditarPerfil && usuario) {
+    if (mostrarEditarPerfil && usuario && !formularioInicializado.current) {
       setPerfilEditado({
         nombre: usuario.nombre || '',
         apellido: usuario.apellido || '',
@@ -388,6 +391,10 @@ export default function PerfilPage() {
         telefono: usuario.telefono || '',
         nombreEmpresa: usuario.nombreEmpresa || ''
       });
+      formularioInicializado.current = true;
+    } else if (!mostrarEditarPerfil) {
+      // Resetear el flag cuando se cierra el formulario
+      formularioInicializado.current = false;
     }
   }, [mostrarEditarPerfil, usuario]);
 
