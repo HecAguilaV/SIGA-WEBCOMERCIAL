@@ -11,11 +11,7 @@ import ResetPasswordPage from './pages/ResetPasswordPage.jsx';
 import CarritoPage from './pages/CarritoPage.jsx';
 import CheckoutPage from './pages/CheckoutPage.jsx';
 import CompraExitosaPage from './pages/CompraExitosaPage.jsx';
-import AdminLayout from './pages/admin/AdminLayout.jsx';
-import AdminDashboardPage from './pages/admin/AdminDashboardPage.jsx';
-import AdminUsuariosPage from './pages/admin/AdminUsuariosPage.jsx';
-import AdminSuscripcionesPage from './pages/admin/AdminSuscripcionesPage.jsx';
-import AdminPlanesPage from './pages/admin/AdminPlanesPage.jsx';
+// Páginas admin eliminadas - usaban datos simulados
 import DocsPage from './pages/DocsPage.jsx';
 import { obtenerUsuarioAutenticado } from './utils/auth.js';
 
@@ -70,23 +66,7 @@ export function Rutas() {
         }
       />
 
-      {/* Vistas privadas (administrador) - DESHABILITADAS: usan datos simulados */}
-      {/* TODO: Migrar páginas admin al backend antes de habilitarlas */}
-      {/* 
-      <Route
-        path="/admin"
-        element={
-          <RutaPrivada>
-            <AdminLayout />
-          </RutaPrivada>
-        }
-      >
-        <Route index element={<AdminDashboardPage />} />
-        <Route path="usuarios" element={<AdminUsuariosPage />} />
-        <Route path="suscripciones" element={<AdminSuscripcionesPage />} />
-        <Route path="planes" element={<AdminPlanesPage />} />
-      </Route>
-      */}
+      {/* Vistas privadas (administrador) - ELIMINADAS: usaban datos simulados */}
 
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
