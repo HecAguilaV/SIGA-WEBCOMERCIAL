@@ -92,7 +92,7 @@ export async function iniciarSesion(email, password) {
 
 /**
  * Registrar nuevo usuario con el backend real
- * Si falla, intenta con datos locales como fallback
+ * NO hay fallback a datos simulados - el backend es la única fuente de verdad
  */
 export async function registrarUsuario(userData) {
   try {
