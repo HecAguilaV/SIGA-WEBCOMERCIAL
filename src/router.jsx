@@ -11,18 +11,8 @@ import ResetPasswordPage from './pages/ResetPasswordPage.jsx';
 import CarritoPage from './pages/CarritoPage.jsx';
 import CheckoutPage from './pages/CheckoutPage.jsx';
 import CompraExitosaPage from './pages/CompraExitosaPage.jsx';
-// Páginas admin eliminadas - usaban datos simulados
 import DocsPage from './pages/DocsPage.jsx';
 import { obtenerUsuarioAutenticado } from './utils/auth.js';
-
-// Ruta privada simple para restringir vistas de administrador
-function RutaPrivada({ children }) {
-  const usuario = obtenerUsuarioAutenticado();
-  if (!usuario || usuario.rol !== 'admin') {
-    return <Navigate to="/login" replace />;
-  }
-  return children;
-}
 
 // Ruta protegida para usuarios autenticados (clientes y admins)
 function RutaAutenticada({ children }) {

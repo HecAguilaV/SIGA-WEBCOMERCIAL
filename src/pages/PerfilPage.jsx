@@ -135,7 +135,7 @@ export default function PerfilPage() {
   }, [tieneSuscripcionActiva, suscripcionActivaData, usuario?.planId, planes]);
 
   // ❌ ELIMINADO: Trial management ahora es responsabilidad del backend
-  // Ya no usamos datos simulados para trials - el backend maneja los trials automáticamente
+  // El backend maneja los trials automáticamente
   // const [trialInfo, setTrialInfo] = useState(null);
   // const [puedeTrial, setPuedeTrial] = useState(false);
 
