@@ -9,8 +9,23 @@ export function guardarUsuarioAutenticado(usuario) {
 }
 
 export function obtenerUsuarioAutenticado() {
-  const dato = localStorage.getItem(CLAVE_USUARIO);
-  return dato ? JSON.parse(dato) : null;
+  try {
+    const dato = localStorage.getItem(CLAVE_USUARIO);
+    if (!dato) {
+      return null;
+    }
+    try {
+      return JSON.parse(dato);
+    } catch (parseError) {
+      console.error('Error al parsear usuario de localStorage:', parseError);
+      // Si el JSON está corrupto, limpiar y retornar null
+      localStorage.removeItem(CLAVE_USUARIO);
+      return null;
+    }
+  } catch (error) {
+    console.error('Error al obtener usuario autenticado:', error);
+    return null;
+  }
 }
 
 /**
