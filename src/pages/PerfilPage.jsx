@@ -500,31 +500,19 @@ export default function PerfilPage() {
                       <div>
                         <strong>
                           <Gift size={18} weight="fill" className="me-1" style={{ verticalAlign: 'middle' }} />
-                          ¡Prueba gratis por 14 días!
+                          ¿Aún no tienes un plan?
                         </strong>
                         <p className="mb-0 mt-2">
-                          Inicia un trial gratuito de 14 días de <strong>{planPro?.nombre}</strong> o{' '}
-                          <strong>{planCrecimiento?.nombre}</strong> y descubre todas las funcionalidades.
-                          Sin tarjeta de crédito requerida.
+                          Visita nuestra página de <strong>Planes</strong> para adquirir una suscripción y comenzar a usar SIGA.
                         </p>
                       </div>
                       <div className="d-flex gap-2 mt-3 mt-md-0">
-                        {planPro && (
-                          <button
-                            className="btn btn-outline-primary"
-                            onClick={() => manejarIniciarTrial(planPro.id)}
-                          >
-                            Trial {planPro.nombre}
-                          </button>
-                        )}
-                        {planCrecimiento && (
-                          <button
-                            className="btn btn-primary"
-                            onClick={() => manejarIniciarTrial(planCrecimiento.id)}
-                          >
-                            Trial {planCrecimiento.nombre}
-                          </button>
-                        )}
+                        <button
+                          className="btn btn-primary"
+                          onClick={() => navigate('/planes')}
+                        >
+                          Ver Planes
+                        </button>
                       </div>
                     </div>
                   </div>
