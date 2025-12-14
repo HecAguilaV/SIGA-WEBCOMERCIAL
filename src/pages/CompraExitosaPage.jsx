@@ -16,6 +16,13 @@ export default function CompraExitosaPage() {
   // Cargar la factura generada al montar el componente
   useEffect(() => {
     const cargarFactura = async () => {
+      // Verificar que haya un usuario autenticado
+      if (!usuario || !usuario.id) {
+        console.error('❌ No hay usuario autenticado');
+        setErrorFactura('Debes iniciar sesión para ver tu factura.');
+        return;
+      }
+      
       // Obtener el número de factura guardado en localStorage
       const numeroFactura = localStorage.getItem('siga_factura_actual');
       
@@ -24,6 +31,19 @@ export default function CompraExitosaPage() {
           // Intentar obtener factura desde el backend
           const response = await getFacturaByNumero(numeroFactura);
           if (response.success && response.factura) {
+            // CRÍTICO: Verificar que la factura pertenezca al usuario actual
+            const facturaUsuarioId = response.factura.usuarioId || response.factura.userId;
+            if (facturaUsuarioId && facturaUsuarioId !== usuario.id) {
+              console.error('❌ La factura no pertenece al usuario actual:', {
+                facturaUsuarioId,
+                usuarioActualId: usuario.id
+              });
+              setErrorFactura('Esta factura no pertenece a tu cuenta.');
+              localStorage.removeItem('siga_factura_actual'); // Limpiar factura incorrecta
+              setFactura(null);
+              return;
+            }
+            
             setFactura(response.factura);
           } else {
             throw new Error('Factura no encontrada en backend');
@@ -32,16 +52,16 @@ export default function CompraExitosaPage() {
           console.error('Error al cargar factura desde backend:', error);
           setErrorFactura(error?.message || 'No se pudo cargar la factura desde el backend.');
           setFactura(null);
+          // Limpiar factura inválida
+          localStorage.removeItem('siga_factura_actual');
         }
-        
-        // Limpiar el número de factura del localStorage después de cargarlo
-        // (opcional: puedes mantenerlo si quieres que persista)
-        // localStorage.removeItem('siga_factura_actual');
+      } else {
+        setErrorFactura('No se encontró información de factura. Puedes ver tus facturas en tu perfil.');
       }
     };
     
     cargarFactura();
-  }, []);
+  }, [usuario]);
 
   // Función para manejar la impresión de la factura
   const manejarImprimir = () => {

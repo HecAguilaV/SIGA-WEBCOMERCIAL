@@ -37,8 +37,9 @@ export function obtenerUsuarioAutenticado() {
 /**
  * Limpia TODOS los datos relacionados al usuario actual
  * Debe llamarse antes de login/registro y al hacer logout
+ * @param {boolean} preservarRedirect - Si es true, no limpia siga_redirect_after_login
  */
-export function limpiarDatosUsuario() {
+export function limpiarDatosUsuario(preservarRedirect = false) {
   // Limpiar usuario y tokens
   localStorage.removeItem(CLAVE_USUARIO);
   localStorage.removeItem('accessToken');
@@ -47,7 +48,9 @@ export function limpiarDatosUsuario() {
   // Limpiar datos específicos del usuario
   localStorage.removeItem('siga_factura_actual'); // Factura del usuario anterior
   localStorage.removeItem('siga_portal_comercial_url'); // URL del portal
-  localStorage.removeItem('siga_redirect_after_login'); // Redirect path
+  if (!preservarRedirect) {
+    localStorage.removeItem('siga_redirect_after_login'); // Redirect path (solo si no se preserva)
+  }
   localStorage.removeItem('siga_carrito_plan'); // Carrito (limpiar al cambiar usuario)
   
   // NO limpiar siga_theme ya que es una preferencia del navegador, no del usuario

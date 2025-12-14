@@ -10,6 +10,11 @@ import { guardarUsuarioAutenticado, obtenerUsuarioAutenticado as obtenerUsuarioL
  */
 export async function iniciarSesion(email, password) {
   try {
+    // CRÍTICO: Limpiar datos del usuario anterior antes de iniciar nueva sesión
+    // Preservar redirect path si existe (se necesita después del login)
+    const redirectPath = localStorage.getItem('siga_redirect_after_login');
+    limpiarDatosUsuario(!!redirectPath);
+    
     // Intentar login con el backend real
     const response = await loginUser(email, password);
     
@@ -65,6 +70,9 @@ export async function iniciarSesion(email, password) {
  */
 export async function registrarUsuario(userData) {
   try {
+    // CRÍTICO: Limpiar datos del usuario anterior antes de registrar nuevo usuario
+    limpiarDatosUsuario();
+    
     // Intentar registro con el backend real
     const response = await registerUser(userData);
     
