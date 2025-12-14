@@ -14,13 +14,26 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
+        manualChunks(id) {
           // Separar vendor libraries grandes
-          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          if (id.includes('node_modules')) {
+            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
+              return 'react-vendor';
+            }
+            // Otras librerías grandes
+            if (id.includes('@google/generative-ai') || id.includes('recharts') || id.includes('swagger-ui')) {
+              return 'vendor-large';
+            }
+            return 'vendor';
+          }
           // Separar servicios de API
-          'api-services': ['./src/services/api.js', './src/services/auth.js'],
-          // Separar componentes grandes
-          'perfil-page': ['./src/pages/PerfilPage.jsx'],
+          if (id.includes('/services/api.js') || id.includes('/services/auth.js')) {
+            return 'api-services';
+          }
+          // Separar PerfilPage que es muy grande
+          if (id.includes('/pages/PerfilPage.jsx')) {
+            return 'perfil-page';
+          }
         },
       },
     },
