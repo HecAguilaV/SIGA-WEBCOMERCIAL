@@ -67,7 +67,18 @@ export default function CompraExitosaPage() {
             
             {/* Botones de acción */}
             <div className="d-flex flex-wrap justify-content-center gap-3 mb-4">
-              <Link to="/perfil" className="btn btn-acento btn-lg">
+              <Link 
+                to="/perfil" 
+                className="btn btn-acento btn-lg"
+                onClick={() => {
+                  // Forzar actualización del usuario al ir al perfil
+                  const usuario = obtenerUsuarioAutenticado();
+                  if (usuario) {
+                    // Disparar evento personalizado para que PerfilPage se actualice
+                    window.dispatchEvent(new CustomEvent('usuarioActualizado'));
+                  }
+                }}
+              >
                 Ver mi Plan
               </Link>
               <Link to="/app" className="btn btn-outline-primary btn-lg">

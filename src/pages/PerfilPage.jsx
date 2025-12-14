@@ -42,13 +42,48 @@ export default function PerfilPage() {
   const [mensajePerfil, setMensajePerfil] = useState(''); // Mensaje de éxito/error al actualizar perfil
 
   // Actualizar usuario desde localStorage cuando el componente se monta
+  // También verificar cuando la página se vuelve visible (por ejemplo, después de volver del pago)
   useEffect(() => {
-    const usuarioActual = obtenerUsuarioAutenticado();
-    if (usuarioActual) {
-      if (!usuario || usuarioActual.id !== usuario.id) {
-        setUsuario(usuarioActual);
+    const actualizarUsuario = () => {
+      const usuarioActual = obtenerUsuarioAutenticado();
+      if (usuarioActual) {
+        // Si el usuario cambió o tiene un planId nuevo, actualizar y resetear verificación
+        if (!usuario || usuarioActual.id !== usuario.id || usuarioActual.planId !== usuario?.planId) {
+          setUsuario(usuarioActual);
+          // Si el usuario tiene un planId nuevo, resetear la verificación de suscripción
+          if (usuarioActual.planId && usuarioActual.planId !== usuario?.planId) {
+            console.log('🔄 PlanId cambió, reseteando verificación de suscripción');
+            setSuscripcionVerificada(false);
+            setTieneSuscripcionActiva(false);
+            setSuscripcionActivaData(null);
+          }
+        }
       }
-    }
+    };
+    
+    // Actualizar al montar
+    actualizarUsuario();
+    
+    // También actualizar cuando la página se vuelve visible (usuario vuelve de otra página)
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        actualizarUsuario();
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    // También escuchar evento personalizado cuando el usuario se actualiza
+    const handleUsuarioActualizado = () => {
+      actualizarUsuario();
+    };
+    
+    window.addEventListener('usuarioActualizado', handleUsuarioActualizado);
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('usuarioActualizado', handleUsuarioActualizado);
+    };
   }, []); // Solo al montar
 
   if (!usuario) {
@@ -155,14 +190,15 @@ export default function PerfilPage() {
   const [suscripcionActivaData, setSuscripcionActivaData] = useState(null); // Guardar datos de suscripción activa
   
   // Verificar suscripción activa - se ejecuta cuando el usuario está disponible
+  // También se ejecuta cuando el usuario cambia (por ejemplo, después del pago)
   useEffect(() => {
     // Evitar múltiples verificaciones
     if (!usuario || !usuario.id) {
       return;
     }
     
-    // Si ya está verificado para este usuario, no verificar de nuevo
-    if (suscripcionVerificada) {
+    // Si ya está verificado para este usuario Y el planId no cambió, no verificar de nuevo
+    if (suscripcionVerificada && usuario.planId === suscripcionActivaData?.planId) {
       return;
     }
     
@@ -234,7 +270,7 @@ export default function PerfilPage() {
     };
     
     verificarSuscripcion();
-  }, [usuario?.id]); // Solo depende del ID del usuario, no del estado de verificación
+  }, [usuario?.id, usuario?.planId]); // Depende del ID y planId del usuario para detectar cambios
 
   const limites = planActual ? {
     usuarios: planActual.limiteUsuarios,

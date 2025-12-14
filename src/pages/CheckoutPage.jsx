@@ -161,8 +161,10 @@ export default function CheckoutPage() {
             email: usuario.email || response.user?.email || usuario.email
           };
           guardarUsuarioAutenticado(usuarioActualizado);
+          console.log('✅ Suscripción creada exitosamente:', response.suscripcion);
+          console.log('🔄 Usuario actualizado con planId:', plan.id);
         } else {
-          throw new Error('Error al crear suscripción');
+          throw new Error(response.message || 'Error al crear suscripción');
         }
       } catch (error) {
         setError(error?.message || 'No se pudo crear la suscripción en el backend.');
@@ -226,23 +228,17 @@ export default function CheckoutPage() {
           
           if (factura && (factura.id || factura.numero || factura.numeroFactura)) {
             // Guardar el número de factura en localStorage para que CompraExitosaPage pueda mostrarla
-            localStorage.setItem('siga_factura_actual', factura.numeroFactura || factura.numero || factura.id);
-            console.log('✅ Factura guardada:', factura.numeroFactura || factura.numero);
+            const numeroFactura = factura.numeroFactura || factura.numero || factura.id;
+            localStorage.setItem('siga_factura_actual', numeroFactura);
+            console.log('✅ Factura creada y guardada:', numeroFactura);
           } else {
             console.error('⚠️ La respuesta tiene success=true pero no contiene una factura válida:', facturaResponse);
             throw new Error('No se recibió la factura del backend (formato inesperado)');
           }
         } else {
-          // Si success es false pero hay mensaje, puede ser un mensaje informativo, no necesariamente error
+          // Si success es false, lanzar error
           const errorMsg = facturaResponse.message || 'Error al crear factura en backend';
-          // Si el mensaje dice "exitosamente", no es un error
-          if (!errorMsg.toLowerCase().includes('exitosamente') && !errorMsg.toLowerCase().includes('success')) {
-            throw new Error(errorMsg);
-          }
-          // Si llegamos aquí y no hay factura, intentar usar el mensaje como información
-          if (!facturaResponse.factura && !facturaResponse.data) {
-            throw new Error('No se recibió la factura del backend');
-          }
+          throw new Error(errorMsg);
         }
       } catch (error) {
         // Extraer mensaje de error más descriptivo
