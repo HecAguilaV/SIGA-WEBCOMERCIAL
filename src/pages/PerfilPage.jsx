@@ -41,6 +41,14 @@ export default function PerfilPage() {
   const [cargandoPerfil, setCargandoPerfil] = useState(false); // Loading al actualizar perfil
   const [mensajePerfil, setMensajePerfil] = useState(''); // Mensaje de éxito/error al actualizar perfil
 
+  // Actualizar usuario desde localStorage cuando el componente se monta o cuando cambia
+  useEffect(() => {
+    const usuarioActual = obtenerUsuarioAutenticado();
+    if (usuarioActual && usuarioActual.id !== usuario?.id) {
+      setUsuario(usuarioActual);
+    }
+  }, []); // Solo al montar
+
   if (!usuario) {
     return null;
   }
@@ -57,13 +65,13 @@ export default function PerfilPage() {
         const response = await getPlanes();
         if (response.success && response.planes) {
           setPlanes(response.planes);
-        } else {
+  } else {
           setPlanes([]);
         }
       } catch (error) {
         console.error('Error al cargar planes:', error);
         setPlanes([]);
-      }
+    }
     };
     
     cargarPlanes();
@@ -104,18 +112,18 @@ export default function PerfilPage() {
     }
     
     const cargarFacturas = async () => {
-      try {
+        try {
         setErrorFacturas('');
-        // Intentar cargar facturas desde el backend
-        const response = await getFacturas();
-        if (response.success && response.facturas) {
-          setFacturas(response.facturas);
-        } else {
+          // Intentar cargar facturas desde el backend
+          const response = await getFacturas();
+          if (response.success && response.facturas) {
+            setFacturas(response.facturas);
+          } else {
           // Si no hay facturas, es válido (usuario nuevo)
           setFacturas([]);
-        }
+          }
         setFacturasCargadas(true);
-      } catch (error) {
+        } catch (error) {
         // Manejar 404 específicamente (usuario sin facturas es válido)
         if (error.message?.includes('404') || error.message?.includes('NOT_FOUND')) {
           console.log('ℹ️ Usuario sin facturas (404 es válido para usuarios nuevos)');
@@ -140,9 +148,16 @@ export default function PerfilPage() {
     cargarFacturas();
   }, [usuario?.id, facturasCargadas]);
 
-  // Verificar suscripción activa al montar el componente (solo una vez)
+  // Verificar suscripción activa al montar el componente y cuando el usuario cambia
   const [suscripcionVerificada, setSuscripcionVerificada] = useState(false);
   const [suscripcionActivaData, setSuscripcionActivaData] = useState(null); // Guardar datos de suscripción activa
+  
+  useEffect(() => {
+    // Si el usuario cambia (por ejemplo, después del login), resetear la verificación
+    if (usuario && usuario.id) {
+      setSuscripcionVerificada(false);
+    }
+  }, [usuario?.id]);
   
   useEffect(() => {
     // Evitar múltiples verificaciones
@@ -380,12 +395,12 @@ export default function PerfilPage() {
           email: response.user?.email || nuevoEmail,
         };
         guardarUsuarioAutenticado(usuarioActualizado);
-        
+
         setMensajeEmail('✅ Email actualizado exitosamente');
         setNuevoEmail('');
         setPasswordEmail('');
         setMostrarActualizarEmail(false);
-        
+
         // Recargar la página después de 2 segundos para reflejar los cambios
         setTimeout(() => {
           window.location.reload();
@@ -422,23 +437,27 @@ export default function PerfilPage() {
   // Inicializar formulario de perfil con datos actuales del usuario
   // Solo cuando se abre el formulario (cuando mostrarEditarPerfil cambia a true)
   const formularioInicializado = useRef(false);
+  const usuarioInicialRef = useRef(null); // Guardar referencia del usuario cuando se abre el formulario
   
   useEffect(() => {
     if (mostrarEditarPerfil && usuario && !formularioInicializado.current) {
       // Capturar los valores actuales del usuario solo cuando se abre el formulario
-      setPerfilEditado({
+      const valoresIniciales = {
         nombre: usuario.nombre || '',
         apellido: usuario.apellido || '',
         rut: usuario.rut || '',
         telefono: usuario.telefono || '',
         nombreEmpresa: usuario.nombreEmpresa || ''
-      });
+      };
+      setPerfilEditado(valoresIniciales);
+      usuarioInicialRef.current = valoresIniciales; // Guardar valores iniciales
       formularioInicializado.current = true;
     } else if (!mostrarEditarPerfil) {
       // Resetear el flag cuando se cierra el formulario
       formularioInicializado.current = false;
+      usuarioInicialRef.current = null;
     }
-  }, [mostrarEditarPerfil, usuario]); // Incluir usuario pero protegido con useRef
+  }, [mostrarEditarPerfil]); // SOLO depende de mostrarEditarPerfil, NO de usuario
 
   const manejarActualizarPerfil = async (e) => {
     e.preventDefault();
@@ -492,7 +511,7 @@ export default function PerfilPage() {
         
         // Recargar la página después de 1.5 segundos para reflejar los cambios
         setTimeout(() => {
-          window.location.reload();
+        window.location.reload();
         }, 1500);
       } else {
         throw new Error(response.message || 'Error al actualizar el perfil');
@@ -543,7 +562,7 @@ export default function PerfilPage() {
                 <div className="row mb-4">
                   <div className="col-md-6">
                     <h5 className="fw-bold text-primario mb-3">
-                      {planActual.precio} {planActual.unidad}/mes
+                          {planActual.precio} {planActual.unidad}/mes
                       {/* ❌ ELIMINADO: Trial info ahora viene del backend */}
                     </h5>
                     <h6 className="text-muted mb-3">Beneficios incluidos:</h6>
@@ -648,12 +667,12 @@ export default function PerfilPage() {
                         </p>
                       </div>
                       <div className="d-flex gap-2 mt-3 mt-md-0">
-                        <button
-                          className="btn btn-primary"
+                          <button
+                            className="btn btn-primary"
                           onClick={() => navigate('/planes')}
-                        >
+                          >
                           Ver Planes
-                        </button>
+                          </button>
                       </div>
                     </div>
                   </div>
@@ -900,21 +919,21 @@ export default function PerfilPage() {
             </div>
             <div className="card-body">
               {!mostrarEditarPerfil ? (
-                <div className="row g-3">
-                  <div className="col-md-6">
-                    <strong className="text-muted d-block mb-1">Nombre:</strong>
+              <div className="row g-3">
+                <div className="col-md-6">
+                  <strong className="text-muted d-block mb-1">Nombre:</strong>
                     <p className="mb-0">{usuario.nombre || 'No especificado'}</p>
-                  </div>
+                </div>
                   {usuario.apellido && (
                     <div className="col-md-6">
                       <strong className="text-muted d-block mb-1">Apellido:</strong>
                       <p className="mb-0">{usuario.apellido}</p>
                     </div>
                   )}
-                  <div className="col-md-6">
-                    <strong className="text-muted d-block mb-1">Email:</strong>
+                <div className="col-md-6">
+                  <strong className="text-muted d-block mb-1">Email:</strong>
                     <div className="d-flex align-items-center gap-2">
-                      <p className="mb-0">{usuario.email}</p>
+                  <p className="mb-0">{usuario.email}</p>
                       <button
                         type="button"
                         className="btn btn-sm btn-outline-primary"
@@ -927,7 +946,7 @@ export default function PerfilPage() {
                       >
                         {mostrarActualizarEmail ? 'Cancelar' : 'Cambiar'}
                       </button>
-                    </div>
+                </div>
                   </div>
                   {usuario.rut && (
                     <div className="col-md-6">
@@ -947,17 +966,17 @@ export default function PerfilPage() {
                       <p className="mb-0">{usuario.nombreEmpresa}</p>
                     </div>
                   )}
-                  <div className="col-md-6">
-                    <strong className="text-muted d-block mb-1">Rol:</strong>
-                    <span className="badge bg-info text-dark px-3 py-2">
-                      {usuario.rol}
-                    </span>
-                  </div>
-                  <div className="col-md-6">
-                    <strong className="text-muted d-block mb-1">ID de Usuario:</strong>
-                    <p className="mb-0 text-muted">#{usuario.id}</p>
-                  </div>
+                <div className="col-md-6">
+                  <strong className="text-muted d-block mb-1">Rol:</strong>
+                  <span className="badge bg-info text-dark px-3 py-2">
+                    {usuario.rol}
+                  </span>
                 </div>
+                <div className="col-md-6">
+                  <strong className="text-muted d-block mb-1">ID de Usuario:</strong>
+                  <p className="mb-0 text-muted">#{usuario.id}</p>
+                </div>
+              </div>
               ) : (
                 <div>
                   <h5 className="mb-3 text-primario">Editar Perfil</h5>
@@ -965,7 +984,7 @@ export default function PerfilPage() {
                   {mensajePerfil && (
                     <div className={`alert ${mensajePerfil.includes('✅') ? 'alert-success' : 'alert-danger'}`} role="alert">
                       {mensajePerfil}
-                    </div>
+            </div>
                   )}
 
                   <form onSubmit={manejarActualizarPerfil}>
@@ -983,7 +1002,7 @@ export default function PerfilPage() {
                           placeholder="Tu nombre"
                           disabled={cargandoPerfil}
                         />
-                      </div>
+          </div>
                       <div className="col-md-6">
                         <label htmlFor="perfilApellido" className="form-label">
                           Apellido
