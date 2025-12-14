@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { vaciarCarrito, obtenerUsuarioAutenticado, obtenerPlanDelCarrito, guardarUsuarioAutenticado } from '../utils/auth.js';
 import { ClipboardText, CheckCircle, Lightbulb, CreditCard, Lock, ShieldCheck, Warning } from 'phosphor-react';
-import { asignarPlanAUsuario, actualizarUsuario, convertirTrialAPagado, crearFactura } from '../datos/datosSimulados.js';
+// ❌ ELIMINADO: Ya no usamos datos simulados - TODO viene del backend
+// import { asignarPlanAUsuario, actualizarUsuario, convertirTrialAPagado, crearFactura } from '../datos/datosSimulados.js';
 import { convertirUFaCLP, formatearPrecioCLP } from '../utils/indicadoresEconomicos.js';
 import { createSuscripcion, createFactura } from '../services/api.js';
 
@@ -80,7 +81,7 @@ export default function CheckoutPage() {
     if (valor.length <= 2) {
       const mesNum = parseInt(valor);
       if (valor === '' || (mesNum >= 1 && mesNum <= 12)) {
-        setMes(valor);
+      setMes(valor);
         // Si se completaron 2 dígitos, saltar al año
         if (valor.length === 2 && anioRef.current) {
           anioRef.current.focus();
@@ -165,29 +166,11 @@ export default function CheckoutPage() {
           throw new Error('Error al crear suscripción');
         }
       } catch (error) {
+        // ❌ ELIMINADO: Ya no hay fallback a datos simulados
         // En producción: NO simular éxito. Debe persistir en BD o fallar.
-        if (!permitirFallbackLocal) {
-          setError(error?.message || 'No se pudo crear la suscripción en el backend.');
-          setProcesando(false);
-          return;
-        }
-
-        console.warn('Error al crear suscripción en backend, usando datos locales:', error);
-        
-        // Fallback a datos locales
-        // Si el usuario está en trial, convertirlo a suscripción pagada
-        if (usuario.enTrial) {
-          convertirTrialAPagado(usuario.id);
-        }
-        
-        // Asignar el plan comprado al usuario en datos simulados
-        asignarPlanAUsuario(usuario.id, plan.id);
-        // Actualizar usuario en localStorage con el nuevo plan
-        usuarioActualizado = { ...usuario, planId: plan.id, enTrial: false };
-        guardarUsuarioAutenticado(usuarioActualizado);
-        
-        // Actualizar también en el array de usuarios
-        actualizarUsuario(usuario.id, { planId: plan.id, enTrial: false });
+        setError(error?.message || 'No se pudo crear la suscripción en el backend.');
+        setProcesando(false);
+        return;
       }
       
       // GENERAR FACTURA después de la compra exitosa
@@ -245,47 +228,26 @@ export default function CheckoutPage() {
           }
         }
       } catch (error) {
+        // ❌ ELIMINADO: Ya no hay fallback a datos simulados
         // En producción: NO simular. Si falla la factura en backend, debe verse.
-        if (!permitirFallbackLocal) {
-          // Extraer mensaje de error más descriptivo
-          let errorMsg = 'No se pudo generar la factura en el backend.';
-          
-          if (error.message) {
-            if (error.message.includes('usuarioEmail') || error.message.includes('usuario email')) {
-              errorMsg = 'Error: El email del usuario es requerido pero no está disponible. Por favor, actualiza tu perfil con un email válido.';
-            } else if (error.message.includes('JSON parse error')) {
-              errorMsg = 'Error: El formato de datos enviado al servidor es inválido. Por favor, contacta al soporte.';
-            } else if (error.message.includes('500')) {
-              errorMsg = 'Error del servidor: El backend no pudo procesar la solicitud. Por favor, intenta nuevamente o contacta al soporte.';
-            } else {
-              errorMsg = `Error: ${error.message}`;
-            }
+        // Extraer mensaje de error más descriptivo
+        let errorMsg = 'No se pudo generar la factura en el backend.';
+        
+        if (error.message) {
+          if (error.message.includes('usuarioEmail') || error.message.includes('usuario email')) {
+            errorMsg = 'Error: El email del usuario es requerido pero no está disponible. Por favor, actualiza tu perfil con un email válido.';
+          } else if (error.message.includes('JSON parse error')) {
+            errorMsg = 'Error: El formato de datos enviado al servidor es inválido. Por favor, contacta al soporte.';
+          } else if (error.message.includes('500')) {
+            errorMsg = 'Error del servidor: El backend no pudo procesar la solicitud. Por favor, intenta nuevamente o contacta al soporte.';
+          } else {
+            errorMsg = `Error: ${error.message}`;
           }
-          
-          setError(errorMsg);
-          setProcesando(false);
-          return;
         }
-
-        console.warn('Error al crear factura en backend, usando datos locales:', error);
         
-        // Fallback a datos locales
-        factura = crearFactura({
-          usuarioId: usuario.id,
-          usuarioNombre: usuario.nombre,
-          usuarioEmail: usuario.email,
-          planId: plan.id,
-          planNombre: plan.nombre,
-          precioUF: plan.precio,
-          precioCLP: precioCLP, // Precio convertido a CLP
-          unidad: plan.unidad,
-          fechaVencimiento: fechaVencimiento.toISOString(),
-          metodoPago: 'Tarjeta de crédito',
-          ultimos4Digitos: ultimos4Digitos,
-        });
-        
-        // Guardar el número de factura en localStorage para que CompraExitosaPage pueda mostrarla
-        localStorage.setItem('siga_factura_actual', factura.numeroFactura || factura.numero);
+        setError(errorMsg);
+        setProcesando(false);
+        return;
       }
     }
     

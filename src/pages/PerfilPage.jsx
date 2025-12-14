@@ -6,17 +6,18 @@ import {
   Warning, FileText, ClipboardText, CheckCircle, Users, Storefront, Robot,
   ChatCircle, UserCircle, ChartBar
 } from 'phosphor-react';
-import {
-  obtenerPlanDelUsuario,
-  obtenerLimitesDelPlan,
-  leerPlanes,
-  verificarTrialActivo,
-  iniciarFreeTrial,
-  puedeIniciarTrial,
-  convertirTrialAPagado,
-  obtenerFacturasDelUsuario,
-} from '../datos/datosSimulados.js';
-import { getFacturas, getSuscripciones, obtenerTokenOperativo, updateEmail, saveTokens } from '../services/api.js';
+// ❌ ELIMINADO: Ya no usamos datos simulados en producción
+// import {
+//   obtenerPlanDelUsuario,
+//   obtenerLimitesDelPlan,
+//   leerPlanes,
+//   verificarTrialActivo,
+//   iniciarFreeTrial,
+//   puedeIniciarTrial,
+//   convertirTrialAPagado,
+//   obtenerFacturasDelUsuario,
+// } from '../datos/datosSimulados.js';
+import { getFacturas, getSuscripciones, obtenerTokenOperativo, updateEmail, saveTokens, getPlanes } from '../services/api.js';
 import { formatearPrecioCLP } from '../utils/indicadoresEconomicos.js';
 import FacturaComponent from '../components/FacturaComponent.jsx';
 import '../styles/PerfilPage.css';
@@ -62,12 +63,10 @@ export default function PerfilPage() {
     }
   }
 
-  // Verificar trial activo y capacidad de iniciar trial
-  useEffect(() => {
-    const trial = verificarTrialActivo(usuario.id);
-    setTrialInfo(trial);
-    setPuedeTrial(puedeIniciarTrial(usuario.id));
-  }, [usuario.id]);
+  // ❌ ELIMINADO: Trial management ahora es responsabilidad del backend
+  // Ya no usamos datos simulados para trials - el backend maneja los trials automáticamente
+  // const [trialInfo, setTrialInfo] = useState(null);
+  // const [puedeTrial, setPuedeTrial] = useState(false);
 
   // Cargar facturas del usuario al montar el componente (solo una vez)
   const [facturasCargadas, setFacturasCargadas] = useState(false);
@@ -103,16 +102,11 @@ export default function PerfilPage() {
           console.warn('⚠️ Error de autenticación al cargar facturas. Sesión puede haber expirado.');
           setFacturas([]);
           setFacturasCargadas(true); // Marcar como cargado para evitar reintentos
-        } else if (!permitirFallbackLocal) {
+        } else {
+          // ❌ ELIMINADO: Ya no hay fallback a datos simulados
           console.error('Error al cargar facturas desde backend:', error);
           setFacturas([]);
           setErrorFacturas(error?.message || 'No se pudieron cargar las facturas desde el backend.');
-          setFacturasCargadas(true);
-        } else {
-          console.warn('Error al cargar facturas desde backend, usando locales:', error);
-          // Fallback a datos locales
-          const facturasUsuario = obtenerFacturasDelUsuario(usuario.id);
-          setFacturas(facturasUsuario);
           setFacturasCargadas(true);
         }
       }
@@ -155,24 +149,29 @@ export default function PerfilPage() {
           console.warn('⚠️ Error de autenticación al verificar suscripción. Sesión puede haber expirado.');
           setTieneSuscripcionActiva(false);
           setSuscripcionVerificada(true); // Marcar como verificado para evitar reintentos
-        } else {
-          console.warn('Error al verificar suscripción:', error);
-          // En producción NO adivinar: si falla, tratamos como NO activa (evita accesos incorrectos)
-          if (!permitirFallbackLocal) {
-            setTieneSuscripcionActiva(false);
           } else {
-            // Fallback: considerar activa si tiene plan asignado (cualquier planId !== null)
-            setTieneSuscripcionActiva(usuario.planId !== null);
+            // ❌ ELIMINADO: Ya no hay fallback a datos simulados
+            console.warn('Error al verificar suscripción:', error);
+            // Si falla, tratamos como NO activa (evita accesos incorrectos)
+            setTieneSuscripcionActiva(false);
+            setSuscripcionVerificada(true);
           }
-          setSuscripcionVerificada(true);
-        }
       }
     };
     
     verificarSuscripcion();
   }, [usuario?.id, suscripcionVerificada]);
 
-  const limites = planActual ? obtenerLimitesDelPlan(planActual.id) : null;
+  // ❌ ELIMINADO: Los límites ahora vienen del backend en el plan
+  // const limites = planActual ? obtenerLimitesDelPlan(planActual.id) : null;
+  const limites = planActual ? {
+    usuarios: planActual.limiteUsuarios,
+    bodegas: planActual.limiteBodegas,
+    productos: planActual.limiteProductos,
+    reportes: planActual.reportes || 'Básicos',
+    soporte: planActual.soporte || 'Estándar',
+    asistenteSIGA: planActual.asistenteSIGA || false
+  } : null;
   const planCrecimiento = planes.find((p) => p.nombre === 'Crecimiento');
   const planPro = planes.find((p) => p.nombre === 'Emprendedor Pro');
 
@@ -183,35 +182,20 @@ export default function PerfilPage() {
     }
   };
 
+  // ❌ ELIMINADO: Trial management ahora es responsabilidad del backend
+  // Los trials se manejan automáticamente cuando un usuario nuevo se registra
+  // No hay funciones manuales para iniciar/convertir trials
   const manejarIniciarTrial = (planId) => {
-    if (window.confirm('¿Deseas iniciar un trial gratuito de 14 días? Después del trial, perderás el acceso hasta que contrates un plan de pago.')) {
-      if (iniciarFreeTrial(usuario.id, planId)) {
-        // Recargar usuario actualizado
-        const usuarioActualizado = obtenerUsuarioAutenticado();
-        usuarioActualizado.planId = planId;
-        usuarioActualizado.enTrial = true;
-        guardarUsuarioAutenticado(usuarioActualizado);
-
-        // Actualizar trial info
-        const nuevoTrial = verificarTrialActivo(usuario.id);
-        setTrialInfo(nuevoTrial);
-        setPuedeTrial(false);
-
-        alert('¡Trial iniciado exitosamente! Tienes 14 días para probar todas las funcionalidades.');
-        window.location.reload(); // Recargar para mostrar cambios
-      } else {
-        alert('No se pudo iniciar el trial. Es posible que ya hayas usado tu trial gratuito.');
-      }
-    }
+    // El trial se inicia automáticamente al registrarse
+    // Para adquirir un plan, debe ir a /planes y comprarlo
+    alert('Para adquirir un plan, por favor visita la página de Planes y realiza la compra.');
+    navigate('/planes');
   };
 
   const manejarConvertirTrialAPagado = () => {
-    if (window.confirm('¿Deseas convertir tu trial en una suscripción pagada?')) {
-      if (convertirTrialAPagado(usuario.id)) {
-        alert('¡Trial convertido exitosamente! Ahora tienes una suscripción activa.');
-        window.location.reload();
-      }
-    }
+    // Para convertir trial a pagado, debe comprar un plan
+    alert('Para convertir tu trial en una suscripción pagada, por favor visita la página de Planes y realiza la compra.');
+    navigate('/planes');
   };
 
   // Manejar acceso a WebApp mediante SSO
@@ -440,9 +424,7 @@ export default function PerfilPage() {
                   <div className="col-md-6">
                     <h5 className="fw-bold text-primario mb-3">
                       {planActual.precio} {planActual.unidad}/mes
-                      {trialInfo && trialInfo.activo && (
-                        <span className="badge bg-warning ms-2">Trial Activo</span>
-                      )}
+                      {/* ❌ ELIMINADO: Trial info ahora viene del backend */}
                     </h5>
                     <h6 className="text-muted mb-3">Beneficios incluidos:</h6>
                     <ul className="list-unstyled">
@@ -533,7 +515,7 @@ export default function PerfilPage() {
                 )}
 
                 {/* Opción de free trial para usuarios sin plan */}
-                {!planActual && puedeTrial && (
+                {!planActual && (
                   <div className="alert alert-primary mt-4" role="alert">
                     <div className="d-flex justify-content-between align-items-center flex-wrap">
                       <div>
