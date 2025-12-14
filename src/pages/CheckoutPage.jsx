@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { vaciarCarrito, obtenerUsuarioAutenticado, obtenerPlanDelCarrito, guardarUsuarioAutenticado } from '../utils/auth.js';
 import { ClipboardText, CheckCircle, Lightbulb, CreditCard, Lock, ShieldCheck, Warning } from 'phosphor-react';
