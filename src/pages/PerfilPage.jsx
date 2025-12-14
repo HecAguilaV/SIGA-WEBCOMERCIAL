@@ -48,6 +48,10 @@ export default function PerfilPage() {
   const [cargandoPerfil, setCargandoPerfil] = useState(false); // Loading al actualizar perfil
   const [mensajePerfil, setMensajePerfil] = useState(''); // Mensaje de éxito/error al actualizar perfil
 
+  // Estados para suscripciones (definir antes del useEffect que los usa)
+  const [suscripcionVerificada, setSuscripcionVerificada] = useState(false);
+  const [suscripcionActivaData, setSuscripcionActivaData] = useState(null);
+
   // Actualizar usuario desde localStorage cuando el componente se monta
   // También verificar cuando la página se vuelve visible (por ejemplo, después de volver del pago)
   useEffect(() => {
@@ -61,14 +65,9 @@ export default function PerfilPage() {
             // Si el usuario tiene un planId nuevo, resetear la verificación de suscripción
             if (usuarioActual.planId && usuarioActual.planId !== usuario?.planId) {
               console.log('🔄 PlanId cambió, reseteando verificación de suscripción');
-              // Estas variables se definen más abajo, solo resetear si existen
-              if (typeof setSuscripcionVerificada !== 'undefined') {
-                setSuscripcionVerificada(false);
-              }
+              setSuscripcionVerificada(false);
               setTieneSuscripcionActiva(false);
-              if (typeof setSuscripcionActivaData !== 'undefined') {
-                setSuscripcionActivaData(null);
-              }
+              setSuscripcionActivaData(null);
             }
           }
         } else if (!usuarioActual && usuario) {
@@ -109,16 +108,24 @@ export default function PerfilPage() {
 
   if (!usuario) {
     // Redirigir al login si no hay usuario
-    React.useEffect(() => {
+    useEffect(() => {
       navigate('/login', { replace: true });
     }, [navigate]);
-    return null;
+    return (
+      <div className="container py-5">
+        <div className="text-center">
+          <p>Redirigiendo al login...</p>
+        </div>
+      </div>
+    );
   }
 
   // Solo permitir “datos simulados” en desarrollo LOCAL
   // Obtener plan del usuario desde el backend
   const [planActual, setPlanActual] = useState(null);
   const [planes, setPlanes] = useState([]);
+  
+  // NOTA: suscripcionVerificada y suscripcionActivaData ya están definidos arriba
   
   // Cargar planes desde el backend
   useEffect(() => {
