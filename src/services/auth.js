@@ -141,5 +141,5 @@ export function cerrarSesion() {
  * Verificar si hay sesión activa (backend o local)
  */
 export function estaAutenticado() {
-  return apiIsAuthenticated() || !!obtenerUsuarioAutenticado();
+  return apiIsAuthenticated() || !!obtenerUsuarioLocal();
 }
