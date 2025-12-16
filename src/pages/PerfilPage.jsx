@@ -310,99 +310,7 @@ export default function PerfilPage() {
   };
 
   // Manejar acceso a WebApp mediante SSO
-  const manejarAccederAWebApp = async () => {
-    setCargandoSSO(true);
-    setErrorSSO('');
 
-    try {
-      console.log('🔍 Iniciando SSO. Usuario:', usuario);
-
-      // Verificar que tenga suscripción activa
-      const suscripcionesResponse = await getSuscripciones();
-      console.log('📋 Respuesta de suscripciones:', suscripcionesResponse);
-
-      if (!suscripcionesResponse.success || !suscripcionesResponse.suscripciones ||
-        suscripcionesResponse.suscripciones.length === 0) {
-        // Verificar planId como alternativa si no hay suscripciones en backend
-        if (!usuario.planId) {
-          console.warn('⚠️ Usuario sin planId y sin suscripciones en backend');
-          setErrorSSO('No tienes una suscripción activa. Por favor adquiere un plan primero.');
-          setCargandoSSO(false);
-          return;
-        } else {
-          console.warn('⚠️ Usuario tiene planId pero no suscripciones en backend. Intentando SSO de todas formas...');
-        }
-      } else {
-        // Verificar que tenga al menos una suscripción activa
-        const suscripcionActiva = suscripcionesResponse.suscripciones.find(
-          s => s.estado === 'ACTIVA'
-        );
-
-        if (!suscripcionActiva) {
-          console.warn('⚠️ Usuario tiene suscripciones pero ninguna está activa:', suscripcionesResponse.suscripciones);
-          setErrorSSO('Tu suscripción no está activa. Por favor renueva tu plan.');
-          setCargandoSSO(false);
-          return;
-        }
-
-        console.log('✅ Suscripción activa encontrada:', suscripcionActiva);
-      }
-
-      // Obtener token operativo mediante SSO
-      console.log('🔄 Obteniendo token operativo...');
-      const ssoResponse = await obtenerTokenOperativo();
-      // Log sanitizado (sin tokens) solo en desarrollo
-      if (import.meta.env.DEV) {
-        const responseSanitized = { ...ssoResponse };
-        if (responseSanitized.accessToken) delete responseSanitized.accessToken;
-        if (responseSanitized.refreshToken) delete responseSanitized.refreshToken;
-        if (responseSanitized.token) delete responseSanitized.token;
-        if (responseSanitized.data?.accessToken) delete responseSanitized.data.accessToken;
-        console.log('🔑 Respuesta SSO (sanitizada):', responseSanitized);
-      }
-
-      if (!ssoResponse.success) {
-        // Mejorar mensaje de error
-        let errorMsg = ssoResponse.message || 'No se pudo obtener acceso a WebApp';
-
-        if (ssoResponse.message?.includes('suscripción') || ssoResponse.message?.includes('suscripcion')) {
-          errorMsg = 'No tienes una suscripción activa. Por favor adquiere un plan primero.';
-        } else if (ssoResponse.message?.includes('401') || ssoResponse.message?.includes('No autenticado')) {
-          errorMsg = 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente.';
-        } else if (ssoResponse.message?.includes('404')) {
-          errorMsg = 'El endpoint de SSO no está disponible. Por favor, contacta al soporte.';
-        }
-
-        console.error('❌ Error en SSO:', ssoResponse);
-        throw new Error(errorMsg);
-      }
-
-      // El accessToken puede estar en ssoResponse.accessToken o ssoResponse.data.accessToken
-      const tokenOperativo = ssoResponse.accessToken || ssoResponse.data?.accessToken;
-
-      if (!tokenOperativo) {
-        console.error('❌ SSO exitoso pero sin accessToken:', ssoResponse);
-        throw new Error('No se recibió token de acceso. Por favor, intenta nuevamente.');
-      }
-
-      // URL de WebApp: usar la del backend si viene, sino usar la URL de producción
-      const webAppUrl = ssoResponse.webAppUrl || ssoResponse.data?.webAppUrl || 'https://siga-webapp.vercel.app/';
-
-      console.log('✅ SSO exitoso. Redirigiendo a WebApp:', webAppUrl);
-
-      // Guardar URL del portal comercial para que WebApp pueda redirigir de vuelta
-      const portalComercialUrl = window.location.origin;
-      localStorage.setItem('siga_portal_comercial_url', portalComercialUrl);
-
-      // Redirigir a WebApp con token en URL
-      window.location.href = `${webAppUrl}?token=${tokenOperativo}`;
-
-    } catch (error) {
-      console.error('❌ Error al acceder a WebApp:', error);
-      setErrorSSO(error.message || 'No se pudo acceder a WebApp. Verifica tu suscripción.');
-      setCargandoSSO(false);
-    }
-  };
 
   const manejarActualizarEmail = async (e) => {
     e.preventDefault();
@@ -567,6 +475,12 @@ export default function PerfilPage() {
     } finally {
       setCargandoPerfil(false);
     }
+  };
+
+  const manejarAccederAWebApp = async () => {
+    // Ya no usamos estados locales manuales (setCargandoSSO), 
+    // usamos la función del hook que gestiona sus propios estados loading/error
+    await iniciarSSO(usuario);
   };
 
   return (
