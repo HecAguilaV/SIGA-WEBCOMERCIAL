@@ -3,22 +3,27 @@
 
 // Configuración de URLs
 // Manejo de variables de entorno compatible con Vite y Karma
-let API_BASE_URL = 'http://localhost:8080';
+let API_BASE_URL = ''; // Por defecto relativo (para usar proxy en Vercel/Vite)
+
 try {
   // Verificar si estamos en un entorno con import.meta (Vite)
-  // En Vite, import.meta.env está disponible directamente
-  if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE_URL) {
-    API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+  if (typeof import.meta !== 'undefined' && import.meta.env) {
+    if (import.meta.env.VITE_API_BASE_URL) {
+      API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+    } else if (import.meta.env.DEV) {
+      // Solo en desarrollo local sin variable definida usamos localhost
+      API_BASE_URL = 'http://localhost:8080';
+    }
   }
 } catch (e) {
-  // En entorno de tests o si import.meta no está disponible, usar valor por defecto
   API_BASE_URL = 'http://localhost:8080';
 }
 
 // Log para debugging (siempre, para identificar problemas en producción)
-console.log('🔧 API_BASE_URL configurada:', API_BASE_URL);
-console.log('🔧 VITE_API_BASE_URL desde env:', import.meta.env.VITE_API_BASE_URL);
-console.log('🔧 Entorno:', import.meta.env.MODE, import.meta.env.PROD ? '(PRODUCCIÓN)' : '(DESARROLLO)');
+// Log para debugging (siempre, para identificar problemas en producción)
+console.log('API_BASE_URL configurada:', API_BASE_URL);
+console.log('VITE_API_BASE_URL desde env:', import.meta.env.VITE_API_BASE_URL);
+console.log('Entorno:', import.meta.env.MODE, import.meta.env.PROD ? '(PRODUCCIÓN)' : '(DESARROLLO)');
 
 // Advertencia si estamos en producción pero usando localhost
 if (import.meta.env.PROD && API_BASE_URL.includes('localhost')) {
@@ -70,53 +75,53 @@ async function refreshAccessToken() {
   if (isRefreshing && refreshPromise) {
     return refreshPromise;
   }
-  
+
   isRefreshing = true;
   refreshPromise = (async () => {
     try {
-  const refreshToken = getRefreshToken();
-  
-  if (!refreshToken) {
-    throw new Error('No hay refresh token disponible');
-  }
+      const refreshToken = getRefreshToken();
+
+      if (!refreshToken) {
+        throw new Error('No hay refresh token disponible');
+      }
 
       const response = await fetch(`${API_URL}/comercial/auth/refresh`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ refreshToken }),
-    });
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ refreshToken }),
+      });
 
-    const data = await response.json();
+      const data = await response.json();
 
-    if (!response.ok) {
-      // Si el refresh falla, limpiar tokens y redirigir a login
+      if (!response.ok) {
+        // Si el refresh falla, limpiar tokens y redirigir a login
+        clearTokens();
+        if (window.location.pathname !== '/login') {
+          window.location.href = '/login';
+        }
+        throw new Error(data.message || 'Error al renovar token');
+      }
+
+      if (data.success && data.accessToken) {
+        saveTokens(data.accessToken, data.refreshToken || refreshToken);
+        return data.accessToken;
+      }
+
+      throw new Error('Error al renovar token');
+    } catch (error) {
       clearTokens();
       if (window.location.pathname !== '/login') {
         window.location.href = '/login';
       }
-      throw new Error(data.message || 'Error al renovar token');
-    }
-
-    if (data.success && data.accessToken) {
-        saveTokens(data.accessToken, data.refreshToken || refreshToken);
-      return data.accessToken;
-    }
-
-    throw new Error('Error al renovar token');
-  } catch (error) {
-    clearTokens();
-    if (window.location.pathname !== '/login') {
-      window.location.href = '/login';
-    }
-    throw error;
+      throw error;
     } finally {
       isRefreshing = false;
       refreshPromise = null;
-  }
+    }
   })();
-  
+
   return refreshPromise;
 }
 
@@ -126,18 +131,18 @@ async function refreshAccessToken() {
 async function apiRequest(endpoint, options = {}) {
   const url = `${API_URL}${endpoint}`;
   const token = getAccessToken();
-  
+
   // Log de debugging SIEMPRE para diagnosticar problemas
   console.log(`🔍 API Request: ${options.method || 'GET'} ${url}`);
   console.log(`📍 Endpoint: ${endpoint}`);
-  
+
   // Verificar que el endpoint sea correcto (especialmente para suscripciones)
   if (endpoint.includes('suscripcion') && !endpoint.includes('suscripciones')) {
     console.error('❌ ERROR CRÍTICO: Endpoint incorrecto detectado!');
     console.error('❌ Debe ser /comercial/suscripciones (plural)');
     console.error('❌ Endpoint recibido:', endpoint);
   }
-  
+
   if (token && !options.skipAuth) {
     console.log('🔑 Token presente:', token.substring(0, 20) + '...');
   } else if (!options.skipAuth) {
@@ -165,7 +170,7 @@ async function apiRequest(endpoint, options = {}) {
 
   try {
     const response = await fetch(url, requestOptions);
-    
+
     // Intentar parsear JSON, pero manejar errores de parseo
     let data = {};
     let responseText = '';
@@ -188,8 +193,8 @@ async function apiRequest(endpoint, options = {}) {
         const newToken = await refreshAccessToken();
         // Reintentar la petición con el nuevo token (solo una vez)
         headers['Authorization'] = `Bearer ${newToken}`;
-        const retryResponse = await fetch(url, { 
-          ...requestOptions, 
+        const retryResponse = await fetch(url, {
+          ...requestOptions,
           headers,
           skipRefresh: true // Evitar bucle infinito
         });
@@ -200,13 +205,13 @@ async function apiRequest(endpoint, options = {}) {
         } catch (e) {
           retryData = { message: retryText };
         }
-        
+
         if (!retryResponse.ok) {
           // Si el retry también falla, no intentar de nuevo
           const errorMsg = retryData.message || 'Error en la solicitud';
           throw new Error(errorMsg);
         }
-        
+
         return retryData;
       } catch (refreshError) {
         // Si el refresh falla, ya se redirigió a login o limpió tokens
@@ -225,7 +230,7 @@ async function apiRequest(endpoint, options = {}) {
         method: options.method || 'GET',
         requestBody: options.body ? JSON.parse(options.body) : null
       });
-      
+
       // Si es 404, verificar si es un error de recurso no encontrado (válido para usuarios nuevos)
       if (response.status === 404) {
         // Para endpoints que pueden retornar 404 cuando no hay datos (facturas, suscripciones)
@@ -236,50 +241,50 @@ async function apiRequest(endpoint, options = {}) {
         // Para otros endpoints, lanzar error
         throw new Error(`Endpoint no encontrado (404): ${url}. Verifica que el endpoint exista en el backend.`);
       }
-      
+
       // Manejar errores específicos según las instrucciones del backend
       if (response.status === 401) {
         // Puede ser token inválido o contraseña incorrecta
         const errorMsg = data.message || 'No autenticado o contraseña incorrecta';
         throw new Error(errorMsg);
       }
-      
+
       if (response.status === 403) {
         // Forbidden - Usuario no tiene permisos o falta validación
         let errorMsg = data.message || 'No tienes permisos para realizar esta acción';
-        
+
         // Mensajes más específicos según el contexto
         if (endpoint.includes('/suscripciones')) {
           errorMsg = data.message || 'No tienes permisos para crear suscripciones. Verifica que tu cuenta esté activa y que tengas un email registrado.';
         } else if (endpoint.includes('/facturas')) {
           errorMsg = data.message || 'No tienes permisos para crear facturas. Verifica que tu cuenta esté activa y que tengas un email registrado.';
         }
-        
+
         console.error('❌ Error 403 (Forbidden):', {
           endpoint,
           message: errorMsg,
           responseData: data
         });
-        
+
         throw new Error(errorMsg);
       }
-      
+
       if (response.status === 409) {
         // Email ya en uso
         const errorMsg = data.message || 'El email ya está en uso por otro usuario';
         throw new Error(errorMsg);
       }
-      
+
       if (response.status === 400) {
         // Email igual al actual u otro error de validación
         const errorMsg = data.message || 'El nuevo email es igual al actual';
         throw new Error(errorMsg);
       }
-      
+
       // Para errores 500, intentar extraer mensaje más descriptivo
       if (response.status === 500) {
         let errorMsg = data.message || responseText || `Error del servidor (500): ${response.statusText}`;
-        
+
         // Si el mensaje contiene información sobre campos faltantes, hacerlo más claro
         if (errorMsg.includes('usuarioEmail') || errorMsg.includes('usuario email') || errorMsg.includes('usuarioEmail due to missing')) {
           errorMsg = 'Error: El email del usuario es requerido pero no está disponible. Por favor, actualiza tu perfil con un email válido.';
@@ -290,10 +295,10 @@ async function apiRequest(endpoint, options = {}) {
             errorMsg = `Error de validación: El campo '${match[1]}' es requerido pero no fue proporcionado.`;
           }
         }
-        
+
         throw new Error(errorMsg);
       }
-      
+
       // Otros errores: usar mensaje del backend si está disponible
       throw new Error(data.message || responseText || `Error ${response.status}: ${response.statusText}`);
     }
@@ -301,16 +306,16 @@ async function apiRequest(endpoint, options = {}) {
     return data;
   } catch (error) {
     console.error('Error en petición API:', error);
-    
+
     // Mejorar mensajes de error para diferentes tipos de fallos
     if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
       // Error de red: CORS, conexión rechazada, servidor no disponible
       const esCors = error.message.includes('CORS') || error.message.includes('cors');
       const esLocalhost = API_BASE_URL.includes('localhost');
       const esProduccion = import.meta.env.PROD;
-      
+
       let mensaje = '';
-      
+
       // Si estamos en producción pero usando localhost, el problema es la variable de entorno
       if (esProduccion && esLocalhost) {
         mensaje = `⚠️ Variable de entorno faltante: VITE_API_BASE_URL no está configurada en Vercel. El frontend está intentando conectarse a ${API_BASE_URL} en lugar de la URL de producción. Ve a Vercel Dashboard → Settings → Environment Variables y agrega VITE_API_BASE_URL=https://siga-backend-production.up.railway.app`;
@@ -319,15 +324,15 @@ async function apiRequest(endpoint, options = {}) {
       } else {
         mensaje = `Error de conexión: No se pudo conectar con el servidor en ${API_BASE_URL}. Verifica que el backend esté funcionando y que la URL sea correcta.`;
       }
-      
+
       throw new Error(mensaje);
     }
-    
+
     // Si el error ya tiene un mensaje descriptivo, mantenerlo
     if (error.message && !error.message.includes('Failed to fetch')) {
-    throw error;
+      throw error;
     }
-    
+
     // Error genérico
     throw new Error(error.message || 'Error al conectar con el servidor');
   }
@@ -346,13 +351,13 @@ export async function registerUser(userData) {
     nombreEmpresa: userData.nombreEmpresa,
     tienePassword: !!userData.password
   });
-  
+
   const response = await apiRequest('/comercial/auth/register', {
     method: 'POST',
     body: JSON.stringify(userData),
     skipAuth: true,
   });
-  
+
   // Log de respuesta del backend
   // Log sanitizado (sin tokens) solo en desarrollo
   if (import.meta.env.DEV) {
@@ -362,7 +367,7 @@ export async function registerUser(userData) {
     if (responseSanitized.token) delete responseSanitized.token;
     console.log('📥 Respuesta del backend en registerUser (sanitizada):', responseSanitized);
   }
-  
+
   return response;
 }
 
@@ -377,8 +382,17 @@ export async function loginUser(email, password) {
   });
 
   // Guardar tokens si el login fue exitoso
-  if (data.success && data.accessToken) {
-    saveTokens(data.accessToken, data.refreshToken);
+  if (data.success) {
+    // Intentar encontrar el token en diferentes campos posibles
+    const accessToken = data.accessToken || data.token || data.access_token || (data.data && data.data.accessToken);
+    const refreshToken = data.refreshToken || data.refresh_token || (data.data && data.data.refreshToken);
+
+    if (accessToken) {
+      console.log('Token encontrado y guardado successfully');
+      saveTokens(accessToken, refreshToken);
+    } else {
+      console.warn('Login exitoso pero no se encontró token en la respuesta:', data);
+    }
   }
 
   return data;
@@ -475,7 +489,7 @@ export async function createSuscripcion(planId, periodo = 'MENSUAL') {
   // IMPORTANTE: El endpoint correcto es /comercial/suscripciones (plural)
   const endpoint = '/comercial/suscripciones';
   console.log('📤 createSuscripcion llamado:', { planId, periodo, endpoint });
-  
+
   return apiRequest(endpoint, {
     method: 'POST',
     body: JSON.stringify({ planId, periodo }),

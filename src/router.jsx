@@ -4,7 +4,6 @@ import HomePage from './pages/HomePage.jsx';
 import PlanesPage from './pages/PlanesPage.jsx';
 import AcercaPage from './pages/AcercaPage.jsx';
 import PerfilPage from './pages/PerfilPage.jsx';
-import AppPage from './pages/AppPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import RegistroPage from './pages/RegistroPage.jsx';
 import ResetPasswordPage from './pages/ResetPasswordPage.jsx';
@@ -17,7 +16,7 @@ import { obtenerUsuarioAutenticado } from './utils/auth.js';
 // Ruta protegida para usuarios autenticados (clientes y admins)
 function RutaAutenticada({ children }) {
   const usuario = obtenerUsuarioAutenticado();
-  
+
   if (!usuario) {
     return <Navigate to="/login" replace />;
   }
@@ -48,15 +47,6 @@ export function Rutas() {
           </RutaAutenticada>
         }
       />
-      <Route
-        path="/app"
-        element={
-          <RutaAutenticada>
-            <AppPage />
-          </RutaAutenticada>
-        }
-      />
-
 
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />

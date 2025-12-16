@@ -9,6 +9,9 @@ import {
 import { getFacturas, getSuscripciones, obtenerTokenOperativo, updateEmail, updatePerfil, saveTokens, getPlanes } from '../services/api.js';
 import { formatearPrecioCLP } from '../utils/indicadoresEconomicos.js';
 import FacturaComponent from '../components/FacturaComponent.jsx';
+import { useWebAppSSO } from '../hooks/useWebAppSSO.js';
+import PlanActualCard from '../components/perfil/PlanActualCard.jsx';
+import PerfilHeader from '../components/perfil/PerfilHeader.jsx';
 import '../styles/PerfilPage.css';
 
 // Página de perfil/dashboard para clientes
@@ -19,8 +22,7 @@ export default function PerfilPage() {
   const [usuario, setUsuario] = useState(obtenerUsuarioAutenticado);
   const [facturas, setFacturas] = useState([]); // Estado para almacenar las facturas del usuario
   const [facturaSeleccionada, setFacturaSeleccionada] = useState(null); // Factura seleccionada para ver/imprimir
-  const [cargandoSSO, setCargandoSSO] = useState(false); // Estado para manejar SSO
-  const [errorSSO, setErrorSSO] = useState(''); // Mensaje de error SSO
+  const { loading: cargandoSSO, error: errorSSO, iniciarSSO } = useWebAppSSO();
   const [tieneSuscripcionActiva, setTieneSuscripcionActiva] = useState(false); // Estado de suscripción activa
   const [errorFacturas, setErrorFacturas] = useState(''); // Error al cargar facturas
   const [mostrarActualizarEmail, setMostrarActualizarEmail] = useState(false); // Mostrar formulario de actualizar email
@@ -28,7 +30,7 @@ export default function PerfilPage() {
   const [passwordEmail, setPasswordEmail] = useState(''); // Contraseña para confirmar cambio de email
   const [cargandoEmail, setCargandoEmail] = useState(false); // Loading al actualizar email
   const [mensajeEmail, setMensajeEmail] = useState(''); // Mensaje de éxito/error al actualizar email
-  
+
   // Estados para edición de perfil completo
   const [mostrarEditarPerfil, setMostrarEditarPerfil] = useState(false); // Mostrar formulario de editar perfil
   const [perfilEditado, setPerfilEditado] = useState({
@@ -64,26 +66,26 @@ export default function PerfilPage() {
         }
       }
     };
-    
+
     // Actualizar al montar
     actualizarUsuario();
-    
+
     // También actualizar cuando la página se vuelve visible (usuario vuelve de otra página)
     const handleVisibilityChange = () => {
       if (!document.hidden) {
         actualizarUsuario();
       }
     };
-    
+
     document.addEventListener('visibilitychange', handleVisibilityChange);
-    
+
     // También escuchar evento personalizado cuando el usuario se actualiza
     const handleUsuarioActualizado = () => {
       actualizarUsuario();
     };
-    
+
     window.addEventListener('usuarioActualizado', handleUsuarioActualizado);
-    
+
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('usuarioActualizado', handleUsuarioActualizado);
@@ -98,9 +100,9 @@ export default function PerfilPage() {
   // Obtener plan del usuario desde el backend
   const [planActual, setPlanActual] = useState(null);
   const [planes, setPlanes] = useState([]);
-  
+
   // NOTA: suscripcionVerificada y suscripcionActivaData ya están definidos arriba (líneas 52-53)
-  
+
   // Cargar planes desde el backend
   useEffect(() => {
     const cargarPlanes = async () => {
@@ -108,15 +110,15 @@ export default function PerfilPage() {
         const response = await getPlanes();
         if (response.success && response.planes) {
           setPlanes(response.planes);
-  } else {
+        } else {
           setPlanes([]);
         }
       } catch (error) {
         console.error('Error al cargar planes:', error);
         setPlanes([]);
-    }
+      }
     };
-    
+
     cargarPlanes();
   }, []);
 
@@ -125,7 +127,7 @@ export default function PerfilPage() {
     const determinarPlanActual = async () => {
       // Si hay suscripción activa, usar el planId de la suscripción (fuente de verdad del backend)
       const planIdParaBuscar = suscripcionActivaData?.planId || usuario?.planId;
-      
+
       if (tieneSuscripcionActiva && planIdParaBuscar && planes.length > 0) {
         const plan = planes.find((p) => p.id === planIdParaBuscar);
         console.log('📦 Plan encontrado para mostrar:', plan);
@@ -136,7 +138,7 @@ export default function PerfilPage() {
         setPlanActual(null);
       }
     };
-    
+
     determinarPlanActual();
   }, [tieneSuscripcionActiva, suscripcionActivaData, usuario?.planId, planes]);
 
@@ -147,26 +149,26 @@ export default function PerfilPage() {
 
   // Cargar facturas del usuario al montar el componente (solo una vez)
   const [facturasCargadas, setFacturasCargadas] = useState(false);
-  
+
   useEffect(() => {
     // Evitar múltiples cargas
     if (facturasCargadas || !usuario || !usuario.id) {
       return;
     }
-    
+
     const cargarFacturas = async () => {
-        try {
+      try {
         setErrorFacturas('');
-          // Intentar cargar facturas desde el backend
-          const response = await getFacturas();
-          if (response.success && response.facturas) {
-            setFacturas(response.facturas);
-          } else {
+        // Intentar cargar facturas desde el backend
+        const response = await getFacturas();
+        if (response.success && response.facturas) {
+          setFacturas(response.facturas);
+        } else {
           // Si no hay facturas, es válido (usuario nuevo)
           setFacturas([]);
-          }
+        }
         setFacturasCargadas(true);
-        } catch (error) {
+      } catch (error) {
         // Manejar 404 específicamente (usuario sin facturas es válido)
         if (error.message?.includes('404') || error.message?.includes('NOT_FOUND')) {
           console.log('ℹ️ Usuario sin facturas (404 es válido para usuarios nuevos)');
@@ -187,7 +189,7 @@ export default function PerfilPage() {
         }
       }
     };
-    
+
     cargarFacturas();
   }, [usuario?.id, facturasCargadas]);
 
@@ -200,17 +202,17 @@ export default function PerfilPage() {
     if (!usuario || !usuario.id) {
       return;
     }
-    
+
     // Si ya está verificado para este usuario Y el planId no cambió, no verificar de nuevo
     if (suscripcionVerificada && usuario.planId === suscripcionActivaData?.planId) {
       return;
     }
-    
+
     const verificarSuscripcion = async () => {
       try {
         console.log('🔍 Verificando suscripción para usuario:', usuario.id);
         const response = await getSuscripciones();
-        
+
         // Log sanitizado (sin tokens) solo en desarrollo
         if (import.meta.env.DEV) {
           const responseSanitized = { ...response };
@@ -219,17 +221,17 @@ export default function PerfilPage() {
           if (responseSanitized.token) delete responseSanitized.token;
           console.log('📋 Respuesta de getSuscripciones (sanitizada):', responseSanitized);
         }
-        
+
         if (response.success && response.suscripciones && response.suscripciones.length > 0) {
           const suscripcionActiva = response.suscripciones.find(
             s => s.estado === 'ACTIVA'
           );
-          
+
           if (suscripcionActiva) {
             console.log('✅ Suscripción activa encontrada:', suscripcionActiva);
             setTieneSuscripcionActiva(true);
             setSuscripcionActivaData(suscripcionActiva);
-            
+
             // Actualizar usuario con planId de la suscripción activa (fuente de verdad)
             if (suscripcionActiva.planId) {
               const usuarioActualizado = {
@@ -272,7 +274,7 @@ export default function PerfilPage() {
         }
       }
     };
-    
+
     verificarSuscripcion();
   }, [usuario?.id, usuario?.planId]); // Depende del ID y planId del usuario para detectar cambios
 
@@ -311,23 +313,23 @@ export default function PerfilPage() {
   const manejarAccederAWebApp = async () => {
     setCargandoSSO(true);
     setErrorSSO('');
-    
+
     try {
       console.log('🔍 Iniciando SSO. Usuario:', usuario);
 
       // Verificar que tenga suscripción activa
       const suscripcionesResponse = await getSuscripciones();
       console.log('📋 Respuesta de suscripciones:', suscripcionesResponse);
-      
-      if (!suscripcionesResponse.success || !suscripcionesResponse.suscripciones || 
-          suscripcionesResponse.suscripciones.length === 0) {
+
+      if (!suscripcionesResponse.success || !suscripcionesResponse.suscripciones ||
+        suscripcionesResponse.suscripciones.length === 0) {
         // Verificar planId como alternativa si no hay suscripciones en backend
         if (!usuario.planId) {
           console.warn('⚠️ Usuario sin planId y sin suscripciones en backend');
           setErrorSSO('No tienes una suscripción activa. Por favor adquiere un plan primero.');
           setCargandoSSO(false);
           return;
-      } else {
+        } else {
           console.warn('⚠️ Usuario tiene planId pero no suscripciones en backend. Intentando SSO de todas formas...');
         }
       } else {
@@ -335,17 +337,17 @@ export default function PerfilPage() {
         const suscripcionActiva = suscripcionesResponse.suscripciones.find(
           s => s.estado === 'ACTIVA'
         );
-        
+
         if (!suscripcionActiva) {
           console.warn('⚠️ Usuario tiene suscripciones pero ninguna está activa:', suscripcionesResponse.suscripciones);
           setErrorSSO('Tu suscripción no está activa. Por favor renueva tu plan.');
           setCargandoSSO(false);
           return;
         }
-        
+
         console.log('✅ Suscripción activa encontrada:', suscripcionActiva);
       }
-      
+
       // Obtener token operativo mediante SSO
       console.log('🔄 Obteniendo token operativo...');
       const ssoResponse = await obtenerTokenOperativo();
@@ -358,11 +360,11 @@ export default function PerfilPage() {
         if (responseSanitized.data?.accessToken) delete responseSanitized.data.accessToken;
         console.log('🔑 Respuesta SSO (sanitizada):', responseSanitized);
       }
-      
+
       if (!ssoResponse.success) {
         // Mejorar mensaje de error
         let errorMsg = ssoResponse.message || 'No se pudo obtener acceso a WebApp';
-        
+
         if (ssoResponse.message?.includes('suscripción') || ssoResponse.message?.includes('suscripcion')) {
           errorMsg = 'No tienes una suscripción activa. Por favor adquiere un plan primero.';
         } else if (ssoResponse.message?.includes('401') || ssoResponse.message?.includes('No autenticado')) {
@@ -370,31 +372,31 @@ export default function PerfilPage() {
         } else if (ssoResponse.message?.includes('404')) {
           errorMsg = 'El endpoint de SSO no está disponible. Por favor, contacta al soporte.';
         }
-        
+
         console.error('❌ Error en SSO:', ssoResponse);
         throw new Error(errorMsg);
       }
-      
+
       // El accessToken puede estar en ssoResponse.accessToken o ssoResponse.data.accessToken
       const tokenOperativo = ssoResponse.accessToken || ssoResponse.data?.accessToken;
-      
+
       if (!tokenOperativo) {
         console.error('❌ SSO exitoso pero sin accessToken:', ssoResponse);
         throw new Error('No se recibió token de acceso. Por favor, intenta nuevamente.');
       }
-      
+
       // URL de WebApp: usar la del backend si viene, sino usar la URL de producción
-      const webAppUrl = ssoResponse.webAppUrl || ssoResponse.data?.webAppUrl || 'https://siga-appweb.vercel.app';
-      
+      const webAppUrl = ssoResponse.webAppUrl || ssoResponse.data?.webAppUrl || 'https://siga-webapp.vercel.app/';
+
       console.log('✅ SSO exitoso. Redirigiendo a WebApp:', webAppUrl);
-      
+
       // Guardar URL del portal comercial para que WebApp pueda redirigir de vuelta
       const portalComercialUrl = window.location.origin;
       localStorage.setItem('siga_portal_comercial_url', portalComercialUrl);
-      
+
       // Redirigir a WebApp con token en URL
       window.location.href = `${webAppUrl}?token=${tokenOperativo}`;
-      
+
     } catch (error) {
       console.error('❌ Error al acceder a WebApp:', error);
       setErrorSSO(error.message || 'No se pudo acceder a WebApp. Verifica tu suscripción.');
@@ -428,13 +430,13 @@ export default function PerfilPage() {
 
     try {
       const response = await updateEmail(nuevoEmail, passwordEmail);
-      
+
       if (response.success) {
         // Actualizar tokens
         if (response.accessToken && response.refreshToken) {
           saveTokens(response.accessToken, response.refreshToken);
         }
-        
+
         // Actualizar usuario en localStorage
         const usuarioActualizado = {
           ...usuario,
@@ -449,7 +451,7 @@ export default function PerfilPage() {
 
         // Recargar la página después de 2 segundos para reflejar los cambios
         setTimeout(() => {
-        window.location.reload();
+          window.location.reload();
         }, 2000);
       } else {
         // El backend retorna mensajes claros, usarlos directamente
@@ -457,10 +459,10 @@ export default function PerfilPage() {
       }
     } catch (error) {
       console.error('Error al actualizar email:', error);
-      
+
       // Manejar errores específicos según las instrucciones
       let mensajeError = error.message || 'Error al actualizar el email';
-      
+
       if (error.message?.includes('404') || error.message?.includes('Endpoint no encontrado')) {
         mensajeError = '❌ Endpoint no encontrado. Verifica que el backend esté desplegado.';
       } else if (error.message?.includes('401') || error.message?.includes('No autenticado') || error.message?.includes('Contraseña incorrecta')) {
@@ -473,7 +475,7 @@ export default function PerfilPage() {
         // Usar el mensaje del backend directamente si está disponible
         mensajeError = error.message;
       }
-      
+
       setMensajeEmail(mensajeError);
     } finally {
       setCargandoEmail(false);
@@ -483,7 +485,7 @@ export default function PerfilPage() {
   // Inicializar formulario de perfil con datos actuales del usuario
   // Solo cuando se abre el formulario (cuando mostrarEditarPerfil cambia a true)
   const formularioInicializado = useRef(false);
-  
+
   useEffect(() => {
     // Solo inicializar cuando se abre el formulario Y no está inicializado
     if (mostrarEditarPerfil && usuario && !formularioInicializado.current) {
@@ -497,7 +499,7 @@ export default function PerfilPage() {
       });
       formularioInicializado.current = true;
     }
-    
+
     // Resetear el flag cuando se cierra el formulario
     if (!mostrarEditarPerfil) {
       formularioInicializado.current = false;
@@ -536,13 +538,13 @@ export default function PerfilPage() {
       }
 
       const response = await updatePerfil(datosActualizados);
-      
+
       if (response.success && response.user) {
         // Actualizar tokens si vienen en la respuesta
         if (response.accessToken && response.refreshToken) {
           saveTokens(response.accessToken, response.refreshToken);
         }
-        
+
         // Actualizar usuario en localStorage con todos los datos actualizados
         const usuarioActualizado = {
           ...usuario,
@@ -550,11 +552,11 @@ export default function PerfilPage() {
         };
         guardarUsuarioAutenticado(usuarioActualizado);
         setUsuario(usuarioActualizado); // Actualizar estado sin recargar
-        
+
         setMensajePerfil('✅ Perfil actualizado exitosamente');
         setMostrarEditarPerfil(false);
         formularioInicializado.current = false; // Resetear flag al guardar
-        
+
         // No recargar la página, solo actualizar el estado
       } else {
         throw new Error(response.message || 'Error al actualizar el perfil');
@@ -571,672 +573,500 @@ export default function PerfilPage() {
     <div className="perfil-section">
       <div className="container">
         {/* Header de bienvenida */}
-        <div className="row mb-5">
-          <div className="col-lg-8 mx-auto text-center">
-            <h1 className="display-5 fw-bold text-primario mb-3">
-              ¡Bienvenido, {usuario.nombre}! <HandWaving size={32} weight="fill" className="text-acento" style={{ verticalAlign: 'middle' }} />
-            </h1>
-            <p className="lead text-muted">
-              Tu portal personal de SIGA. Accede a tu aplicación y gestiona tu cuenta.
-            </p>
-          </div>
-        </div>
+        {/* Header de bienvenida */}
+        <PerfilHeader usuario={usuario} />
 
         {/* Plan Actual y Suscripción - Primero, información más importante */}
-      {planActual ? (
-        <div className="row mb-5">
-          <div className="col-lg-12">
-            <div className="plan-actual-card">
-              <div className="plan-actual-header">
-                <div className="d-flex justify-content-between align-items-center">
-                  <h4 className="mb-0 text-primario">
-                    <Package size={20} weight="fill" className="me-2" style={{ verticalAlign: 'middle' }} />
-                    Tu Plan Actual
-                  </h4>
-                  <span className="badge bg-acento text-white px-3 py-2">
-                    {planActual.nombre}
-                  </span>
+        <PlanActualCard
+          planActual={planActual}
+          limites={limites}
+          planCrecimiento={planCrecimiento}
+          manejarActualizarACrecimiento={manejarActualizarACrecimiento}
+          errorSSO={errorSSO}
+          cargandoSSO={cargandoSSO}
+          manejarAccederAWebApp={manejarAccederAWebApp}
+        />
+        {/* Acciones Rápidas - Después del plan */}
+        <div className="row g-4 mb-5">
+          <div className="col-md-6 col-lg-4">
+            <Link to="/planes" style={{ textDecoration: 'none' }}>
+              <div className="action-card-glass">
+                <div className="action-card-icon">
+                  <Package size={48} weight="fill" className="text-primario" />
                 </div>
+                <h3 className="h5 fw-bold text-primario mb-3">Planes y Suscripción</h3>
+                <p className="text-muted mb-0">
+                  Explora nuestros planes y actualiza tu suscripción.
+                </p>
               </div>
-              <div className="plan-actual-body">
-                {/* ❌ ELIMINADO: Trial info ahora viene del backend en las suscripciones */}
-                {/* El backend maneja los trials automáticamente */}
-
-                <div className="row mb-4">
-                  <div className="col-md-6">
-                    <h5 className="fw-bold text-primario mb-3">
-                          {planActual.precio} {planActual.unidad}/mes
-                      {/* ❌ ELIMINADO: Trial info ahora viene del backend */}
-                    </h5>
-                    <h6 className="text-muted mb-3">Beneficios incluidos:</h6>
-                    <ul className="list-unstyled">
-                      {planActual.caracteristicas.map((caracteristica, index) => (
-                        <li key={index} className="mb-2">
-                          <CheckCircle size={16} weight="fill" className="text-success me-2" style={{ verticalAlign: 'middle' }} />
-                          {caracteristica}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div className="col-md-6">
-                    <h6 className="text-muted mb-3">Límites de tu plan:</h6>
-                    {limites && (
-                      <ul className="list-unstyled">
-                        <li className="mb-2">
-                          <Users size={18} weight="fill" className="me-2" style={{ verticalAlign: 'middle' }} />
-                          <strong>Usuarios:</strong>{' '}
-                          {limites.usuarios === -1 ? 'Ilimitados' : limites.usuarios}
-                        </li>
-                        <li className="mb-2">
-                          <Storefront size={18} weight="fill" className="me-2" style={{ verticalAlign: 'middle' }} />
-                          <strong>Bodegas/Sucursales:</strong>{' '}
-                          {limites.bodegas === -1 ? 'Ilimitadas' : limites.bodegas}
-                        </li>
-                        {limites.asistenteSIGA && (
-                          <li className="mb-2">
-                            <Robot size={18} weight="fill" className="me-2" style={{ verticalAlign: 'middle' }} />
-                            <strong>Asistente SIGA:</strong> Incluido (con Inteligencia Artificial)
-                          </li>
-                        )}
-                        <li className="mb-2">
-                          <Package size={18} weight="fill" className="me-2" style={{ verticalAlign: 'middle' }} />
-                          <strong>Productos:</strong>{' '}
-                          {limites.productos === -1 ? 'Ilimitados' : limites.productos}
-                        </li>
-                        <li className="mb-2">
-                          <ChartBar size={18} weight="fill" className="me-2" style={{ verticalAlign: 'middle' }} />
-                          <strong>Reportes:</strong> {limites.reportes}
-                        </li>
-                        <li className="mb-2">
-                          <ChatCircle size={18} weight="fill" className="me-2" style={{ verticalAlign: 'middle' }} />
-                          <strong>Soporte:</strong> {limites.soporte}
-                        </li>
-                      </ul>
-                    )}
-                  </div>
-                </div>
-
-                {/* Sección de Acceso a WebApp */}
-                {planActual && planActual.esFreemium === false && (
-                  <div className="card mb-4 border-primary">
-                    <div className="card-body">
-                      <h5 className="card-title d-flex align-items-center text-primario">
-                        <Rocket size={24} weight="fill" className="me-2" />
-                        Acceder a WebApp
-                      </h5>
-                      <p className="card-text text-muted">
-                        Accede a tu aplicación SIGA para gestionar tu negocio, inventario y ventas.
-                      </p>
-                      
-                      {errorSSO && (
-                        <div className="alert alert-warning mb-3" role="alert">
-                          <Warning size={20} className="me-2" />
-                          {errorSSO}
-                        </div>
-                      )}
-                      
-                      <button
-                        className="btn btn-primary btn-lg"
-                        onClick={manejarAccederAWebApp}
-                        disabled={cargandoSSO}
-                      >
-                        {cargandoSSO ? (
-                          <>
-                            <span className="spinner-border spinner-border-sm me-2" role="status"></span>
-                            Conectando...
-                          </>
-                        ) : (
-                          <>
-                            <Rocket size={20} weight="fill" className="me-2" />
-                            Acceder a WebApp
-                          </>
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                {/* Opción de free trial para usuarios sin plan */}
-                {!planActual && (
-                  <div className="alert alert-primary mt-4" role="alert">
-                    <div className="d-flex justify-content-between align-items-center flex-wrap">
-                      <div>
-                        <strong>
-                          <Gift size={18} weight="fill" className="me-1" style={{ verticalAlign: 'middle' }} />
-                          ¿Aún no tienes un plan?
-                        </strong>
-                        <p className="mb-0 mt-2">
-                          Visita nuestra página de <strong>Planes</strong> para adquirir una suscripción y comenzar a usar SIGA.
-                        </p>
-                      </div>
-                      <div className="d-flex gap-2 mt-3 mt-md-0">
-                          <button
-                            className="btn btn-primary"
-                          onClick={() => navigate('/planes')}
-                          >
-                          Ver Planes
-                          </button>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Opción de actualizar al plan Crecimiento */}
-                {planActual && planActual.nombre !== 'Crecimiento' && planCrecimiento && (
-                  <div className="alert alert-info mt-4" role="alert">
-                    <div className="d-flex justify-content-between align-items-center flex-wrap">
-                      <div>
-                        <strong>
-                          <Rocket size={18} weight="fill" className="me-1" style={{ verticalAlign: 'middle' }} />
-                          ¿Necesitas más?
-                        </strong>
-                        <p className="mb-0 mt-2">
-                          Actualiza al plan <strong>{planCrecimiento.nombre}</strong> y obtén
-                          usuarios ilimitados, bodegas ilimitadas, reportes completos con IA y
-                          soporte prioritario 24/7.
-                        </p>
-                      </div>
-                      <button
-                        className="btn btn-acento mt-3 mt-md-0"
-                        onClick={manejarActualizarACrecimiento}
-                      >
-                        Actualizar a {planCrecimiento.nombre}
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                {planActual.nombre === 'Crecimiento' && (
-                  <div className="alert alert-success mt-4" role="alert">
-                    <strong>
-                      <Sparkle size={18} weight="fill" className="me-1" style={{ verticalAlign: 'middle' }} />
-                      ¡Excelente!
-                    </strong> Ya tienes el plan más completo. Disfruta de
-                    todas las funcionalidades de SIGA sin límites.
-                  </div>
-                )}
-              </div>
-            </div>
+            </Link>
           </div>
-        </div>
-      ) : (
-        <div className="row mb-4">
+          <div className="col-md-6 col-lg-4">
+            <Link to="/carrito" style={{ textDecoration: 'none' }}>
+              <div className="action-card-glass">
+                <div className="action-card-icon">
+                  <ShoppingCart size={48} weight="fill" className="text-primario" />
+                </div>
+                <h3 className="h5 fw-bold text-primario mb-3">Carrito</h3>
+                <p className="text-muted mb-0">
+                  Revisa tus planes seleccionados y completa tu compra.
+                </p>
+              </div>
+            </Link>
+          </div>
+        </div >
+
+        {/* Historial de Compras y Facturas */}
+        < div className="row mb-4" >
           <div className="col-lg-10 mx-auto">
-            <div className="alert alert-warning" role="alert">
-              <strong>
-                <Warning size={18} weight="fill" className="me-1" style={{ verticalAlign: 'middle' }} />
-                Aún no tienes un plan activo
-              </strong>
-              <p className="mb-0 mt-2">
-                Explora nuestros planes de suscripción y elige el que mejor se adapte a tu
-                negocio.
-              </p>
-              <Link to="/planes" className="btn btn-outline-primary mt-3">
-                Ver Planes Disponibles
-              </Link>
+            <div className="card shadow-sm border-0">
+              <div className="card-header bg-light">
+                <h4 className="mb-0 text-primario">
+                  <FileText size={20} weight="fill" className="me-2" style={{ verticalAlign: 'middle' }} />
+                  Historial de Compras y Facturas
+                </h4>
+              </div>
+              <div className="card-body">
+                {errorFacturas && (
+                  <div className="alert alert-warning" role="alert">
+                    <Warning size={18} className="me-2" style={{ verticalAlign: 'middle' }} />
+                    {errorFacturas}
+                  </div>
+                )}
+                {facturas.length === 0 ? (
+                  <div className="alert alert-info mb-0">
+                    <p className="mb-0">
+                      <strong>No tienes compras registradas aún.</strong>
+                      <br />
+                      Cuando realices una compra, tus facturas aparecerán aquí.
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <p className="text-muted mb-3">
+                      Aquí puedes ver todas tus facturas y compras realizadas en SIGA.
+                      Haz clic en "Ver Factura" para ver el detalle completo e imprimir.
+                    </p>
+
+                    {/* Lista de facturas */}
+                    <div className="table-responsive">
+                      <table className="table table-hover">
+                        <thead>
+                          <tr>
+                            <th>Número de Factura</th>
+                            <th>Plan</th>
+                            <th>Fecha</th>
+                            <th>Monto</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {facturas.map((factura) => {
+                            const fecha = new Date(factura.fechaCompra);
+                            const fechaFormateada = fecha.toLocaleDateString('es-CL', {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric',
+                            });
+
+                            return (
+                              <tr key={factura.id}>
+                                <td>
+                                  <strong className="text-primario">{factura.numeroFactura}</strong>
+                                </td>
+                                <td>{factura.planNombre}</td>
+                                <td>{fechaFormateada}</td>
+                                <td>
+                                  <strong>{factura.precioUF} {factura.unidad}</strong>
+                                  {factura.precioCLP && (
+                                    <div className="text-muted small">
+                                      ≈ {formatearPrecioCLP(factura.precioCLP)}
+                                    </div>
+                                  )}
+                                </td>
+                                <td>
+                                  <span className={`badge ${factura.estado === 'pagada'
+                                    ? 'bg-success'
+                                    : factura.estado === 'cancelada'
+                                      ? 'bg-danger'
+                                      : 'bg-warning'
+                                    }`}>
+                                    {factura.estado === 'pagada' ? (
+                                      <>
+                                        <CheckCircle size={14} weight="fill" className="me-1" style={{ verticalAlign: 'middle' }} />
+                                        Pagada
+                                      </>
+                                    ) : factura.estado}
+                                  </span>
+                                </td>
+                                <td>
+                                  <button
+                                    className="btn btn-sm btn-outline-primary"
+                                    onClick={() => setFacturaSeleccionada(
+                                      facturaSeleccionada?.id === factura.id ? null : factura
+                                    )}
+                                  >
+                                    {facturaSeleccionada?.id === factura.id
+                                      ? 'Ocultar Factura'
+                                      : 'Ver Factura'}
+                                  </button>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    {/* Mostrar factura seleccionada */}
+                    {facturaSeleccionada && (
+                      <div className="mt-4 pt-4 border-top">
+                        <div className="d-flex justify-content-between align-items-center mb-3">
+                          <h5 className="mb-0 text-primario">
+                            <FileText size={20} weight="fill" className="me-2" style={{ verticalAlign: 'middle' }} />
+                            Factura: {facturaSeleccionada.numeroFactura}
+                          </h5>
+                          <button
+                            className="btn btn-sm btn-outline-secondary"
+                            onClick={() => setFacturaSeleccionada(null)}
+                          >
+                            Cerrar
+                          </button>
+                        </div>
+                        <FacturaComponent
+                          factura={facturaSeleccionada}
+                          onImprimir={() => window.print()}
+                        />
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        </div >
 
-      {/* Acciones Rápidas - Después del plan */}
-      <div className="row g-4 mb-5">
-        <div className="col-md-6 col-lg-4">
-          <Link to="/planes" style={{ textDecoration: 'none' }}>
-            <div className="action-card-glass">
-              <div className="action-card-icon">
-                <Package size={48} weight="fill" className="text-primario" />
+        {/* Información de la cuenta */}
+        < div className="row" >
+          <div className="col-lg-8 mx-auto">
+            <div className="card shadow-sm border-0">
+              <div className="card-header bg-light d-flex justify-content-between align-items-center">
+                <h4 className="mb-0 text-primario">
+                  <ClipboardText size={20} weight="fill" className="me-2" style={{ verticalAlign: 'middle' }} />
+                  Información de tu Cuenta
+                </h4>
+                <button
+                  type="button"
+                  className="btn btn-sm btn-outline-primary"
+                  onClick={() => {
+                    setMostrarEditarPerfil(!mostrarEditarPerfil);
+                    setMensajePerfil('');
+                  }}
+                >
+                  {mostrarEditarPerfil ? 'Cancelar' : 'Editar Perfil'}
+                </button>
               </div>
-              <h3 className="h5 fw-bold text-primario mb-3">Planes y Suscripción</h3>
-              <p className="text-muted mb-0">
-                Explora nuestros planes y actualiza tu suscripción.
-              </p>
-            </div>
-          </Link>
-        </div>
-        <div className="col-md-6 col-lg-4">
-          <Link to="/carrito" style={{ textDecoration: 'none' }}>
-            <div className="action-card-glass">
-              <div className="action-card-icon">
-                <ShoppingCart size={48} weight="fill" className="text-primario" />
-              </div>
-              <h3 className="h5 fw-bold text-primario mb-3">Carrito</h3>
-              <p className="text-muted mb-0">
-                Revisa tus planes seleccionados y completa tu compra.
-              </p>
-            </div>
-          </Link>
-        </div>
-      </div>
-
-      {/* Historial de Compras y Facturas */}
-      <div className="row mb-4">
-        <div className="col-lg-10 mx-auto">
-          <div className="card shadow-sm border-0">
-            <div className="card-header bg-light">
-              <h4 className="mb-0 text-primario">
-                <FileText size={20} weight="fill" className="me-2" style={{ verticalAlign: 'middle' }} />
-                Historial de Compras y Facturas
-              </h4>
-            </div>
-            <div className="card-body">
-              {errorFacturas && (
-                <div className="alert alert-warning" role="alert">
-                  <Warning size={18} className="me-2" style={{ verticalAlign: 'middle' }} />
-                  {errorFacturas}
-                </div>
-              )}
-              {facturas.length === 0 ? (
-                <div className="alert alert-info mb-0">
-                  <p className="mb-0">
-                    <strong>No tienes compras registradas aún.</strong>
-                    <br />
-                    Cuando realices una compra, tus facturas aparecerán aquí.
-                  </p>
-                </div>
-              ) : (
-                <>
-                  <p className="text-muted mb-3">
-                    Aquí puedes ver todas tus facturas y compras realizadas en SIGA.
-                    Haz clic en "Ver Factura" para ver el detalle completo e imprimir.
-                  </p>
-
-                  {/* Lista de facturas */}
-                  <div className="table-responsive">
-                    <table className="table table-hover">
-                      <thead>
-                        <tr>
-                          <th>Número de Factura</th>
-                          <th>Plan</th>
-                          <th>Fecha</th>
-                          <th>Monto</th>
-                          <th>Estado</th>
-                          <th>Acciones</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {facturas.map((factura) => {
-                          const fecha = new Date(factura.fechaCompra);
-                          const fechaFormateada = fecha.toLocaleDateString('es-CL', {
-                            year: 'numeric',
-                            month: 'short',
-                            day: 'numeric',
-                          });
-
-                          return (
-                            <tr key={factura.id}>
-                              <td>
-                                <strong className="text-primario">{factura.numeroFactura}</strong>
-                              </td>
-                              <td>{factura.planNombre}</td>
-                              <td>{fechaFormateada}</td>
-                              <td>
-                                <strong>{factura.precioUF} {factura.unidad}</strong>
-                                {factura.precioCLP && (
-                                  <div className="text-muted small">
-                                    ≈ {formatearPrecioCLP(factura.precioCLP)}
-                                  </div>
-                                )}
-                              </td>
-                              <td>
-                                <span className={`badge ${factura.estado === 'pagada'
-                                  ? 'bg-success'
-                                  : factura.estado === 'cancelada'
-                                    ? 'bg-danger'
-                                    : 'bg-warning'
-                                  }`}>
-                                  {factura.estado === 'pagada' ? (
-                                    <>
-                                      <CheckCircle size={14} weight="fill" className="me-1" style={{ verticalAlign: 'middle' }} />
-                                      Pagada
-                                    </>
-                                  ) : factura.estado}
-                                </span>
-                              </td>
-                              <td>
-                                <button
-                                  className="btn btn-sm btn-outline-primary"
-                                  onClick={() => setFacturaSeleccionada(
-                                    facturaSeleccionada?.id === factura.id ? null : factura
-                                  )}
-                                >
-                                  {facturaSeleccionada?.id === factura.id
-                                    ? 'Ocultar Factura'
-                                    : 'Ver Factura'}
-                                </button>
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-
-                  {/* Mostrar factura seleccionada */}
-                  {facturaSeleccionada && (
-                    <div className="mt-4 pt-4 border-top">
-                      <div className="d-flex justify-content-between align-items-center mb-3">
-                        <h5 className="mb-0 text-primario">
-                          <FileText size={20} weight="fill" className="me-2" style={{ verticalAlign: 'middle' }} />
-                          Factura: {facturaSeleccionada.numeroFactura}
-                        </h5>
+              <div className="card-body">
+                {!mostrarEditarPerfil ? (
+                  <div className="row g-3">
+                    <div className="col-md-6">
+                      <strong className="text-muted d-block mb-1">Nombre:</strong>
+                      <p className="mb-0">{usuario.nombre || 'No especificado'}</p>
+                    </div>
+                    {usuario.apellido && (
+                      <div className="col-md-6">
+                        <strong className="text-muted d-block mb-1">Apellido:</strong>
+                        <p className="mb-0">{usuario.apellido}</p>
+                      </div>
+                    )}
+                    <div className="col-md-6">
+                      <strong className="text-muted d-block mb-1">Email:</strong>
+                      <div className="d-flex align-items-center gap-2">
+                        <p className="mb-0">{usuario.email}</p>
                         <button
-                          className="btn btn-sm btn-outline-secondary"
-                          onClick={() => setFacturaSeleccionada(null)}
+                          type="button"
+                          className="btn btn-sm btn-outline-primary"
+                          onClick={() => {
+                            setMostrarActualizarEmail(!mostrarActualizarEmail);
+                            setMensajeEmail('');
+                            setNuevoEmail('');
+                            setPasswordEmail('');
+                          }}
                         >
-                          Cerrar
+                          {mostrarActualizarEmail ? 'Cancelar' : 'Cambiar'}
                         </button>
                       </div>
-                      <FacturaComponent
-                        factura={facturaSeleccionada}
-                        onImprimir={() => window.print()}
-                      />
                     </div>
-                  )}
-                </>
-              )}
+                    {usuario.rut && (
+                      <div className="col-md-6">
+                        <strong className="text-muted d-block mb-1">RUT:</strong>
+                        <p className="mb-0">{usuario.rut}</p>
+                      </div>
+                    )}
+                    {usuario.telefono && (
+                      <div className="col-md-6">
+                        <strong className="text-muted d-block mb-1">Teléfono:</strong>
+                        <p className="mb-0">{usuario.telefono}</p>
+                      </div>
+                    )}
+                    {usuario.nombreEmpresa && (
+                      <div className="col-md-6">
+                        <strong className="text-muted d-block mb-1">Empresa:</strong>
+                        <p className="mb-0">{usuario.nombreEmpresa}</p>
+                      </div>
+                    )}
+                    <div className="col-md-6">
+                      <strong className="text-muted d-block mb-1">Rol:</strong>
+                      <span className="badge bg-info text-dark px-3 py-2">
+                        {usuario.rol}
+                      </span>
+                    </div>
+                    <div className="col-md-6">
+                      <strong className="text-muted d-block mb-1">ID de Usuario:</strong>
+                      <p className="mb-0 text-muted">#{usuario.id}</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <h5 className="mb-3 text-primario">Editar Perfil</h5>
+
+                    {mensajePerfil && (
+                      <div className={`alert ${mensajePerfil.includes('✅') ? 'alert-success' : 'alert-danger'}`} role="alert">
+                        {mensajePerfil}
+                      </div>
+                    )}
+
+                    <form onSubmit={manejarActualizarPerfil}>
+                      <div className="row g-3">
+                        <div className="col-md-6">
+                          <label htmlFor="perfilNombre" className="form-label">
+                            Nombre
+                          </label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            id="perfilNombre"
+                            value={perfilEditado.nombre}
+                            onChange={(e) => setPerfilEditado({ ...perfilEditado, nombre: e.target.value })}
+                            placeholder="Tu nombre"
+                            disabled={cargandoPerfil}
+                          />
+                        </div>
+                        <div className="col-md-6">
+                          <label htmlFor="perfilApellido" className="form-label">
+                            Apellido
+                          </label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            id="perfilApellido"
+                            value={perfilEditado.apellido}
+                            onChange={(e) => setPerfilEditado({ ...perfilEditado, apellido: e.target.value })}
+                            placeholder="Tu apellido"
+                            disabled={cargandoPerfil}
+                          />
+                        </div>
+                        <div className="col-md-6">
+                          <label htmlFor="perfilRut" className="form-label">
+                            RUT
+                          </label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            id="perfilRut"
+                            value={perfilEditado.rut}
+                            onChange={(e) => {
+                              // Formatear RUT automáticamente
+                              let val = e.target.value.replace(/[^0-9kK]/g, '');
+                              if (val.length > 1) {
+                                const dv = val.slice(-1);
+                                const num = val.slice(0, -1);
+                                val = num.replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "-" + dv;
+                              }
+                              setPerfilEditado({ ...perfilEditado, rut: val });
+                            }}
+                            placeholder="12.345.678-9"
+                            disabled={cargandoPerfil}
+                          />
+                        </div>
+                        <div className="col-md-6">
+                          <label htmlFor="perfilTelefono" className="form-label">
+                            Teléfono
+                          </label>
+                          <input
+                            type="tel"
+                            className="form-control"
+                            id="perfilTelefono"
+                            value={perfilEditado.telefono}
+                            onChange={(e) => {
+                              let val = e.target.value.replace(/\D/g, '');
+                              // Si el usuario borra todo, dejarlo vacío
+                              if (!val) {
+                                setPerfilEditado({ ...perfilEditado, telefono: '' });
+                                return;
+                              }
+                              // Asegurar prefijo 56
+                              if (!val.startsWith('56')) {
+                                val = '56' + val;
+                              }
+                              setPerfilEditado({ ...perfilEditado, telefono: '+' + val });
+                            }}
+                            placeholder="+56912345678"
+                            disabled={cargandoPerfil}
+                          />
+                        </div>
+                        <div className="col-md-12">
+                          <label htmlFor="perfilNombreEmpresa" className="form-label">
+                            Nombre de Empresa
+                          </label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            id="perfilNombreEmpresa"
+                            value={perfilEditado.nombreEmpresa}
+                            onChange={(e) => setPerfilEditado({ ...perfilEditado, nombreEmpresa: e.target.value })}
+                            placeholder="Mi Empresa S.A."
+                            disabled={cargandoPerfil}
+                          />
+                          <small className="text-muted">Puedes actualizar el nombre de tu empresa aquí</small>
+                        </div>
+                      </div>
+
+                      <div className="d-flex gap-2 mt-4">
+                        <button
+                          type="submit"
+                          className="btn btn-primary"
+                          disabled={cargandoPerfil}
+                        >
+                          {cargandoPerfil ? (
+                            <>
+                              <span className="spinner-border spinner-border-sm me-2" role="status"></span>
+                              Guardando...
+                            </>
+                          ) : (
+                            'Guardar Cambios'
+                          )}
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn-outline-secondary"
+                          onClick={() => {
+                            setMostrarEditarPerfil(false);
+                            setMensajePerfil('');
+                            formularioInicializado.current = false; // Resetear flag al cancelar
+                          }}
+                          disabled={cargandoPerfil}
+                        >
+                          Cancelar
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                )}
+
+                {/* Formulario de actualizar email */}
+                {mostrarActualizarEmail && (
+                  <div className="mt-4 pt-4 border-top">
+                    <h5 className="mb-3 text-primario">Cambiar Email</h5>
+
+                    {mensajeEmail && (
+                      <div className={`alert ${mensajeEmail.includes('✅') ? 'alert-success' : 'alert-danger'}`} role="alert">
+                        {mensajeEmail}
+                      </div>
+                    )}
+
+                    <form onSubmit={manejarActualizarEmail}>
+                      <div className="mb-3">
+                        <label htmlFor="nuevoEmail" className="form-label">
+                          Nuevo Email <span className="text-danger">*</span>
+                        </label>
+                        <input
+                          type="email"
+                          className="form-control"
+                          id="nuevoEmail"
+                          value={nuevoEmail}
+                          onChange={(e) => setNuevoEmail(e.target.value)}
+                          placeholder="nuevo@email.com"
+                          required
+                          disabled={cargandoEmail}
+                        />
+                      </div>
+
+                      <div className="mb-3">
+                        <label htmlFor="passwordEmail" className="form-label">
+                          Contraseña Actual <span className="text-danger">*</span>
+                          <small className="text-muted d-block">Necesaria para confirmar el cambio</small>
+                        </label>
+                        <input
+                          type="password"
+                          className="form-control"
+                          id="passwordEmail"
+                          value={passwordEmail}
+                          onChange={(e) => setPasswordEmail(e.target.value)}
+                          placeholder="Ingresa tu contraseña actual"
+                          required
+                          disabled={cargandoEmail}
+                        />
+                      </div>
+
+                      <div className="d-flex gap-2">
+                        <button
+                          type="submit"
+                          className="btn btn-primary"
+                          disabled={cargandoEmail}
+                        >
+                          {cargandoEmail ? (
+                            <>
+                              <span className="spinner-border spinner-border-sm me-2" role="status"></span>
+                              Actualizando...
+                            </>
+                          ) : (
+                            'Actualizar Email'
+                          )}
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn-outline-secondary"
+                          onClick={() => {
+                            setMostrarActualizarEmail(false);
+                            setNuevoEmail('');
+                            setPasswordEmail('');
+                            setMensajeEmail('');
+                          }}
+                          disabled={cargandoEmail}
+                        >
+                          Cancelar
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      </div>
+        </div >
 
-      {/* Información de la cuenta */}
-      <div className="row">
-        <div className="col-lg-8 mx-auto">
-          <div className="card shadow-sm border-0">
-            <div className="card-header bg-light d-flex justify-content-between align-items-center">
-              <h4 className="mb-0 text-primario">
-                <ClipboardText size={20} weight="fill" className="me-2" style={{ verticalAlign: 'middle' }} />
-                Información de tu Cuenta
-              </h4>
-              <button
-                type="button"
-                className="btn btn-sm btn-outline-primary"
-                onClick={() => {
-                  setMostrarEditarPerfil(!mostrarEditarPerfil);
-                  setMensajePerfil('');
-                }}
-              >
-                {mostrarEditarPerfil ? 'Cancelar' : 'Editar Perfil'}
-              </button>
-            </div>
-            <div className="card-body">
-              {!mostrarEditarPerfil ? (
-              <div className="row g-3">
-                <div className="col-md-6">
-                  <strong className="text-muted d-block mb-1">Nombre:</strong>
-                    <p className="mb-0">{usuario.nombre || 'No especificado'}</p>
-                </div>
-                  {usuario.apellido && (
-                    <div className="col-md-6">
-                      <strong className="text-muted d-block mb-1">Apellido:</strong>
-                      <p className="mb-0">{usuario.apellido}</p>
-                    </div>
-                  )}
-                <div className="col-md-6">
-                  <strong className="text-muted d-block mb-1">Email:</strong>
-                    <div className="d-flex align-items-center gap-2">
-                  <p className="mb-0">{usuario.email}</p>
-                      <button
-                        type="button"
-                        className="btn btn-sm btn-outline-primary"
-                        onClick={() => {
-                          setMostrarActualizarEmail(!mostrarActualizarEmail);
-                          setMensajeEmail('');
-                          setNuevoEmail('');
-                          setPasswordEmail('');
-                        }}
-                      >
-                        {mostrarActualizarEmail ? 'Cancelar' : 'Cambiar'}
-                      </button>
-                </div>
-                  </div>
-                  {usuario.rut && (
-                    <div className="col-md-6">
-                      <strong className="text-muted d-block mb-1">RUT:</strong>
-                      <p className="mb-0">{usuario.rut}</p>
-                    </div>
-                  )}
-                  {usuario.telefono && (
-                    <div className="col-md-6">
-                      <strong className="text-muted d-block mb-1">Teléfono:</strong>
-                      <p className="mb-0">{usuario.telefono}</p>
-                    </div>
-                  )}
-                  {usuario.nombreEmpresa && (
-                    <div className="col-md-6">
-                      <strong className="text-muted d-block mb-1">Empresa:</strong>
-                      <p className="mb-0">{usuario.nombreEmpresa}</p>
-                    </div>
-                  )}
-                <div className="col-md-6">
-                  <strong className="text-muted d-block mb-1">Rol:</strong>
-                  <span className="badge bg-info text-dark px-3 py-2">
-                    {usuario.rol}
-                  </span>
-                </div>
-                <div className="col-md-6">
-                  <strong className="text-muted d-block mb-1">ID de Usuario:</strong>
-                  <p className="mb-0 text-muted">#{usuario.id}</p>
+        {/* Nota para administradores */}
+        {
+          usuario.rol === 'admin' && (
+            <div className="row mt-4">
+              <div className="col-lg-8 mx-auto">
+                <div className="alert alert-warning" role="alert">
+                  <strong>
+                    <UserCircle size={18} weight="fill" className="me-1" style={{ verticalAlign: 'middle' }} />
+                    Eres Administrador:
+                  </strong> Puedes acceder al{' '}
+                  <Link to="/admin" className="alert-link">
+                    panel de administración
+                  </Link>{' '}
+                  para gestionar usuarios, planes y estadísticas del portal.
                 </div>
               </div>
-              ) : (
-                <div>
-                  <h5 className="mb-3 text-primario">Editar Perfil</h5>
-                  
-                  {mensajePerfil && (
-                    <div className={`alert ${mensajePerfil.includes('✅') ? 'alert-success' : 'alert-danger'}`} role="alert">
-                      {mensajePerfil}
             </div>
-                  )}
-
-                  <form onSubmit={manejarActualizarPerfil}>
-                    <div className="row g-3">
-                      <div className="col-md-6">
-                        <label htmlFor="perfilNombre" className="form-label">
-                          Nombre
-                        </label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          id="perfilNombre"
-                          value={perfilEditado.nombre}
-                          onChange={(e) => setPerfilEditado({ ...perfilEditado, nombre: e.target.value })}
-                          placeholder="Tu nombre"
-                          disabled={cargandoPerfil}
-                        />
-          </div>
-                      <div className="col-md-6">
-                        <label htmlFor="perfilApellido" className="form-label">
-                          Apellido
-                        </label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          id="perfilApellido"
-                          value={perfilEditado.apellido}
-                          onChange={(e) => setPerfilEditado({ ...perfilEditado, apellido: e.target.value })}
-                          placeholder="Tu apellido"
-                          disabled={cargandoPerfil}
-                        />
-                      </div>
-                      <div className="col-md-6">
-                        <label htmlFor="perfilRut" className="form-label">
-                          RUT
-                        </label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          id="perfilRut"
-                          value={perfilEditado.rut}
-                          onChange={(e) => setPerfilEditado({ ...perfilEditado, rut: e.target.value })}
-                          placeholder="12345678-9"
-                          disabled={cargandoPerfil}
-                        />
-                      </div>
-                      <div className="col-md-6">
-                        <label htmlFor="perfilTelefono" className="form-label">
-                          Teléfono
-                        </label>
-                        <input
-                          type="tel"
-                          className="form-control"
-                          id="perfilTelefono"
-                          value={perfilEditado.telefono}
-                          onChange={(e) => setPerfilEditado({ ...perfilEditado, telefono: e.target.value })}
-                          placeholder="+56912345678"
-                          disabled={cargandoPerfil}
-                        />
-                      </div>
-                      <div className="col-md-12">
-                        <label htmlFor="perfilNombreEmpresa" className="form-label">
-                          Nombre de Empresa
-                        </label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          id="perfilNombreEmpresa"
-                          value={perfilEditado.nombreEmpresa}
-                          onChange={(e) => setPerfilEditado({ ...perfilEditado, nombreEmpresa: e.target.value })}
-                          placeholder="Mi Empresa S.A."
-                          disabled={cargandoPerfil}
-                        />
-                        <small className="text-muted">Puedes actualizar el nombre de tu empresa aquí</small>
-                      </div>
-                    </div>
-
-                    <div className="d-flex gap-2 mt-4">
-                      <button
-                        type="submit"
-                        className="btn btn-primary"
-                        disabled={cargandoPerfil}
-                      >
-                        {cargandoPerfil ? (
-                          <>
-                            <span className="spinner-border spinner-border-sm me-2" role="status"></span>
-                            Guardando...
-                          </>
-                        ) : (
-                          'Guardar Cambios'
-                        )}
-                      </button>
-                      <button
-                        type="button"
-                        className="btn btn-outline-secondary"
-                        onClick={() => {
-                          setMostrarEditarPerfil(false);
-                          setMensajePerfil('');
-                          formularioInicializado.current = false; // Resetear flag al cancelar
-                        }}
-                        disabled={cargandoPerfil}
-                      >
-                        Cancelar
-                      </button>
-                    </div>
-                  </form>
-                </div>
-              )}
-
-              {/* Formulario de actualizar email */}
-              {mostrarActualizarEmail && (
-                <div className="mt-4 pt-4 border-top">
-                  <h5 className="mb-3 text-primario">Cambiar Email</h5>
-                  
-                  {mensajeEmail && (
-                    <div className={`alert ${mensajeEmail.includes('✅') ? 'alert-success' : 'alert-danger'}`} role="alert">
-                      {mensajeEmail}
-                    </div>
-                  )}
-
-                  <form onSubmit={manejarActualizarEmail}>
-                    <div className="mb-3">
-                      <label htmlFor="nuevoEmail" className="form-label">
-                        Nuevo Email <span className="text-danger">*</span>
-                      </label>
-                      <input
-                        type="email"
-                        className="form-control"
-                        id="nuevoEmail"
-                        value={nuevoEmail}
-                        onChange={(e) => setNuevoEmail(e.target.value)}
-                        placeholder="nuevo@email.com"
-                        required
-                        disabled={cargandoEmail}
-                      />
-                    </div>
-
-                    <div className="mb-3">
-                      <label htmlFor="passwordEmail" className="form-label">
-                        Contraseña Actual <span className="text-danger">*</span>
-                        <small className="text-muted d-block">Necesaria para confirmar el cambio</small>
-                      </label>
-                      <input
-                        type="password"
-                        className="form-control"
-                        id="passwordEmail"
-                        value={passwordEmail}
-                        onChange={(e) => setPasswordEmail(e.target.value)}
-                        placeholder="Ingresa tu contraseña actual"
-                        required
-                        disabled={cargandoEmail}
-                      />
-                    </div>
-
-                    <div className="d-flex gap-2">
-                      <button
-                        type="submit"
-                        className="btn btn-primary"
-                        disabled={cargandoEmail}
-                      >
-                        {cargandoEmail ? (
-                          <>
-                            <span className="spinner-border spinner-border-sm me-2" role="status"></span>
-                            Actualizando...
-                          </>
-                        ) : (
-                          'Actualizar Email'
-                        )}
-                      </button>
-                      <button
-                        type="button"
-                        className="btn btn-outline-secondary"
-                        onClick={() => {
-                          setMostrarActualizarEmail(false);
-                          setNuevoEmail('');
-                          setPasswordEmail('');
-                          setMensajeEmail('');
-                        }}
-                        disabled={cargandoEmail}
-                      >
-                        Cancelar
-                      </button>
-                    </div>
-                  </form>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Nota para administradores */}
-      {usuario.rol === 'admin' && (
-        <div className="row mt-4">
-          <div className="col-lg-8 mx-auto">
-            <div className="alert alert-warning" role="alert">
-              <strong>
-                <UserCircle size={18} weight="fill" className="me-1" style={{ verticalAlign: 'middle' }} />
-                Eres Administrador:
-              </strong> Puedes acceder al{' '}
-              <Link to="/admin" className="alert-link">
-                panel de administración
-              </Link>{' '}
-              para gestionar usuarios, planes y estadísticas del portal.
-            </div>
-          </div>
-        </div>
-      )}
-      </div>
-    </div>
+          )
+        }
+      </div >
+    </div >
   );
 }

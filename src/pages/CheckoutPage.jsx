@@ -24,14 +24,14 @@ export default function CheckoutPage() {
   // Obtener el plan del carrito y el usuario autenticado desde localStorage
   const plan = obtenerPlanDelCarrito();
   const usuario = obtenerUsuarioAutenticado();
-  
+
   // Log de debugging para verificar el usuario y token
   useEffect(() => {
     if (usuario) {
       console.log('👤 Usuario en CheckoutPage:', usuario);
       const token = localStorage.getItem('accessToken');
       console.log('🔑 Token disponible:', token ? 'Sí (' + token.substring(0, 20) + '...)' : 'No');
-      
+
       if (!usuario.email) {
         console.error('⚠️ PROBLEMA: Usuario sin email en CheckoutPage:', usuario);
       }
@@ -86,7 +86,7 @@ export default function CheckoutPage() {
     if (valor.length <= 2) {
       const mesNum = parseInt(valor);
       if (valor === '' || (mesNum >= 1 && mesNum <= 12)) {
-      setMes(valor);
+        setMes(valor);
         // Si se completaron 2 dígitos, saltar al año
         if (valor.length === 2 && anioRef.current) {
           anioRef.current.focus();
@@ -151,27 +151,27 @@ export default function CheckoutPage() {
       }
 
       let usuarioActualizado = { ...usuario };
-      
+
       try {
         // Verificar que el usuario tenga token antes de crear suscripción
         const token = localStorage.getItem('accessToken');
         if (!token) {
           throw new Error('No estás autenticado. Por favor, inicia sesión nuevamente.');
         }
-        
+
         console.log('🔄 Creando suscripción para plan:', plan.id);
         console.log('👤 Usuario ID:', usuario.id, 'Email:', usuario.email);
-        
+
         // Intentar crear suscripción en el backend real
         const response = await createSuscripcion(plan.id, 'MENSUAL');
-        
+
         console.log('📋 Respuesta de createSuscripcion:', response);
-        
+
         if (response.success && response.suscripcion) {
           // Suscripción creada exitosamente en el backend
-          usuarioActualizado = { 
-            ...usuario, 
-            planId: plan.id, 
+          usuarioActualizado = {
+            ...usuario,
+            planId: plan.id,
             enTrial: false,
             suscripcionId: response.suscripcion.id,
             // ✅ Asegurar que el email se mantenga
@@ -185,10 +185,10 @@ export default function CheckoutPage() {
         }
       } catch (error) {
         console.error('❌ Error al crear suscripción:', error);
-        
+
         // Mensajes de error más específicos
         let errorMsg = error?.message || 'No se pudo crear la suscripción en el backend.';
-        
+
         if (error.message?.includes('403') || error.message?.includes('Forbidden') || error.message?.includes('permisos')) {
           errorMsg = 'Error: No tienes permisos para crear suscripciones. Verifica que tu cuenta esté activa y que tengas un email registrado. Si el problema persiste, contacta al soporte.';
         } else if (error.message?.includes('401') || error.message?.includes('autenticado')) {
@@ -196,12 +196,12 @@ export default function CheckoutPage() {
         } else if (error.message?.includes('email')) {
           errorMsg = 'Error: Tu cuenta no tiene un email registrado. Por favor, actualiza tu perfil con un email válido antes de realizar el pago.';
         }
-        
+
         setError(errorMsg);
         setProcesando(false);
         return;
       }
-      
+
       // GENERAR FACTURA después de la compra exitosa
       // ✅ Usar usuarioActualizado que tiene el email garantizado
       if (!usuarioActualizado.email) {
@@ -215,11 +215,11 @@ export default function CheckoutPage() {
       // Extraer últimos 4 dígitos de la tarjeta para la factura
       const numeroLimpio = numero.replace(/\s/g, '');
       const ultimos4Digitos = numeroLimpio.slice(-4);
-      
+
       // Calcular fecha de vencimiento (próximo mes para suscripción mensual)
       const fechaVencimiento = new Date();
       fechaVencimiento.setMonth(fechaVencimiento.getMonth() + 1);
-      
+
       // Intentar crear factura en el backend
       let factura = null;
       try {
@@ -236,9 +236,9 @@ export default function CheckoutPage() {
           metodoPago: 'Tarjeta de crédito',
           ultimos4Digitos: ultimos4Digitos,
         };
-        
+
         const facturaResponse = await createFactura(facturaData);
-        
+
         // Log sanitizado (sin tokens) solo en desarrollo
         if (import.meta.env.DEV) {
           const responseSanitized = { ...facturaResponse };
@@ -247,7 +247,7 @@ export default function CheckoutPage() {
           if (responseSanitized.token) delete responseSanitized.token;
           console.log('📄 Respuesta completa de createFactura (sanitizada):', responseSanitized);
         }
-        
+
         // El backend puede devolver la factura de diferentes formas:
         // 1. { success: true, factura: {...} }
         // 2. { success: true, data: {...} }
@@ -255,9 +255,9 @@ export default function CheckoutPage() {
         if (facturaResponse.success) {
           // Intentar obtener la factura de diferentes posibles ubicaciones
           factura = facturaResponse.factura || facturaResponse.data || facturaResponse;
-          
+
           if (factura && (factura.id || factura.numero || factura.numeroFactura)) {
-          // Guardar el número de factura en localStorage para que CompraExitosaPage pueda mostrarla
+            // Guardar el número de factura en localStorage para que CompraExitosaPage pueda mostrarla
             const numeroFactura = factura.numeroFactura || factura.numero || factura.id;
             localStorage.setItem('siga_factura_actual', numeroFactura);
             console.log('✅ Factura creada y guardada:', numeroFactura);
@@ -272,10 +272,10 @@ export default function CheckoutPage() {
         }
       } catch (error) {
         console.error('❌ Error al crear factura:', error);
-        
+
         // Extraer mensaje de error más descriptivo
         let errorMsg = 'No se pudo generar la factura en el backend.';
-        
+
         if (error.message) {
           if (error.message.includes('403') || error.message?.includes('Forbidden') || error.message?.includes('permisos')) {
             errorMsg = 'Error: No tienes permisos para crear facturas. Verifica que tu cuenta esté activa y que tengas un email registrado. Si el problema persiste, contacta al soporte.';
@@ -291,18 +291,18 @@ export default function CheckoutPage() {
             errorMsg = `Error: ${error.message}`;
           }
         }
-        
+
         setError(errorMsg);
         setProcesando(false);
         return;
       }
     }
-    
+
     // ✅ Navegar PRIMERO a /exito antes de vaciar el carrito
     // Esto evita que el useEffect detecte que no hay plan y redirija a /planes
     setProcesando(false);
     navigate('/exito');
-    
+
     // Vaciar el carrito después de navegar (con un pequeño delay para asegurar la navegación)
     setTimeout(() => {
       vaciarCarrito();
@@ -316,7 +316,7 @@ export default function CheckoutPage() {
     if (procesando) {
       return;
     }
-    
+
     // VALIDACIÓN 1: Si no hay plan en el carrito, redirigir a la página de planes
     // Esto evita que alguien acceda directamente a /checkout sin tener un plan seleccionado
     if (!plan) {
@@ -413,8 +413,8 @@ export default function CheckoutPage() {
                   <ul className="list-unstyled small mb-0">
                     {plan.caracteristicas.map((caracteristica, index) => (
                       <li key={index} className="mb-1">
-                      <CheckCircle size={16} weight="fill" className="text-success me-2" style={{ verticalAlign: 'middle' }} />
-                      {caracteristica}
+                        <CheckCircle size={16} weight="fill" className="text-success me-2" style={{ verticalAlign: 'middle' }} />
+                        {caracteristica}
                       </li>
                     ))}
                   </ul>
@@ -450,10 +450,10 @@ export default function CheckoutPage() {
                   </div>
                 </div>
                 <div className="mt-2">
-                    <small className="text-muted">
-                      <Lock size={14} weight="fill" className="me-1" style={{ verticalAlign: 'middle' }} />
-                      Pago seguro y encriptado - Transacción simulada
-                    </small>
+                  <small className="text-muted">
+                    <Lock size={14} weight="fill" className="me-1" style={{ verticalAlign: 'middle' }} />
+                    Pago seguro y encriptado
+                  </small>
                 </div>
               </div>
               <div className="card-body p-4">
@@ -608,15 +608,6 @@ export default function CheckoutPage() {
                       <small className="text-muted">
                         <ShieldCheck size={14} weight="fill" className="me-1" style={{ verticalAlign: 'middle' }} />
                         Protección de datos
-                      </small>
-                    </div>
-                    <div className="text-center mt-2">
-                      <small className="text-muted">
-                        <strong>
-                          <Warning size={14} weight="fill" className="me-1" style={{ verticalAlign: 'middle' }} />
-                          Modo Simulación:
-                        </strong> Esta es una transacción simulada. 
-                        No se realizará ningún cargo real a tu tarjeta.
                       </small>
                     </div>
                   </div>

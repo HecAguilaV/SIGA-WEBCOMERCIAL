@@ -10,6 +10,13 @@ export default defineConfig({
     port: 5173,
     host: true, // Permite acceso desde la red local
     strictPort: true, // Falla si el puerto está ocupado en lugar de usar otro
+    proxy: {
+      '/api': {
+        target: 'https://siga-backend-production.up.railway.app',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
   },
   // Exponer variables de entorno con prefijo VITE_
   // Las variables se pueden acceder con import.meta.env.VITE_GEMINI_API_KEY

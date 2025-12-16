@@ -19,10 +19,10 @@ export async function iniciarSesion(email, password) {
       // Ignorar errores de localStorage durante inicialización
     }
     limpiarDatosUsuario(!!redirectPath);
-    
+
     // Intentar login con el backend real
     const response = await loginUser(email, password);
-    
+
     // Log de debugging (sin exponer tokens)
     if (import.meta.env.DEV) {
       const responseSanitized = { ...response };
@@ -31,7 +31,7 @@ export async function iniciarSesion(email, password) {
       if (responseSanitized.token) delete responseSanitized.token;
       console.log('🔐 Respuesta del login (sanitizada):', responseSanitized);
     }
-    
+
     if (response.success) {
       // Guardar información del usuario en localStorage para compatibilidad
       // El backend puede retornar response.user o campos directamente
@@ -45,22 +45,22 @@ export async function iniciarSesion(email, password) {
         rol: response.rol || userFromBackend.rol || 'cliente',
         planId: response.planId || userFromBackend.planId || null,
       };
-      
+
       // Validar que el email esté presente
       if (!usuario.email) {
-        console.error('⚠️ ADVERTENCIA: Usuario logueado sin email');
+        console.error('ADVERTENCIA: Usuario logueado sin email');
         usuario.email = email; // Usar el email del login como fallback
       }
-      
+
       // Log del usuario que se va a guardar (sin tokens)
       if (import.meta.env.DEV) {
-        console.log('💾 Guardando usuario en localStorage:', { ...usuario, email: usuario.email ? '***' : undefined });
+        console.log('Guardando usuario en localStorage:', { ...usuario, email: usuario.email ? '***' : undefined });
       }
-      
+
       guardarUsuarioAutenticado(usuario);
       return usuario;
     }
-    
+
     // Si el backend respondió pero no fue exitoso, lanzar error
     throw new Error(response?.message || 'Credenciales inválidas');
   } catch (error) {
@@ -77,10 +77,10 @@ export async function registrarUsuario(userData) {
   try {
     // CRÍTICO: Limpiar datos del usuario anterior antes de registrar nuevo usuario
     limpiarDatosUsuario();
-    
+
     // Intentar registro con el backend real
     const response = await registerUser(userData);
-    
+
     // Log de debugging (sin exponer tokens)
     if (import.meta.env.DEV) {
       const responseSanitized = { ...response };
@@ -89,7 +89,7 @@ export async function registrarUsuario(userData) {
       if (responseSanitized.token) delete responseSanitized.token;
       console.log('📝 Respuesta del registro (sanitizada):', responseSanitized);
     }
-    
+
     if (response.success) {
       // Guardar información del usuario
       // El backend puede retornar response.user o response.email/userId directamente
@@ -103,22 +103,22 @@ export async function registrarUsuario(userData) {
         rol: userFromBackend.rol || 'cliente',
         planId: userFromBackend.planId || null,
       };
-      
+
       // Validar que el email esté presente
       if (!usuario.email) {
         console.error('⚠️ ADVERTENCIA: Usuario registrado sin email');
         usuario.email = userData.email; // Usar el email del formulario como fallback
       }
-      
+
       // Log del usuario que se va a guardar (sin tokens)
       if (import.meta.env.DEV) {
         console.log('💾 Guardando usuario en localStorage:', { ...usuario, email: usuario.email ? '***' : undefined });
       }
-      
+
       guardarUsuarioAutenticado(usuario);
       return usuario;
     }
-    
+
     throw new Error(response?.message || 'No se pudo registrar el usuario');
   } catch (error) {
     // NO hay fallback a datos simulados - el registro debe funcionar con el backend o fallar
