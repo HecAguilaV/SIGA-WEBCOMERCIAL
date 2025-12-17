@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { obtenerTokenOperativo } from '../services/api';
+import { usuariosAPI, api } from '../services/api.js';
 
 /**
  * Hook para manejar la lógica de SSO hacia la WebApp

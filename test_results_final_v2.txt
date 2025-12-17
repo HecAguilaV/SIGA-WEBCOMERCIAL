@@ -1,0 +1,110 @@
+
+> siga-web-comercial@1.0.0 test:single C:\Users\hdagu\Desktop\WEBCOMERCIAL\SIGA-WEBCOMERCIAL
+> karma start karma.conf.cjs --single-run
+
+webpack was not included as a framework in karma configuration, setting this automatically...
+Webpack bundling...
+asset [1m[32mcommons.js[39m[22m 9.34 MiB [1m[32m[emitted][39m[22m (name: commons) (id hint: commons)
+asset [1m[32mruntime.js[39m[22m 9.15 KiB [1m[32m[emitted][39m[22m (name: runtime)
+asset [1m[32mAsistenteContextual.2225272378.js[39m[22m 1.04 KiB [1m[32m[emitted][39m[22m (name: AsistenteContextual.2225272378)
+asset [1m[32mindicadoresEconomicos.3649972016.js[39m[22m 1.04 KiB [1m[32m[emitted][39m[22m (name: indicadoresEconomicos.3649972016)
+asset [1m[32mPlanActualCard.2277296487.js[39m[22m 1.04 KiB [1m[32m[emitted][39m[22m (name: PlanActualCard.2277296487)
+asset [1m[32mFacturaComponent.2734308826.js[39m[22m 1.03 KiB [1m[32m[emitted][39m[22m (name: FacturaComponent.2734308826)
+asset [1m[32mPerfilHeader.359560471.js[39m[22m 1.03 KiB [1m[32m[emitted][39m[22m (name: PerfilHeader.359560471)
+asset [1m[32meliminarUsuario.spec.1070609041.js[39m[22m 1.03 KiB [1m[32m[emitted][39m[22m (name: eliminarUsuario.spec.1070609041)
+asset [1m[32mCompraExitosaPage.465222099.js[39m[22m 1.03 KiB [1m[32m[emitted][39m[22m (name: CompraExitosaPage.465222099)
+asset [1m[32mResetPasswordPage.279117983.js[39m[22m 1.03 KiB [1m[32m[emitted][39m[22m (name: ResetPasswordPage.279117983)
+asset [1m[32mGraficoBarras.3298816208.js[39m[22m 1.03 KiB [1m[32m[emitted][39m[22m (name: GraficoBarras.3298816208)
+asset [1m[32mGraficoLineas.1973612496.js[39m[22m 1.03 KiB [1m[32m[emitted][39m[22m (name: GraficoLineas.1973612496)
+asset [1m[32mGraficoTorta.3703642787.js[39m[22m 1.02 KiB [1m[32m[emitted][39m[22m (name: GraficoTorta.3703642787)
+asset [1m[32mAsistenteIA.4019080009.js[39m[22m 1.02 KiB [1m[32m[emitted][39m[22m (name: AsistenteIA.4019080009)
++ 29 assets
+webpack 5.103.0 compiled [1m[32msuccessfully[39m[22m in 3189 ms
+[32m16 12 2025 23:51:07.105:INFO [karma-server]: [39mKarma v6.4.4 server started at http://localhost:9876/
+[32m16 12 2025 23:51:07.106:INFO [launcher]: [39mLaunching browsers Chrome with concurrency unlimited
+[32m16 12 2025 23:51:07.121:INFO [launcher]: [39mStarting browser Chrome
+[32m16 12 2025 23:51:08.093:INFO [Chrome 143.0.0.0 (Windows 10)]: [39mConnected on socket 24uReop1665m_YgjAAAB with id 96558376
+Chrome 143.0.0.0 (Windows 10): Executed 0 of 39[32m SUCCESS[39m (0 secs / 0 secs)
+[1A[2KERROR: [36m'Warning: ReactDOM.render is no longer supported in React 18. Use createRoot instead. Until you switch to the new API, your app will behave as if it's running React 17. Learn more: https://reactjs.org/link/switch-to-createroot'[39m
+Chrome 143.0.0.0 (Windows 10): Executed 0 of 39[32m SUCCESS[39m (0 secs / 0 secs)
+[1A[2KERROR: [36m'Warning: ReactDOM.render is no longer supported in React 18. Use createRoot instead. Until you switch to the new API, your app will behave as if it's running React 17. Learn more: https://reactjs.org/link/switch-to-createroot'[39m
+Chrome 143.0.0.0 (Windows 10): Executed 0 of 39[32m SUCCESS[39m (0 secs / 0 secs)
+[1A[2KERROR: [36m'Warning: ReactDOM.render is no longer supported in React 18. Use createRoot instead. Until you switch to the new API, your app will behave as if it's running React 17. Learn more: https://reactjs.org/link/switch-to-createroot'[39m
+Chrome 143.0.0.0 (Windows 10): Executed 0 of 39[32m SUCCESS[39m (0 secs / 0 secs)
+[1A[2KERROR: [36m'Warning: ReactDOM.render is no longer supported in React 18. Use createRoot instead. Until you switch to the new API, your app will behave as if it's running React 17. Learn more: https://reactjs.org/link/switch-to-createroot'[39m
+Chrome 143.0.0.0 (Windows 10): Executed 0 of 39[32m SUCCESS[39m (0 secs / 0 secs)
+[1A[2KERROR: [36m'Warning: ReactDOM.render is no longer supported in React 18. Use createRoot instead. Until you switch to the new API, your app will behave as if it's running React 17. Learn more: https://reactjs.org/link/switch-to-createroot'[39m
+Chrome 143.0.0.0 (Windows 10): Executed 0 of 39[32m SUCCESS[39m (0 secs / 0 secs)
+[1A[2KWARN: [36m'⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.'[39m
+Chrome 143.0.0.0 (Windows 10): Executed 0 of 39[32m SUCCESS[39m (0 secs / 0 secs)
+[1A[2KWARN: [36m'⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.'[39m
+Chrome 143.0.0.0 (Windows 10): Executed 0 of 39[32m SUCCESS[39m (0 secs / 0 secs)
+[1A[2KERROR: [36m'Warning: ReactDOM.render is no longer supported in React 18. Use createRoot instead. Until you switch to the new API, your app will behave as if it's running React 17. Learn more: https://reactjs.org/link/switch-to-createroot'[39m
+Chrome 143.0.0.0 (Windows 10): Executed 0 of 39[32m SUCCESS[39m (0 secs / 0 secs)
+[1A[2KChrome 143.0.0.0 (Windows 10): Executed 1 of 39[32m SUCCESS[39m (0 secs / 0.007 secs)
+[1A[2KChrome 143.0.0.0 (Windows 10): Executed 2 of 39[32m SUCCESS[39m (0 secs / 0.009 secs)
+[1A[2KChrome 143.0.0.0 (Windows 10): Executed 3 of 39[32m SUCCESS[39m (0 secs / 0.009 secs)
+[1A[2KChrome 143.0.0.0 (Windows 10): Executed 4 of 39[32m SUCCESS[39m (0 secs / 0.01 secs)
+[1A[2KChrome 143.0.0.0 (Windows 10): Executed 5 of 39[32m SUCCESS[39m (0 secs / 0.015 secs)
+[1A[2KChrome 143.0.0.0 (Windows 10): Executed 6 of 39[32m SUCCESS[39m (0 secs / 0.016 secs)
+[1A[2KChrome 143.0.0.0 (Windows 10): Executed 7 of 39[32m SUCCESS[39m (0 secs / 0.016 secs)
+[1A[2KChrome 143.0.0.0 (Windows 10): Executed 8 of 39[32m SUCCESS[39m (0 secs / 0.016 secs)
+[1A[2KChrome 143.0.0.0 (Windows 10): Executed 9 of 39[32m SUCCESS[39m (0 secs / 0.016 secs)
+[1A[2KChrome 143.0.0.0 (Windows 10): Executed 10 of 39[32m SUCCESS[39m (0 secs / 0.016 secs)
+[1A[2KChrome 143.0.0.0 (Windows 10): Executed 11 of 39[32m SUCCESS[39m (0 secs / 0.016 secs)
+[1A[2KChrome 143.0.0.0 (Windows 10): Executed 12 of 39[32m SUCCESS[39m (0 secs / 0.016 secs)
+[1A[2K[31mChrome 143.0.0.0 (Windows 10) Eliminar Usuario debe eliminar un usuario existente FAILED[39m
+	Expected 0 to be 1.
+	    at <Jasmine>
+	    at UserContext.eval (webpack://siga-web-comercial/./tests/eliminarUsuario.spec.js?:29:36)
+	    at <Jasmine>
+Chrome 143.0.0.0 (Windows 10): Executed 13 of 39[31m (1 FAILED)[39m (0 secs / 0.016 secs)
+[1A[2KChrome 143.0.0.0 (Windows 10): Executed 14 of 39[31m (1 FAILED)[39m (0 secs / 0.016 secs)
+[1A[2KChrome 143.0.0.0 (Windows 10): Executed 15 of 39[31m (1 FAILED)[39m (0 secs / 0.016 secs)
+[1A[2KChrome 143.0.0.0 (Windows 10): Executed 16 of 39[31m (1 FAILED)[39m (0 secs / 0.016 secs)
+[1A[2KChrome 143.0.0.0 (Windows 10): Executed 17 of 39[31m (1 FAILED)[39m (0 secs / 0.016 secs)
+[1A[2KChrome 143.0.0.0 (Windows 10): Executed 18 of 39[31m (1 FAILED)[39m (0 secs / 0.016 secs)
+[1A[2KChrome 143.0.0.0 (Windows 10): Executed 19 of 39[31m (1 FAILED)[39m (0 secs / 0.017 secs)
+[1A[2KChrome 143.0.0.0 (Windows 10): Executed 20 of 39[31m (1 FAILED)[39m (0 secs / 0.018 secs)
+[1A[2KChrome 143.0.0.0 (Windows 10): Executed 21 of 39[31m (1 FAILED)[39m (0 secs / 0.018 secs)
+[1A[2KChrome 143.0.0.0 (Windows 10): Executed 22 of 39[31m (1 FAILED)[39m (0 secs / 0.018 secs)
+[1A[2KChrome 143.0.0.0 (Windows 10): Executed 23 of 39[31m (1 FAILED)[39m (0 secs / 0.018 secs)
+[1A[2KChrome 143.0.0.0 (Windows 10): Executed 24 of 39[31m (1 FAILED)[39m (0 secs / 0.019 secs)
+[1A[2KChrome 143.0.0.0 (Windows 10): Executed 25 of 39[31m (1 FAILED)[39m (0 secs / 0.019 secs)
+[1A[2KChrome 143.0.0.0 (Windows 10): Executed 26 of 39[31m (1 FAILED)[39m (0 secs / 0.019 secs)
+[1A[2KChrome 143.0.0.0 (Windows 10): Executed 27 of 39[31m (1 FAILED)[39m (0 secs / 0.019 secs)
+[1A[2KChrome 143.0.0.0 (Windows 10): Executed 28 of 39[31m (1 FAILED)[39m (0 secs / 0.019 secs)
+[1A[2K[31mChrome 143.0.0.0 (Windows 10) CRUD de Planes leerPlanes debe retornar planes con estructura correcta FAILED[39m
+	TypeError: expect(...).toHaveProperty is not a function
+	    at UserContext.eval (webpack://siga-web-comercial/./tests/planes.spec.js?:50:22)
+	    at <Jasmine>
+Chrome 143.0.0.0 (Windows 10): Executed 29 of 39[31m (2 FAILED)[39m (0 secs / 0.019 secs)
+[1A[2KChrome 143.0.0.0 (Windows 10): Executed 30 of 39[31m (2 FAILED)[39m (0 secs / 0.019 secs)
+[1A[2KChrome 143.0.0.0 (Windows 10): Executed 31 of 39[31m (2 FAILED)[39m (0 secs / 0.019 secs)
+[1A[2K[31mChrome 143.0.0.0 (Windows 10) CRUD de Planes eliminarPlan debe eliminar un plan existente FAILED[39m
+	Expected 3 to be 0.
+	    at <Jasmine>
+	    at UserContext.eval (webpack://siga-web-comercial/./tests/planes.spec.js?:98:23)
+	    at <Jasmine>
+Chrome 143.0.0.0 (Windows 10): Executed 32 of 39[31m (3 FAILED)[39m (0 secs / 0.019 secs)
+[1A[2KChrome 143.0.0.0 (Windows 10): Executed 33 of 39[31m (3 FAILED)[39m (0 secs / 0.019 secs)
+[1A[2KChrome 143.0.0.0 (Windows 10): Executed 34 of 39[31m (3 FAILED)[39m (0 secs / 0.019 secs)
+[1A[2KChrome 143.0.0.0 (Windows 10): Executed 35 of 39[31m (3 FAILED)[39m (0 secs / 0.019 secs)
+[1A[2KChrome 143.0.0.0 (Windows 10): Executed 36 of 39[31m (3 FAILED)[39m (0 secs / 0.02 secs)
+[1A[2K[31mChrome 143.0.0.0 (Windows 10) CRUD de Usuarios leerUsuarios debe retornar usuarios con estructura correcta FAILED[39m
+	TypeError: expect(...).toHaveProperty is not a function
+	    at UserContext.eval (webpack://siga-web-comercial/./tests/usuarios.spec.js?:52:25)
+	    at <Jasmine>
+Chrome 143.0.0.0 (Windows 10): Executed 37 of 39[31m (4 FAILED)[39m (0 secs / 0.02 secs)
+[1A[2KChrome 143.0.0.0 (Windows 10): Executed 38 of 39[31m (4 FAILED)[39m (0 secs / 0.02 secs)
+[1A[2KChrome 143.0.0.0 (Windows 10): Executed 39 of 39[31m (4 FAILED)[39m (0 secs / 0.02 secs)
+[1A[2KChrome 143.0.0.0 (Windows 10): Executed 39 of 39[31m (4 FAILED)[39m (0.037 secs / 0.02 secs)
+[31mTOTAL: 4 FAILED, 35 SUCCESS[39m
+
+=============================== Coverage summary ===============================
+Statements   : Unknown% ( 0/0 )
+Branches     : Unknown% ( 0/0 )
+Functions    : Unknown% ( 0/0 )
+Lines        : Unknown% ( 0/0 )
+================================================================================
+ ELIFECYCLE  Command failed with exit code 1.

@@ -56,10 +56,10 @@ describe('CRUD de Planes', () => {
 
       if (planes.length > 0) {
         const plan = planes[0];
-        expect(plan).toHaveProperty('id');
-        expect(plan).toHaveProperty('nombre');
-        expect(plan).toHaveProperty('precio');
-        expect(plan).toHaveProperty('unidad');
+        expect(plan.id).toBeDefined();
+        expect(plan.nombre).toBeDefined();
+        expect(plan.precio).toBeDefined();
+        expect(plan.unidad).toBeDefined();
       }
     });
   });

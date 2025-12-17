@@ -59,10 +59,10 @@ describe('CRUD de Usuarios', () => {
 
       if (usuarios.length > 0) {
         const usuario = usuarios[0];
-        expect(usuario).toHaveProperty('id');
-        expect(usuario).toHaveProperty('nombre');
-        expect(usuario).toHaveProperty('email');
-        expect(usuario).toHaveProperty('rol');
+        expect(usuario.id).toBeDefined();
+        expect(usuario.nombre).toBeDefined();
+        expect(usuario.email).toBeDefined();
+        expect(usuario.rol).toBeDefined();
       }
     });
   });

@@ -8,10 +8,21 @@
  * Babel-loader ya está configurado con @babel/preset-react para transformar JSX.
  */
 
+const webpack = require('webpack');
+
 module.exports = function (config) {
   config.set({
     frameworks: ['jasmine'],
-    
+
+    // Plugins explicitly listed using require to avoid resolution issues (pnpm)
+    plugins: [
+      require('karma-jasmine'),
+      require('karma-chrome-launcher'),
+      require('karma-webpack'),
+      require('karma-coverage'),
+      require('karma-jasmine-html-reporter')
+    ],
+
     // Archivos que Karma debe cargar y observar para cambios
     // Excluir DocsPage.jsx porque usa swagger-ui-react que requiere configuración CSS adicional
     files: [
@@ -22,10 +33,10 @@ module.exports = function (config) {
       { pattern: 'src/**/*.jsx', watched: true, included: false, served: false },
       { pattern: 'src/**/*.js', watched: true, included: false, served: false },
     ],
-    
+
     // Excluir DocsPage de los tests (no necesita testing)
     exclude: ['src/pages/DocsPage.jsx'],
-    
+
     // Preprocesadores: webpack transforma JSX y JS antes de ejecutar los tests
     preprocessors: {
       'src/**/*.jsx': ['webpack'],
@@ -33,16 +44,16 @@ module.exports = function (config) {
       'tests/**/*.spec.jsx': ['webpack'],
       'tests/**/*.spec.js': ['webpack'],
     },
-    
+
     // Configuración de webpack que incluye Babel para transformar JSX
     webpack: {
       mode: 'development',
-      
+
       // Resolver extensiones .js y .jsx
       resolve: {
         extensions: ['.js', '.jsx'],
       },
-      
+
       // Reglas de módulos: usar babel-loader para transformar JSX
       module: {
         rules: [
@@ -64,6 +75,15 @@ module.exports = function (config) {
           },
         ],
       },
+      plugins: [
+        new webpack.DefinePlugin({
+          'import.meta.env': JSON.stringify({
+            DEV: true,
+            VITE_WEBAPP_URL: 'http://localhost:5173',
+            MODE: 'test'
+          })
+        })
+      ],
       // Resolver fallbacks para módulos que no se usan en tests
       resolve: {
         extensions: ['.js', '.jsx'],
@@ -73,9 +93,9 @@ module.exports = function (config) {
         },
       },
     },
-    
+
     // Reporters: mostrar progreso y coverage (cobertura de código)
-    reporters: ['progress', 'coverage'],
+    reporters: ['progress', 'coverage', 'kjhtml'],
     coverageReporter: {
       dir: 'coverage',
       reporters: [
@@ -84,13 +104,13 @@ module.exports = function (config) {
       ],
       includeAllSources: true,
     },
-    
+
     // Navegador para ejecutar los tests
     // 'Chrome' = con interfaz gráfica para ver los tests en el navegador
     // 'ChromeHeadless' = sin interfaz gráfica (para CI/CD)
     browsers: ['Chrome'],
     singleRun: false, // false para ver la interfaz gráfica y watch mode
-    
+
     // Configuración del cliente Jasmine
     client: {
       jasmine: {
@@ -100,7 +120,7 @@ module.exports = function (config) {
       captureConsole: true, // Capturar console.log para debug
       runInParent: false,
     },
-    
+
     // Configuración para debugging
     logLevel: config.LOG_INFO, // Mostrar información de debug
     browserConsoleLogOptions: {

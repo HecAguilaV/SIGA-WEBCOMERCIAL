@@ -1,0 +1,149 @@
+
+> siga-web-comercial@1.0.0 test:single C:\Users\hdagu\Desktop\WEBCOMERCIAL\SIGA-WEBCOMERCIAL
+> karma start karma.conf.cjs --single-run
+
+webpack was not included as a framework in karma configuration, setting this automatically...
+Webpack bundling...
+asset [1m[32mcommons.js[39m[22m 9.33 MiB [1m[32m[emitted][39m[22m (name: commons) (id hint: commons)
+asset [1m[32mruntime.js[39m[22m 9.15 KiB [1m[32m[emitted][39m[22m (name: runtime)
+asset [1m[32mAsistenteContextual.2225272378.js[39m[22m 1.04 KiB [1m[32m[emitted][39m[22m (name: AsistenteContextual.2225272378)
+asset [1m[32mindicadoresEconomicos.3649972016.js[39m[22m 1.04 KiB [1m[32m[emitted][39m[22m (name: indicadoresEconomicos.3649972016)
+asset [1m[32mPlanActualCard.2277296487.js[39m[22m 1.04 KiB [1m[32m[emitted][39m[22m (name: PlanActualCard.2277296487)
+asset [1m[32mFacturaComponent.2734308826.js[39m[22m 1.03 KiB [1m[32m[emitted][39m[22m (name: FacturaComponent.2734308826)
+asset [1m[32mPerfilHeader.359560471.js[39m[22m 1.03 KiB [1m[32m[emitted][39m[22m (name: PerfilHeader.359560471)
+asset [1m[32meliminarUsuario.spec.1070609041.js[39m[22m 1.03 KiB [1m[32m[emitted][39m[22m (name: eliminarUsuario.spec.1070609041)
+asset [1m[32mCompraExitosaPage.465222099.js[39m[22m 1.03 KiB [1m[32m[emitted][39m[22m (name: CompraExitosaPage.465222099)
+asset [1m[32mResetPasswordPage.279117983.js[39m[22m 1.03 KiB [1m[32m[emitted][39m[22m (name: ResetPasswordPage.279117983)
+asset [1m[32mGraficoBarras.3298816208.js[39m[22m 1.03 KiB [1m[32m[emitted][39m[22m (name: GraficoBarras.3298816208)
+asset [1m[32mGraficoLineas.1973612496.js[39m[22m 1.03 KiB [1m[32m[emitted][39m[22m (name: GraficoLineas.1973612496)
+asset [1m[32mGraficoTorta.3703642787.js[39m[22m 1.02 KiB [1m[32m[emitted][39m[22m (name: GraficoTorta.3703642787)
+asset [1m[32mAsistenteIA.4019080009.js[39m[22m 1.02 KiB [1m[32m[emitted][39m[22m (name: AsistenteIA.4019080009)
++ 28 assets
+
+[1m[31mERROR[39m[22m in [1m./src/hooks/useWebAppSSO.js[39m[22m [1m[32m2:0-56[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve '../services/api' in 'C:\Users\hdagu\Desktop\WEBCOMERCIAL\SIGA-WEBCOMERCIAL\src\hooks'
+[1m[32mDid you mean 'api.js'?[39m[22m[1m
+[1m[31mBREAKING CHANGE[39m[22m[1m: The request '../services/api' [1m[31mfailed[39m[22m[1m to resolve only because it was resolved as fully specified
+(probably because the origin is strict EcmaScript Module, e. g. a module with javascript mimetype, a '*.mjs' file, or a '*.js' file where the package.json contains '"type": "module"').
+The extension in the request is mandatory for it to be fully specified.
+Add the extension to the request.[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./tests/eliminarUsuario.spec.js[39m[22m [1m[32m1:0-93[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve '../src/datos/datosSimulados.js' in 'C:\Users\hdagu\Desktop\WEBCOMERCIAL\SIGA-WEBCOMERCIAL\tests'[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./tests/facturas.spec.js[39m[22m [1m[32m1:0-159[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve '../src/datos/datosSimulados.js' in 'C:\Users\hdagu\Desktop\WEBCOMERCIAL\SIGA-WEBCOMERCIAL\tests'[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./tests/planes.spec.js[39m[22m [1m[32m2:0-101[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve '../src/datos/datosSimulados.js' in 'C:\Users\hdagu\Desktop\WEBCOMERCIAL\SIGA-WEBCOMERCIAL\tests'[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./tests/usuarios.spec.js[39m[22m [1m[32m2:0-95[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve '../src/datos/datosSimulados.js' in 'C:\Users\hdagu\Desktop\WEBCOMERCIAL\SIGA-WEBCOMERCIAL\tests'[39m[22m
+
+[1m[33m5 errors have detailed information that is not shown.
+Use 'stats.errorDetails: true' resp. '--stats-error-details' to show it.[39m[22m
+
+webpack 5.103.0 compiled with [1m[31m5 errors[39m[22m in 3223 ms
+[32m16 12 2025 23:45:34.406:INFO [karma-server]: [39mKarma v6.4.4 server started at http://localhost:9876/
+[32m16 12 2025 23:45:34.406:INFO [launcher]: [39mLaunching browsers Chrome with concurrency unlimited
+[32m16 12 2025 23:45:34.418:INFO [launcher]: [39mStarting browser Chrome
+[32m16 12 2025 23:45:35.748:INFO [Chrome 143.0.0.0 (Windows 10)]: [39mConnected on socket AVbbFN-LjNeuzpN2AAAB with id 5623545
+Chrome 143.0.0.0 (Windows 10): Executed 0 of 10[32m SUCCESS[39m (0 secs / 0 secs)
+[1A[2KERROR: [36m'Warning: ReactDOM.render is no longer supported in React 18. Use createRoot instead. Until you switch to the new API, your app will behave as if it's running React 17. Learn more: https://reactjs.org/link/switch-to-createroot'[39m
+Chrome 143.0.0.0 (Windows 10): Executed 0 of 10[32m SUCCESS[39m (0 secs / 0 secs)
+[1A[2KERROR: [36m'Warning: ReactDOM.render is no longer supported in React 18. Use createRoot instead. Until you switch to the new API, your app will behave as if it's running React 17. Learn more: https://reactjs.org/link/switch-to-createroot'[39m
+Chrome 143.0.0.0 (Windows 10): Executed 0 of 10[32m SUCCESS[39m (0 secs / 0 secs)
+[1A[2KERROR: [36m'Warning: ReactDOM.render is no longer supported in React 18. Use createRoot instead. Until you switch to the new API, your app will behave as if it's running React 17. Learn more: https://reactjs.org/link/switch-to-createroot'[39m
+Chrome 143.0.0.0 (Windows 10): Executed 0 of 10[32m SUCCESS[39m (0 secs / 0 secs)
+[1A[2KERROR: [36m'Warning: ReactDOM.render is no longer supported in React 18. Use createRoot instead. Until you switch to the new API, your app will behave as if it's running React 17. Learn more: https://reactjs.org/link/switch-to-createroot'[39m
+Chrome 143.0.0.0 (Windows 10): Executed 0 of 10[32m SUCCESS[39m (0 secs / 0 secs)
+[1A[2K[31mChrome 143.0.0.0 (Windows 10) ERROR[39m
+  An error was thrown in afterAll
+  Uncaught SyntaxError: Cannot use 'import.meta' outside a module
+  SyntaxError: Cannot use 'import.meta' outside a module
+      at ./src/services/auth.js (C:/Users/hdagu/AppData/Local/Temp/_karma_webpack_227751/commons.js:20057:1)
+      at __webpack_require__ (C:/Users/hdagu/AppData/Local/Temp/_karma_webpack_227751/runtime.js:31:42)
+      at eval (webpack://siga-web-comercial/./src/pages/LoginPage.jsx?:8:75)
+      at ./src/pages/LoginPage.jsx (C:/Users/hdagu/AppData/Local/Temp/_karma_webpack_227751/commons.js:19980:1)
+      at __webpack_require__ (C:/Users/hdagu/AppData/Local/Temp/_karma_webpack_227751/runtime.js:31:42)
+      at eval (webpack://siga-web-comercial/./tests/login.spec.jsx?:6:82)
+      at ./tests/login.spec.jsx (C:/Users/hdagu/AppData/Local/Temp/_karma_webpack_227751/commons.js:20216:1)
+      at __webpack_require__ (C:/Users/hdagu/AppData/Local/Temp/_karma_webpack_227751/runtime.js:31:42)
+      at __webpack_exec__ (login.spec.1358352323.js:12:48)
+      at login.spec.1358352323.js:13:55
+  Uncaught Error: Cannot find module '../src/datos/datosSimulados.js'
+  Error: Cannot find module '../src/datos/datosSimulados.js'
+      at webpackMissingModule (webpack://siga-web-comercial/./tests/eliminarUsuario.spec.js?:2:50)
+      at eval (webpack://siga-web-comercial/./tests/eliminarUsuario.spec.js?:2:155)
+      at ./tests/eliminarUsuario.spec.js (C:/Users/hdagu/AppData/Local/Temp/_karma_webpack_227751/commons.js:20194:1)
+      at __webpack_require__ (C:/Users/hdagu/AppData/Local/Temp/_karma_webpack_227751/runtime.js:31:42)
+      at __webpack_exec__ (eliminarUsuario.spec.1070609041.js:12:48)
+      at eliminarUsuario.spec.1070609041.js:13:55
+      at __webpack_require__.O (C:/Users/hdagu/AppData/Local/Temp/_karma_webpack_227751/runtime.js:68:23)
+      at eliminarUsuario.spec.1070609041.js:14:56
+      at webpackJsonpCallback (C:/Users/hdagu/AppData/Local/Temp/_karma_webpack_227751/runtime.js:202:39)
+      at eliminarUsuario.spec.1070609041.js:10:89
+  Uncaught Error: Cannot find module '../src/datos/datosSimulados.js'
+  Error: Cannot find module '../src/datos/datosSimulados.js'
+      at webpackMissingModule (webpack://siga-web-comercial/./tests/facturas.spec.js?:2:50)
+      at eval (webpack://siga-web-comercial/./tests/facturas.spec.js?:2:155)
+      at ./tests/facturas.spec.js (C:/Users/hdagu/AppData/Local/Temp/_karma_webpack_227751/commons.js:20205:1)
+      at __webpack_require__ (C:/Users/hdagu/AppData/Local/Temp/_karma_webpack_227751/runtime.js:31:42)
+      at __webpack_exec__ (facturas.spec.875750297.js:12:48)
+      at facturas.spec.875750297.js:13:55
+      at __webpack_require__.O (C:/Users/hdagu/AppData/Local/Temp/_karma_webpack_227751/runtime.js:68:23)
+      at facturas.spec.875750297.js:14:56
+      at webpackJsonpCallback (C:/Users/hdagu/AppData/Local/Temp/_karma_webpack_227751/runtime.js:202:39)
+      at facturas.spec.875750297.js:10:89
+  Uncaught Error: Cannot find module '../src/datos/datosSimulados.js'
+  Error: Cannot find module '../src/datos/datosSimulados.js'
+      at webpackMissingModule (webpack://siga-web-comercial/./tests/planes.spec.js?:2:50)
+      at eval (webpack://siga-web-comercial/./tests/planes.spec.js?:2:155)
+      at ./tests/planes.spec.js (C:/Users/hdagu/AppData/Local/Temp/_karma_webpack_227751/commons.js:20227:1)
+      at __webpack_require__ (C:/Users/hdagu/AppData/Local/Temp/_karma_webpack_227751/runtime.js:31:42)
+      at __webpack_exec__ (planes.spec.1651878862.js:12:48)
+      at planes.spec.1651878862.js:13:55
+      at __webpack_require__.O (C:/Users/hdagu/AppData/Local/Temp/_karma_webpack_227751/runtime.js:68:23)
+      at planes.spec.1651878862.js:14:56
+      at webpackJsonpCallback (C:/Users/hdagu/AppData/Local/Temp/_karma_webpack_227751/runtime.js:202:39)
+      at planes.spec.1651878862.js:10:89
+  Uncaught Error: Cannot find module '../src/datos/datosSimulados.js'
+  Error: Cannot find module '../src/datos/datosSimulados.js'
+      at webpackMissingModule (webpack://siga-web-comercial/./tests/usuarios.spec.js?:2:50)
+      at eval (webpack://siga-web-comercial/./tests/usuarios.spec.js?:2:155)
+      at ./tests/usuarios.spec.js (C:/Users/hdagu/AppData/Local/Temp/_karma_webpack_227751/commons.js:20238:1)
+      at __webpack_require__ (C:/Users/hdagu/AppData/Local/Temp/_karma_webpack_227751/runtime.js:31:42)
+      at __webpack_exec__ (usuarios.spec.957121431.js:12:48)
+      at usuarios.spec.957121431.js:13:55
+      at __webpack_require__.O (C:/Users/hdagu/AppData/Local/Temp/_karma_webpack_227751/runtime.js:68:23)
+      at usuarios.spec.957121431.js:14:56
+      at webpackJsonpCallback (C:/Users/hdagu/AppData/Local/Temp/_karma_webpack_227751/runtime.js:202:39)
+      at usuarios.spec.957121431.js:10:89
+Chrome 143.0.0.0 (Windows 10): Executed 0 of 10[31m ERROR[39m (0 secs / 0 secs)
+[1A[2KChrome 143.0.0.0 (Windows 10): Executed 1 of 10[31m ERROR[39m (0 secs / 0.009 secs)
+[1A[2KChrome 143.0.0.0 (Windows 10): Executed 2 of 10[31m ERROR[39m (0 secs / 0.011 secs)
+[1A[2KChrome 143.0.0.0 (Windows 10): Executed 3 of 10[31m ERROR[39m (0 secs / 0.011 secs)
+[1A[2KChrome 143.0.0.0 (Windows 10): Executed 4 of 10[31m ERROR[39m (0 secs / 0.012 secs)
+[1A[2KChrome 143.0.0.0 (Windows 10): Executed 5 of 10[31m ERROR[39m (0 secs / 0.013 secs)
+[1A[2KChrome 143.0.0.0 (Windows 10): Executed 6 of 10[31m ERROR[39m (0 secs / 0.013 secs)
+[1A[2KChrome 143.0.0.0 (Windows 10): Executed 7 of 10[31m ERROR[39m (0 secs / 0.013 secs)
+[1A[2KChrome 143.0.0.0 (Windows 10): Executed 8 of 10[31m ERROR[39m (0 secs / 0.013 secs)
+[1A[2KChrome 143.0.0.0 (Windows 10): Executed 9 of 10[31m ERROR[39m (0 secs / 0.013 secs)
+[1A[2KChrome 143.0.0.0 (Windows 10): Executed 10 of 10[31m ERROR[39m (0 secs / 0.013 secs)
+[1A[2KChrome 143.0.0.0 (Windows 10): Executed 10 of 10[31m ERROR[39m (0.002 secs / 0.013 secs)
+[1A[2KChrome 143.0.0.0 (Windows 10): Executed 10 of 10[31m ERROR[39m (0.004 secs / 0.013 secs)
+
+=============================== Coverage summary ===============================
+Statements   : Unknown% ( 0/0 )
+Branches     : Unknown% ( 0/0 )
+Functions    : Unknown% ( 0/0 )
+Lines        : Unknown% ( 0/0 )
+================================================================================
+
+=============================== Coverage summary ===============================
+Statements   : Unknown% ( 0/0 )
+Branches     : Unknown% ( 0/0 )
+Functions    : Unknown% ( 0/0 )
+Lines        : Unknown% ( 0/0 )
+================================================================================
+ ELIFECYCLE  Command failed with exit code 1.
