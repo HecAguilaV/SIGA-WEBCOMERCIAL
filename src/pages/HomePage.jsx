@@ -47,7 +47,7 @@ export default function HomePage() {
                     muted
                     playsInline
                     className="w-100 h-100 object-fit-cover"
-                    poster="/public\brand\Dashboard.png"
+                    poster="public\brand\Dashboard.png"
                     style={{ display: 'block' }}
                   >
                     <source src="/videos/demo-sigaapp.mp4" type="video/mp4" />
