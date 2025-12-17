@@ -10,20 +10,18 @@ try {
   if (typeof import.meta !== 'undefined' && import.meta.env) {
     if (import.meta.env.VITE_API_BASE_URL) {
       API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-    } else if (import.meta.env.DEV) {
-      // Solo en desarrollo local sin variable definida usamos localhost
-      API_BASE_URL = 'http://localhost:8080';
     }
+    // Eliminado fallback a localhost:8080 para permitir uso de proxy (relative path '')
+    // else if (import.meta.env.DEV) { ... }
   }
 } catch (e) {
   API_BASE_URL = 'http://localhost:8080';
 }
 
-// Log para debugging (siempre, para identificar problemas en producción)
-// Log para debugging (siempre, para identificar problemas en producción)
-console.log('API_BASE_URL configurada:', API_BASE_URL);
-console.log('VITE_API_BASE_URL desde env:', import.meta.env.VITE_API_BASE_URL);
-console.log('Entorno:', import.meta.env.MODE, import.meta.env.PROD ? '(PRODUCCIÓN)' : '(DESARROLLO)');
+// Log para debugging (solo en desarrollo)
+if (import.meta.env.DEV) {
+  // console.log('API_BASE_URL configurada:', API_BASE_URL); // Commented to reduce noise
+}
 
 // Advertencia si estamos en producción pero usando localhost
 if (import.meta.env.PROD && API_BASE_URL.includes('localhost')) {
@@ -132,21 +130,12 @@ async function apiRequest(endpoint, options = {}) {
   const url = `${API_URL}${endpoint}`;
   const token = getAccessToken();
 
-  // Log de debugging SIEMPRE para diagnosticar problemas
-  console.log(`🔍 API Request: ${options.method || 'GET'} ${url}`);
-  console.log(`📍 Endpoint: ${endpoint}`);
+  // Log de debugging reducido (solo errores y operaciones clave)
+  // console.log(`🔍 API Request: ${options.method || 'GET'} ${url}`);
 
   // Verificar que el endpoint sea correcto (especialmente para suscripciones)
   if (endpoint.includes('suscripcion') && !endpoint.includes('suscripciones')) {
-    console.error('❌ ERROR CRÍTICO: Endpoint incorrecto detectado!');
-    console.error('❌ Debe ser /comercial/suscripciones (plural)');
-    console.error('❌ Endpoint recibido:', endpoint);
-  }
-
-  if (token && !options.skipAuth) {
-    console.log('🔑 Token presente:', token.substring(0, 20) + '...');
-  } else if (!options.skipAuth) {
-    console.warn('⚠️ No hay token disponible para esta petición');
+    console.error('❌ ERROR CRÍTICO: Endpoint incorrecto detectado: /suscripciones (plural)');
   }
 
   // Configurar headers
@@ -158,8 +147,6 @@ async function apiRequest(endpoint, options = {}) {
   // Agregar token de autenticación si existe
   if (token && !options.skipAuth) {
     headers['Authorization'] = `Bearer ${token}`;
-  } else if (!options.skipAuth) {
-    console.warn('⚠️ Petición requiere autenticación pero no hay token disponible');
   }
 
   // Configurar opciones de la petición
@@ -366,6 +353,17 @@ export async function registerUser(userData) {
     if (responseSanitized.refreshToken) delete responseSanitized.refreshToken;
     if (responseSanitized.token) delete responseSanitized.token;
     console.log('📥 Respuesta del backend en registerUser (sanitizada):', responseSanitized);
+  }
+
+  // Corregido: Guardar tokens si el registro devuelve usuario y token (Auto Login)
+  if (response.success) {
+    const accessToken = response.accessToken || response.token || response.access_token || (response.data && response.data.accessToken);
+    const refreshToken = response.refreshToken || response.refresh_token || (response.data && response.data.refreshToken);
+
+    if (accessToken) {
+      console.log('Token recibido en registro - Auto Login activado');
+      saveTokens(accessToken, refreshToken);
+    }
   }
 
   return response;

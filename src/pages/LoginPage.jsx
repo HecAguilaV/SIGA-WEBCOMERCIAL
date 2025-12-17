@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { iniciarSesion } from '../services/auth.js';
-import { solicitarResetPassword } from '../services/api.js';
+import { solicitarResetPassword, cambiarPasswordConToken } from '../services/api.js';
+import { Eye, EyeSlash } from 'phosphor-react';
 
 /**
  * Página de inicio de sesión
@@ -10,6 +11,7 @@ import { solicitarResetPassword } from '../services/api.js';
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [mostrarPassword, setMostrarPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [mostrarReset, setMostrarReset] = useState(false);
@@ -22,7 +24,7 @@ export default function LoginPage() {
     e.preventDefault();
     setError('');
     setLoading(true);
-    
+
     if (!email || !password) {
       setError('Por favor completa todos los campos');
       setLoading(false);
@@ -63,34 +65,79 @@ export default function LoginPage() {
     }
   };
 
-  const manejarResetPassword = async (e) => {
+  // Estados para Reset Password MVP
+  const [stepReset, setStepReset] = useState(1);
+  const [resetToken, setResetToken] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [mostrarPasswordReset, setMostrarPasswordReset] = useState(false);
+  const [tipoMensaje, setTipoMensaje] = useState(''); // 'success' | 'error'
+
+  const manejarSolicitudReset = async (e) => {
     e.preventDefault();
     setMensajeReset('');
-    setError('');
-    
-    if (!emailReset || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailReset)) {
-      setMensajeReset('Por favor ingresa un email válido');
+    setTipoMensaje('');
+
+    if (!emailReset || !/@[^\s@]+\.[^\s@]+/.test(emailReset)) {
+      setMensajeReset('Email inválido');
+      setTipoMensaje('error');
       return;
     }
 
     setLoadingReset(true);
     try {
+      // 1. Solicitar token al backend
       const response = await solicitarResetPassword(emailReset);
+
       if (response.success) {
-        setMensajeReset('✅ Revisa tu email para continuar con el cambio de contraseña. En producción recibirás un token por email.');
-        // Si estamos en desarrollo y hay token, mostrarlo
-        if (response.resetToken && import.meta.env.DEV) {
-          console.log('Token de reset (solo en desarrollo):', response.resetToken);
-          setMensajeReset(`✅ Token generado. En producción se enviará por email. Token (solo dev): ${response.resetToken.substring(0, 20)}...`);
-        }
-        setEmailReset('');
-        setTimeout(() => {
-          setMostrarReset(false);
+        // MVP TRICK: En desarrollo, el backend nos devuelve el token directamente.
+        // Lo usaremos para pasar al paso 2 sin salir de la pantalla.
+        if (response.resetToken) {
+          setResetToken(response.resetToken);
+          setStepReset(2); // Avanzar al paso de cambio de password
           setMensajeReset('');
-        }, 5000);
+        } else {
+          // Si por alguna razón no hay token (prod estricto?), fallback a mensaje
+          setMensajeReset('Enviamos un enlace a tu correo (Simulación: Revisa consola si estás en dev)');
+          setTipoMensaje('success');
+        }
+      } else {
+        throw new Error(response.message || 'No se pudo verificar el usuario');
       }
     } catch (err) {
-      setMensajeReset(err.message || 'Error al solicitar reset de contraseña');
+      setMensajeReset(err.message || 'Error al verificar usuario');
+      setTipoMensaje('error');
+    } finally {
+      setLoadingReset(false);
+    }
+  };
+
+  const manejarConfirmacionReset = async (e) => {
+    e.preventDefault();
+    if (!newPassword || newPassword.length < 6) {
+      setMensajeReset('La contraseña debe tener al menos 6 caracteres');
+      setTipoMensaje('error');
+      return;
+    }
+
+    setLoadingReset(true);
+    try {
+      const response = await cambiarPasswordConToken(resetToken, newPassword);
+      if (response.success) {
+        setMostrarReset(false);
+        setStepReset(1);
+        setEmailReset('');
+        setNewPassword('');
+        setResetToken('');
+        // Mostrar éxito en el login principal
+        setError('✅ ¡Contraseña actualizada! Ya puedes iniciar sesión.');
+        // Hack visual: usar setError para mensaje de éxito verde (si el componente lo soporta, sino css)
+        // Como el componente usa alert-danger para error, mejor agrego estado de éxito global o manipulo error...
+        // Mejor:
+        alert('✅ Contraseña actualizada correctamente. Inicia sesión con tu nueva clave.');
+      }
+    } catch (err) {
+      setMensajeReset(err.message || 'Error al actualizar contraseña');
+      setTipoMensaje('error');
     } finally {
       setLoadingReset(false);
     }
@@ -103,7 +150,7 @@ export default function LoginPage() {
           <div className="card shadow">
             <div className="card-body p-5">
               <h2 className="card-title text-center mb-4">Iniciar Sesión</h2>
-              
+
               {error && (
                 <div className="alert alert-danger" role="alert">
                   {error}
@@ -130,14 +177,24 @@ export default function LoginPage() {
                   <label htmlFor="password" className="form-label">
                     Contraseña
                   </label>
-                  <input
-                    type="password"
-                    className="form-control"
-                    id="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
+                  <div className="input-group">
+                    <input
+                      type={mostrarPassword ? "text" : "password"}
+                      className="form-control"
+                      id="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                    />
+                    <button
+                      className="btn btn-outline-secondary"
+                      type="button"
+                      onClick={() => setMostrarPassword(!mostrarPassword)}
+                      style={{ borderLeft: 'none' }}
+                    >
+                      {mostrarPassword ? <EyeSlash size={20} /> : <Eye size={20} />}
+                    </button>
+                  </div>
                 </div>
 
                 <button type="submit" className="btn btn-primario w-100" disabled={loading}>
@@ -153,8 +210,8 @@ export default function LoginPage() {
               </form>
 
               <div className="text-center mt-3">
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   className="btn btn-link text-decoration-none p-0"
                   onClick={() => setMostrarReset(!mostrarReset)}
                 >
@@ -164,49 +221,88 @@ export default function LoginPage() {
 
               {mostrarReset && (
                 <div className="mt-4 pt-4 border-top">
-                  <h5 className="mb-3">Recuperar Contraseña</h5>
-                  <form onSubmit={manejarResetPassword}>
-                    <div className="mb-3">
-                      <label htmlFor="emailReset" className="form-label">
-                        Email
-                      </label>
-                      <input
-                        type="email"
-                        className="form-control"
-                        id="emailReset"
-                        value={emailReset}
-                        onChange={(e) => setEmailReset(e.target.value)}
-                        placeholder="Ingresa tu email"
-                        required
-                      />
-                    </div>
-                    {mensajeReset && (
-                      <div className={`alert ${mensajeReset.includes('✅') ? 'alert-success' : 'alert-danger'}`} role="alert">
-                        {mensajeReset}
+                  <h5 className="mb-3">
+                    {stepReset === 1 ? 'Recuperar Contraseña' : 'Establecer Nueva Contraseña'}
+                  </h5>
+
+                  {stepReset === 1 && (
+                    <form onSubmit={manejarSolicitudReset}>
+                      <div className="mb-3">
+                        <label htmlFor="emailReset" className="form-label">
+                          Email corporativo
+                        </label>
+                        <input
+                          type="email"
+                          className="form-control"
+                          id="emailReset"
+                          value={emailReset}
+                          onChange={(e) => setEmailReset(e.target.value)}
+                          placeholder="nombre@empresa.com"
+                          required
+                          disabled={loadingReset}
+                        />
                       </div>
-                    )}
-                    <button type="submit" className="btn btn-outline-primary w-100" disabled={loadingReset}>
-                      {loadingReset ? (
-                        <>
-                          <span className="spinner-border spinner-border-sm me-2" role="status"></span>
-                          Enviando...
-                        </>
-                      ) : (
-                        'Enviar Instrucciones'
+                      {mensajeReset && (
+                        <div className={`alert ${tipoMensaje === 'error' ? 'alert-danger' : 'alert-info'}`} role="alert">
+                          {mensajeReset}
+                        </div>
                       )}
-                    </button>
-                    <button 
-                      type="button" 
-                      className="btn btn-link text-decoration-none w-100 mt-2"
-                      onClick={() => {
-                        setMostrarReset(false);
-                        setEmailReset('');
-                        setMensajeReset('');
-                      }}
-                    >
-                      Cancelar
-                    </button>
-                  </form>
+                      <button type="submit" className="btn btn-primary w-100" disabled={loadingReset}>
+                        {loadingReset ? 'Verificando...' : 'Verificar Usuario'}
+                      </button>
+                    </form>
+                  )}
+
+                  {stepReset === 2 && (
+                    <form onSubmit={manejarConfirmacionReset}>
+                      <div className="alert alert-success small mb-3">
+                        <i className="fas fa-check-circle me-1"></i>
+                        Identidad verificada. Por favor define tu nueva contraseña.
+                      </div>
+
+                      <div className="mb-3">
+                        <label className="form-label">Nueva Contraseña</label>
+                        <div className="input-group">
+                          <input
+                            type={mostrarPasswordReset ? "text" : "password"}
+                            className="form-control"
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                            placeholder="Mínimo 6 caracteres"
+                            required
+                            minLength={6}
+                          />
+                          <button
+                            className="btn btn-outline-secondary"
+                            type="button"
+                            onClick={() => setMostrarPasswordReset(!mostrarPasswordReset)}
+                            style={{ borderLeft: 'none' }}
+                          >
+                            {mostrarPasswordReset ? <EyeSlash size={20} /> : <Eye size={20} />}
+                          </button>
+                        </div>
+                      </div>
+
+                      <button type="submit" className="btn btn-success w-100" disabled={loadingReset}>
+                        {loadingReset ? 'Actualizando...' : 'Actualizar Contraseña'}
+                      </button>
+                    </form>
+                  )}
+
+                  <button
+                    type="button"
+                    className="btn btn-link text-decoration-none w-100 mt-2"
+                    onClick={() => {
+                      setMostrarReset(false);
+                      setStepReset(1);
+                      setEmailReset('');
+                      setMensajeReset('');
+                      setNewPassword('');
+                      setResetToken(''); // Limpiar token al cancelar
+                    }}
+                  >
+                    Cancelar
+                  </button>
                 </div>
               )}
             </div>

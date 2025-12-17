@@ -25,21 +25,18 @@ export default function CheckoutPage() {
   const plan = obtenerPlanDelCarrito();
   const usuario = obtenerUsuarioAutenticado();
 
-  // Log de debugging para verificar el usuario y token
+  // Verificar autenticación al cargar
   useEffect(() => {
-    if (usuario) {
-      console.log('👤 Usuario en CheckoutPage:', usuario);
-      const token = localStorage.getItem('accessToken');
-      console.log('🔑 Token disponible:', token ? 'Sí (' + token.substring(0, 20) + '...)' : 'No');
-
-      if (!usuario.email) {
-        console.error('⚠️ PROBLEMA: Usuario sin email en CheckoutPage:', usuario);
-      }
-      if (!token) {
-        console.error('⚠️ PROBLEMA: No hay token de acceso disponible');
-      }
+    // Solo verificar si hay usuario pero no hay token
+    if (usuario && !localStorage.getItem('accessToken')) {
+      console.warn('⚠️ Sesión inconsistente: Redirigiendo a login...');
+      // Limpiar sesión corrupta
+      localStorage.removeItem('siga_usuario');
+      // Guardar intento de checkout
+      localStorage.setItem('siga_redirect_after_login', '/checkout');
+      navigate('/login');
     }
-  }, [usuario]);
+  }, [usuario, navigate]);
 
   // Validar formato de número de tarjeta
   const validarNumeroTarjeta = (numero) => {
@@ -160,12 +157,12 @@ export default function CheckoutPage() {
         }
 
         console.log('🔄 Creando suscripción para plan:', plan.id);
-        console.log('👤 Usuario ID:', usuario.id, 'Email:', usuario.email);
+        console.log('👤 Usuario ID:', usuario.id); // Log sanitizado
 
         // Intentar crear suscripción en el backend real
         const response = await createSuscripcion(plan.id, 'MENSUAL');
 
-        console.log('📋 Respuesta de createSuscripcion:', response);
+        console.log('📋 Respuesta de createSuscripcion:', response.success ? 'Success' : 'Error');
 
         if (response.success && response.suscripcion) {
           // Suscripción creada exitosamente en el backend
@@ -178,13 +175,13 @@ export default function CheckoutPage() {
             email: usuario.email || response.user?.email || usuario.email
           };
           guardarUsuarioAutenticado(usuarioActualizado);
-          console.log('✅ Suscripción creada exitosamente:', response.suscripcion);
+          console.log('✅ Suscripción creada exitosamente ID:', response.suscripcion.id);
           console.log('🔄 Usuario actualizado con planId:', plan.id);
         } else {
           throw new Error(response.message || 'Error al crear suscripción');
         }
       } catch (error) {
-        console.error('❌ Error al crear suscripción:', error);
+        console.error('❌ Error al crear suscripción:', error.message);
 
         // Mensajes de error más específicos
         let errorMsg = error?.message || 'No se pudo crear la suscripción en el backend.';
@@ -205,7 +202,7 @@ export default function CheckoutPage() {
       // GENERAR FACTURA después de la compra exitosa
       // ✅ Usar usuarioActualizado que tiene el email garantizado
       if (!usuarioActualizado.email) {
-        console.error('⚠️ Usuario actualizado sin email:', usuarioActualizado);
+        console.error('⚠️ Usuario actualizado sin email ID:', usuarioActualizado.id);
         const errorMsg = 'Error: No se pudo obtener el email del usuario. Por favor, actualiza tu perfil con un email válido.';
         setError(errorMsg);
         setProcesando(false);
@@ -225,7 +222,8 @@ export default function CheckoutPage() {
       try {
         const facturaData = {
           usuarioId: usuarioActualizado.id,
-          usuarioNombre: usuarioActualizado.nombre || 'Usuario',
+          // ✅ Usar Nombre de Empresa si existe (Prioridad indicada por usuario)
+          usuarioNombre: usuarioActualizado.nombreEmpresa || usuarioActualizado.nombre || 'Usuario',
           usuarioEmail: usuarioActualizado.email, // ✅ Validado arriba, usando usuarioActualizado
           planId: plan.id,
           planNombre: plan.nombre,
@@ -242,10 +240,16 @@ export default function CheckoutPage() {
         // Log sanitizado (sin tokens) solo en desarrollo
         if (import.meta.env.DEV) {
           const responseSanitized = { ...facturaResponse };
+          // Sanitizar datos sensibles de la respuesta antes de loguear
           if (responseSanitized.accessToken) delete responseSanitized.accessToken;
           if (responseSanitized.refreshToken) delete responseSanitized.refreshToken;
           if (responseSanitized.token) delete responseSanitized.token;
-          console.log('📄 Respuesta completa de createFactura (sanitizada):', responseSanitized);
+          // Ocultar email en la factura logueada si existe
+          if (responseSanitized.factura && responseSanitized.factura.usuarioEmail) {
+            const em = responseSanitized.factura.usuarioEmail;
+            responseSanitized.factura.usuarioEmail = em.substring(0, 3) + '***@' + em.split('@')[1];
+          }
+          console.log('📄 Respuesta createFactura (sanitizada): Success=' + responseSanitized.success);
         }
 
         // El backend puede devolver la factura de diferentes formas:

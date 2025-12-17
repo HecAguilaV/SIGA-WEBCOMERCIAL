@@ -8,6 +8,7 @@ import {
 } from 'phosphor-react';
 import { getFacturas, getSuscripciones, obtenerTokenOperativo, updateEmail, updatePerfil, saveTokens, getPlanes } from '../services/api.js';
 import { formatearPrecioCLP } from '../utils/indicadoresEconomicos.js';
+import { validarRut, formatearRut, validarTelefono, limpiarTelefono } from '../utils/validation.js';
 import FacturaComponent from '../components/FacturaComponent.jsx';
 import { useWebAppSSO } from '../hooks/useWebAppSSO.js';
 import PlanActualCard from '../components/perfil/PlanActualCard.jsx';
@@ -420,6 +421,15 @@ export default function PerfilPage() {
     setCargandoPerfil(true);
 
     try {
+      // Validaciones previas
+      if (perfilEditado.rut && !validarRut(perfilEditado.rut)) {
+        throw new Error('El RUT ingresado no es válido. Formato: 12.345.678-9');
+      }
+
+      if (perfilEditado.telefono && !validarTelefono(limpiarTelefono(perfilEditado.telefono))) {
+        throw new Error('El teléfono debe tener 9 dígitos.');
+      }
+
       // Solo enviar campos que han cambiado o que tienen valor
       const datosActualizados = {};
       if (perfilEditado.nombre && perfilEditado.nombre !== usuario.nombre) {
@@ -429,10 +439,11 @@ export default function PerfilPage() {
         datosActualizados.apellido = perfilEditado.apellido;
       }
       if (perfilEditado.rut && perfilEditado.rut !== usuario.rut) {
-        datosActualizados.rut = perfilEditado.rut;
+        // Enviar RUT formateado estándar: X.XXX.XXX-Y
+        datosActualizados.rut = formatearRut(perfilEditado.rut);
       }
       if (perfilEditado.telefono && perfilEditado.telefono !== usuario.telefono) {
-        datosActualizados.telefono = perfilEditado.telefono;
+        datosActualizados.telefono = limpiarTelefono(perfilEditado.telefono);
       }
       if (perfilEditado.nombreEmpresa !== usuario.nombreEmpresa) {
         datosActualizados.nombreEmpresa = perfilEditado.nombreEmpresa || null;

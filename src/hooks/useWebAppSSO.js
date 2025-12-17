@@ -54,8 +54,9 @@ export function useWebAppSSO() {
             // Guardar URL del portal comercial para que WebApp pueda redirigir de vuelta si es necesario
             localStorage.setItem('siga_portal_comercial_url', window.location.origin);
 
-            // Redirigir a WebApp con token en URL
-            window.location.href = `${webAppUrl}?token=${tokenOperativo}`;
+            // Redirigir a WebApp con token en URL (Ruta específica /sso)
+            const baseUrl = webAppUrl.endsWith('/') ? webAppUrl.slice(0, -1) : webAppUrl;
+            window.location.href = `${baseUrl}/sso?token=${tokenOperativo}`;
 
         } catch (err) {
             console.error('❌ Error en SSO:', err);

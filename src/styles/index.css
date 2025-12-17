@@ -1,17 +1,26 @@
-/* Paleta de colores de marca SIGA:
-   Primario #03045E, Acento #00B4D8, Acento Secundario #80FFDB, Blanco #FFFFFF */
+/* Paleta de colores de marca SIGA (Modern SaaS 2025):
+   Deep Blue #023E8A, Cyan Vibrante #00B4D8, Dark Navy #03045E */
 
 :root {
   --color-primario: #03045e;
+  /* Navy muy oscuro */
   --color-secundario: #00b4d8;
+  /* Cyan vibrante */
+  --color-terciario: #0077b6;
+  /* Azul medio */
   --color-acento: #00b4d8;
-  --color-acento-secundario: #80ffdb;
+  --color-acento-secundario: #90e0ef;
+  /* Cyan pastel */
   --color-blanco: #ffffff;
-  --color-fondo: #f7f9fc;
-  --color-texto: #222222;
-  --color-texto-secundario: #666666;
+  --color-fondo: #f8f9fa;
+  /* Gris muy claro para secciones de contenido */
+  --color-texto: #1a1a1a;
+  --color-texto-secundario: #64748b;
   --color-borde: rgba(3, 4, 94, 0.1);
-  --color-sombra: rgba(0, 0, 0, 0.08);
+  --color-glass: rgba(255, 255, 255, 0.1);
+  --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-glow: 0 0 20px rgba(0, 180, 216, 0.3);
 }
 
 body {
@@ -50,50 +59,34 @@ body {
   border-color: var(--color-acento) !important;
 }
 
-/* Estilos mejorados para Navbar SIGA - Fondo blanco */
-.navbar-siga {
-  background: var(--color-blanco) !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+/* Navbar Styles */
+.transition-all {
+  transition: all 0.3s ease;
+}
+
+.navbar {
+  transition: all 0.3s ease;
+  padding: 1rem 0;
+}
+
+.navbar-solid {
+  background-color: var(--color-blanco);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   padding: 0.75rem 0;
-  border-bottom: 1px solid rgba(3, 4, 94, 0.1);
 }
 
-.navbar-siga .navbar-brand {
-  font-weight: 800;
-  font-size: 1.5rem;
-  color: var(--color-primario) !important;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+.navbar-transparent {
+  background-color: transparent;
+  padding: 1.5rem 0;
 }
 
-.navbar-siga .navbar-brand:hover {
+.navbar-transparent .nav-link:hover {
   color: var(--color-secundario) !important;
 }
 
-.navbar-siga .navbar-brand img {
-  height: 32px;
-  width: auto;
-}
-
-.navbar-siga .nav-link {
-  color: var(--color-primario) !important;
-  font-weight: 500;
-  padding: 0.5rem 1rem !important;
-  transition: all 0.2s ease;
-  border-radius: 6px;
-  margin: 0 0.25rem;
-}
-
-.navbar-siga .nav-link:hover {
-  color: var(--color-secundario) !important;
-  background-color: rgba(0, 180, 216, 0.1);
-}
-
-.navbar-siga .nav-link.active {
-  color: var(--color-secundario) !important;
-  background-color: rgba(0, 180, 216, 0.15);
-  font-weight: 600;
+/* Evitar colisión con contenido al ser fixed */
+body {
+  padding-top: 0;
 }
 
 .navbar-siga .navbar-toggler {
@@ -283,8 +276,10 @@ body {
 .feature-card {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   border-left: 4px solid var(--color-acento);
-  padding: 2.5rem !important; /* ✅ Más grande en desktop (de p-4 a 2.5rem) */
-  min-height: 280px; /* ✅ Altura mínima para consistencia */
+  padding: 2.5rem !important;
+  /* ✅ Más grande en desktop (de p-4 a 2.5rem) */
+  min-height: 280px;
+  /* ✅ Altura mínima para consistencia */
 }
 
 .feature-card:hover {
@@ -293,19 +288,24 @@ body {
 }
 
 .feature-icon {
-  font-size: 3.5rem; /* ✅ Aumentado de 3rem a 3.5rem */
-  margin-bottom: 1.5rem; /* ✅ Más espacio */
+  font-size: 3.5rem;
+  /* ✅ Aumentado de 3rem a 3.5rem */
+  margin-bottom: 1.5rem;
+  /* ✅ Más espacio */
 }
 
 /* Responsive para feature cards */
 @media (max-width: 768px) {
   .feature-card {
-    padding: 1.5rem !important; /* ✅ Padding reducido en móvil */
-    min-height: auto; /* ✅ Sin altura mínima en móvil */
+    padding: 1.5rem !important;
+    /* ✅ Padding reducido en móvil */
+    min-height: auto;
+    /* ✅ Sin altura mínima en móvil */
   }
-  
+
   .feature-icon {
-    font-size: 2.5rem; /* ✅ Iconos más pequeños en móvil */
+    font-size: 2.5rem;
+    /* ✅ Iconos más pequeños en móvil */
     margin-bottom: 1rem;
   }
 }

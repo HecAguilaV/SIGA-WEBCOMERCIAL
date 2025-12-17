@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [react()],
   publicDir: 'static',
   server: {
-    port: 5173,
+    port: 1573,
     host: true, // Permite acceso desde la red local
     strictPort: true, // Falla si el puerto está ocupado en lugar de usar otro
     proxy: {
@@ -15,6 +15,11 @@ export default defineConfig({
         target: 'https://siga-backend-production.up.railway.app',
         changeOrigin: true,
         secure: false,
+        configure: (proxy, _options) => {
+          proxy.on('proxyReq', (proxyReq, req, _res) => {
+            proxyReq.removeHeader('Origin');
+          });
+        }
       },
     },
   },

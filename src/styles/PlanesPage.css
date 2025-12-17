@@ -5,10 +5,12 @@
     padding: 4rem 0;
     position: relative;
     overflow: hidden;
-    background: var(--color-fondo);
+    background: #03045e;
+    /* Deep Blue base */
+    color: white;
 }
 
-/* Fondo con destellos sutiles */
+/* Fondo con destellos sutiles - MATCH HOMEPAGE */
 .planes-background {
     position: absolute;
     top: 0;
@@ -16,7 +18,10 @@
     width: 100%;
     height: 100%;
     z-index: 0;
-    background: linear-gradient(135deg, var(--color-fondo) 0%, rgba(0, 180, 216, 0.03) 100%);
+    background:
+        radial-gradient(circle at 10% 20%, rgba(0, 119, 182, 0.4) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(0, 180, 216, 0.2) 0%, transparent 40%),
+        linear-gradient(135deg, #03045e 0%, #023e8a 100%);
 }
 
 .planes-glow {
@@ -25,22 +30,23 @@
     filter: blur(100px);
     animation: breathe 6s ease-in-out infinite;
     pointer-events: none;
+    opacity: 0.5;
 }
 
 .planes-glow-1 {
     top: 20%;
     right: 15%;
-    width: 350px;
-    height: 350px;
-    background: rgba(128, 255, 219, 0.1);
+    width: 400px;
+    height: 400px;
+    background: rgba(0, 180, 216, 0.25);
 }
 
 .planes-glow-2 {
     bottom: 20%;
     left: 15%;
-    width: 300px;
-    height: 300px;
-    background: rgba(0, 180, 216, 0.08);
+    width: 350px;
+    height: 350px;
+    background: rgba(3, 4, 94, 0.4);
     animation-delay: 3s;
 }
 
@@ -52,30 +58,38 @@
 .planes-title {
     font-size: 3rem;
     font-weight: 800;
-    color: var(--color-texto);
+
+    /* White to Cyan Gradient */
+    background: linear-gradient(to right, #ffffff, #90e0ef);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+
     margin-bottom: 1rem;
     text-align: center;
 }
 
 .planes-subtitle {
     font-size: 1.25rem;
-    color: var(--color-texto-secundario);
+    color: rgba(255, 255, 255, 0.85);
+    /* Light text on dark */
     text-align: center;
     margin-bottom: 3rem;
 }
 
 /* Cards de planes con glassmorphism */
 .plan-card-glass {
-    background: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.95);
+    /* Nearly opaque white for best contrast */
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.8);
     border-radius: 20px;
     padding: 2rem;
     transition: all 0.3s ease;
     height: 100%;
     position: relative;
     overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
 .plan-card-glass::before {
@@ -97,13 +111,15 @@
 
 .plan-card-glass:hover {
     transform: translateY(-10px);
-    box-shadow: 0 20px 40px rgba(0, 180, 216, 0.2);
-    border-color: rgba(0, 180, 216, 0.4);
+    box-shadow: 0 20px 40px rgba(0, 180, 216, 0.3);
+    border-color: rgba(0, 180, 216, 0.6);
 }
 
 .plan-card-glass.featured {
-    background: rgba(0, 180, 216, 0.1);
-    border: 2px solid rgba(0, 180, 216, 0.5);
+    /* Featured: Solid white with Blue Glow Border */
+    background: #ffffff;
+    border: 2px solid #00b4d8;
+    box-shadow: 0 0 25px rgba(0, 180, 216, 0.2);
 }
 
 .plan-badge {

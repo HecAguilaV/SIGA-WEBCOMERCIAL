@@ -148,30 +148,7 @@ export default function PlanActualCard({
                             </div>
                         )}
 
-                        {/* Opción de actualizar al plan Crecimiento */}
-                        {planActual.nombre !== 'Crecimiento' && planCrecimiento && (
-                            <div className="alert alert-info mt-4" role="alert">
-                                <div className="d-flex justify-content-between align-items-center flex-wrap">
-                                    <div>
-                                        <strong>
-                                            <Rocket size={18} weight="fill" className="me-1" style={{ verticalAlign: 'middle' }} />
-                                            ¿Necesitas más?
-                                        </strong>
-                                        <p className="mb-0 mt-2">
-                                            Actualiza al plan <strong>{planCrecimiento.nombre}</strong> y obtén
-                                            usuarios ilimitados, bodegas ilimitadas, reportes completos con IA y
-                                            soporte prioritario 24/7.
-                                        </p>
-                                    </div>
-                                    <button
-                                        className="btn btn-acento mt-3 mt-md-0"
-                                        onClick={manejarActualizarACrecimiento}
-                                    >
-                                        Actualizar a {planCrecimiento.nombre}
-                                    </button>
-                                </div>
-                            </div>
-                        )}
+
 
                         {planActual.nombre === 'Crecimiento' && (
                             <div className="alert alert-success mt-4" role="alert">

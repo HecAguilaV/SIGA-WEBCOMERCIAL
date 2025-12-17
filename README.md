@@ -11,18 +11,40 @@
 
 <hr />
 
-## Descripción
+<p align="center">
+  <img src="https://img.shields.io/badge/Coraz%C3%B3n_de-SIGA-00B4D8?style=for-the-badge&labelColor=03045E" />
+  <img src="https://img.shields.io/badge/Visi%C3%B3n-Que_el_emprendedor_nunca_se_detenga-80FFDB?style=for-the-badge&labelColor=03045E" />
+</p>
 
-**SIGA Portal Comercial** es una aplicación web desarrollada con React que funciona como portal comercial y sistema de gestión de suscripciones para el software SIGA (Sistema Inteligente de Gestión de Activos). Este proyecto permite a los usuarios explorar planes de suscripción, realizar compras simuladas y gestionar sus cuentas.
+# SIGA - Portal Comercial
 
-### Objetivo
+**Sistema Inteligente de Gestión de Activos**  
+*Más que un software, una declaración de intenciones.*
 
-Proporcionar una plataforma comercial moderna donde los usuarios pueden:
-- Explorar y comparar planes de suscripción SIGA
-- Realizar compras simuladas de planes
-- Gestionar sus cuentas y suscripciones
-- Acceder a la aplicación SIGA después de autenticarse
-- Administrar usuarios y planes (para administradores)
+---
+
+## 🦅 Filosofía del Proyecto
+
+> **"No gestiones tu inventario, gestiona tu tiempo."**
+
+SIGA nace de una problemática real: la parálisis operativa que sufren las PYMES.
+Nuestra misión no es solo registrar productos, es **reducir la fricción operativa** traduciendo la intención del negocio en acciones automáticas.
+
+### Pilares
+1.  **Menos Fricción:** Interfaces intuitivas que no requieren manuales.
+2.  **Más Intención:** El sistema entiende lo que quieres hacer (Asistente IA).
+3.  **Automatización:** El emprendedor no debe detenerse por tareas administrativas.
+
+---
+
+## 🎨 Identidad Visual y Experiencia (New Look 2025)
+
+Hemos migrado de una interfaz genérica a una identidad propia y premium:
+
+*   **Tema:** **Deep Blue** (`#03045e`) con acentos Cyan y Neon.
+*   **Estilo:** **Glassmorphism** (Paneles de cristal translúcido).
+*   **Dashboards Reales:** Mostramos la interfaz real de la aplicación desde el primer segundo.
+*   **Unificación:** El **Asistente IA** ahora es un gemelo visual de la WebApp principal.
 
 ## Características Principales
 

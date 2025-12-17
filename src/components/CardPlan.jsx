@@ -36,8 +36,11 @@ export default function CardPlan({ plan, onSeleccionar }) {
 
         <div className="mb-3">
           <div className="plan-price">
-            {plan.precio}
-            <span className="plan-price-unit"> {plan.unidad}/mes</span>
+            {plan.unidad === 'UF'
+              ? `UF ${plan.precio.toLocaleString('es-CL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+              : formatearPrecioCLP(plan.precio)
+            }
+            <span className="plan-price-unit"> /mes</span>
           </div>
           {!cargandoPrecio && precioCLP && (
             <p className="text-muted mb-0" style={{ fontSize: '0.9rem' }}>

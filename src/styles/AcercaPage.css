@@ -5,7 +5,10 @@
     padding: 4rem 0;
     position: relative;
     overflow: hidden;
-    background: var(--color-fondo);
+    background: #03045e;
+    /* Deep Blue base matching Home */
+    color: white;
+    /* Default text white */
 }
 
 /* Hero section con fondo animado */
@@ -22,7 +25,11 @@
     width: 100%;
     height: 100%;
     z-index: 0;
-    background: linear-gradient(135deg, var(--color-fondo) 0%, rgba(0, 180, 216, 0.05) 100%);
+    /* Copied from HomePage.css for consistency */
+    background:
+        radial-gradient(circle at 10% 20%, rgba(0, 119, 182, 0.4) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(0, 180, 216, 0.2) 0%, transparent 40%),
+        linear-gradient(135deg, #03045e 0%, #023e8a 100%);
 }
 
 .acerca-glow {
@@ -31,22 +38,24 @@
     filter: blur(90px);
     animation: breathe 5s ease-in-out infinite;
     pointer-events: none;
+    opacity: 0.5;
+    /* Slightly subtler on dark */
 }
 
 .acerca-glow-1 {
     top: 10%;
     right: 20%;
-    width: 400px;
-    height: 400px;
-    background: rgba(128, 255, 219, 0.12);
+    width: 600px;
+    height: 600px;
+    background: rgba(0, 180, 216, 0.25);
 }
 
 .acerca-glow-2 {
     bottom: 10%;
     left: 20%;
-    width: 350px;
-    height: 350px;
-    background: rgba(0, 180, 216, 0.1);
+    width: 500px;
+    height: 500px;
+    background: rgba(3, 4, 94, 0.4);
     animation-delay: 2.5s;
 }
 
@@ -58,13 +67,16 @@
 .acerca-title {
     font-size: 3.5rem;
     font-weight: 800;
-    color: var(--color-texto);
+    /* White to Blue gradient */
+    background: linear-gradient(to right, #ffffff, #90e0ef);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
     margin-bottom: 1.5rem;
 }
 
 .acerca-subtitle {
     font-size: 1.25rem;
-    color: var(--color-texto-secundario);
+    color: rgba(255, 255, 255, 0.85);
     line-height: 1.6;
 }
 
