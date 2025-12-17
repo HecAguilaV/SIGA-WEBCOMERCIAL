@@ -23,7 +23,7 @@
 
 ---
 
-## 🦅 Filosofía del Proyecto
+##  Filosofía del Proyecto
 
 > **"No gestiones tu inventario, gestiona tu tiempo."**
 
@@ -37,7 +37,7 @@ Nuestra misión no es solo registrar productos, es **reducir la fricción operat
 
 ---
 
-## 🎨 Identidad Visual y Experiencia (New Look 2025)
+##  Identidad Visual y Experiencia (New Look 2025)
 
 Hemos migrado de una interfaz genérica a una identidad propia y premium:
 
@@ -524,11 +524,11 @@ localStorage.clear()
 Visualiza la documentación completa de la API de forma interactiva directamente en la aplicación:
 
 **📖 Documentación en la aplicación:**
-👉 [http://localhost:5173/docs](http://localhost:5173/docs) (desarrollo local)
-👉 `https://tu-dominio.com/docs` (producción)
+ [http://localhost:5173/docs](http://localhost:5173/docs) (desarrollo local)
+ `https://tu-dominio.com/docs` (producción)
 
 **📖 Swagger Editor (Online) - Alternativa:**
-👉 [Ver Documentación Swagger](https://editor.swagger.io/?url=https://raw.githubusercontent.com/HecAguilaV/SIGA-WEBCOMERCIAL/main/docs/api/openapi.yaml)
+ [Ver Documentación Swagger](https://editor.swagger.io/?url=https://raw.githubusercontent.com/HecAguilaV/SIGA-WEBCOMERCIAL/main/docs/api/openapi.yaml)
 
 O copia y pega esta URL:
 ```
@@ -585,13 +585,9 @@ La interfaz de Karma se abrirá en tu navegador mostrando todos los tests con su
 
 Este proyecto es la base de SIGA.
 
-## Autor
-
->**Héctor Aguila**
->>Un Soñador con Poca RAM
-
 ---
 
-<p align="center">
-  <strong>© Para que no te detengas</strong>
-</p>
+## Autor
+
+> **Héctor Aguila**  
+>> Un Soñador con Poca RAM
