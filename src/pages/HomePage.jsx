@@ -41,18 +41,12 @@ export default function HomePage() {
               {/* Contenedor del Video con marco de dispositivo estilizado */}
               <div className="glass-dashboard p-2" style={{ background: 'rgba(255, 255, 255, 0.1)', backdropFilter: 'blur(20px)', borderRadius: '16px', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
                 <div className="video-wrapper position-relative overflow-hidden" style={{ borderRadius: '12px' }}>
-                  <video
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
+                  <img
+                    src="/brand/Dashboard.png"
+                    alt="Dashboard SIGA"
                     className="w-100 h-100 object-fit-cover"
-                    poster="public\brand\Dashboard.png"
-                    style={{ display: 'block' }}
-                  >
-                    <source src="/videos/demo-sigaapp.mp4" type="video/mp4" />
-                    Tu navegador no soporta videos HTML5.
-                  </video>
+                    style={{ borderRadius: '1rem', boxShadow: '0 20px 40px rgba(0,0,0,0.2)' }}
+                  />
 
                   {/* Overlay sutil para integrar con el fondo */}
                   <div className="position-absolute top-0 start-0 w-100 h-100 pointer-events-none" style={{ background: 'linear-gradient(to top, rgba(3,4,94,0.2), transparent)' }}></div>
