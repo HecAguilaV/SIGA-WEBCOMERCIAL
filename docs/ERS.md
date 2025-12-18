@@ -2,7 +2,7 @@
 ## SIGA Portal Comercial
 
 **Fecha:** Diciembre 2025  
-**Autor:** Equipo SIGA
+**Autor:** Héctor Aguila
 
 ---
 
@@ -440,3 +440,11 @@ SIGA Portal Comercial es un sistema independiente que funciona como punto de ent
 |---------|-------|-------|-------------|
 | 1.0 | Dic 2025 | Equipo SIGA | Versión inicial del documento |
 
+
+
+---
+
+## Autor
+
+> **Héctor Aguila**  
+>> Un Soñador con Poca RAM

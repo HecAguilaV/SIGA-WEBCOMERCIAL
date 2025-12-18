@@ -63,7 +63,7 @@ Hemos migrado de una interfaz genérica a una identidad propia y premium:
 - **Asistente con IA** para consultas y visualización de datos (gráficos de mermas)
 
 ### Gestión de Usuarios
-- Sistema de autenticación simulada
+- Sistema de autenticación JWT Integrado
 - Registro e inicio de sesión
 - Perfil de usuario con información del plan actual
 - Dashboard personalizado para clientes
@@ -77,19 +77,13 @@ Hemos migrado de una interfaz genérica a una identidad propia y premium:
 - Notificaciones de días restantes
 
 ### Planes de Suscripción
-1. **Kiosco (Freemium)** - Plan gratuito permanente
-   - Asistente SIGA con Inteligencia Artificial
-   - 1 bodega/sucursal
-   - 1 usuario
-   - Productos limitados
-
-2. **Emprendedor Pro** - 0.9 UF/mes
+1. **Emprendedor Pro** - 0.9 UF/mes (Precios Referenciales)
    - Asistente SIGA con Inteligencia Artificial
    - 2 bodegas/sucursales
    - 3 usuarios
    - Reportes avanzados
 
-3. **Crecimiento** - 1.9 UF/mes
+2. **Crecimiento** - 1.9 UF/mes (Precios Referenciales)
    - Asistente SIGA con Inteligencia Artificial
    - Bodegas ilimitadas
    - Usuarios ilimitados
@@ -217,13 +211,15 @@ pnpm test
 
 El sistema incluye usuarios de prueba:
 
-**Administrador:**
-- Email: `admin@siga.com`
-- Contraseña: `admin123`
+### Usuarios por Defecto
 
-**Cliente:**
-- Email: `hector@siga.com`
-- Contraseña: `hector123`
+**Administrador:**
+- Email: `admin@test.cl`
+- Contraseña: `test123`
+
+**Operador / Cliente:**
+- Email: `oper@test.cl`
+- Contraseña: `test123`
 
 ## Estructura del Proyecto
 
@@ -288,8 +284,8 @@ SIGA_WEB_COMERCIAL/
 ## Funcionalidades Clave
 
 ### Sistema de Autenticación
-- Autenticación simulada con localStorage
-- Roles: `admin` y `cliente`
+- Autenticación real via JWT (Backend Spring Boot)
+- Roles: `admin` (Administrador) y `operador` (Cliente)
 - Sesiones persistentes
 - **Validación obligatoria** antes de permitir compras
 - **Redirección inteligente** después del login

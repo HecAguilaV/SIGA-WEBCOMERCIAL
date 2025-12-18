@@ -341,3 +341,10 @@ tests/
 
 **Última actualización:** Diciembre 2025
 
+
+---
+
+## Autor
+
+> **Héctor Aguila**  
+>> Un Soñador con Poca RAM

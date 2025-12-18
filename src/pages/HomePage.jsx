@@ -40,7 +40,7 @@ export default function HomePage() {
             <div className="hero-visuals d-none d-lg-block">
               {/* Contenedor del Video con marco de dispositivo estilizado */}
               <div className="glass-dashboard p-2" style={{ background: 'rgba(255, 255, 255, 0.1)', backdropFilter: 'blur(20px)', borderRadius: '16px', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
-                <div className="video-wrapper position-relative overflow-hidden" style={{ borderRadius: '12px', minHeight: '350px' }}>
+                <div className="video-wrapper position-relative overflow-hidden" style={{ borderRadius: '12px', height: '350px' }}>
                   <img
                     src="/brand/Dashboard.png"
                     alt="Dashboard SIGA"

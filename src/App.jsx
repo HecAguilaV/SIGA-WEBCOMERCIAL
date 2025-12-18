@@ -11,11 +11,13 @@ export default function App() {
   const location = useLocation();
   const estaEnApp = location.pathname === '/app';
 
+  const isHome = location.pathname === '/';
+
   return (
     <div className="d-flex flex-column min-vh-100">
       {/* Navbar y Footer no se muestran en /app ya que AppPage tiene su propio layout */}
       {!estaEnApp && <Navbar />}
-      <main className="flex-grow-1">
+      <main className="flex-grow-1" style={{ paddingTop: (!isHome && !estaEnApp) ? '80px' : '0' }}>
         <Rutas />
       </main>
       {!estaEnApp && <Footer />}

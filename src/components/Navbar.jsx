@@ -196,22 +196,22 @@ export default function Navbar() {
                 >
                   {usuario.nombre}
                 </a>
-                <ul className="dropdown-menu dropdown-menu-end">
+                <ul className="dropdown-menu dropdown-menu-end bg-white border-0 shadow-lg">
                   <li>
-                    <Link className="dropdown-item" to="/perfil" onClick={manejarClickNavLink}>
+                    <Link className="dropdown-item text-dark" to="/perfil" onClick={manejarClickNavLink}>
                       Mi Perfil
                     </Link>
                   </li>
                   {usuario?.rol === 'admin' && (
                     <li>
-                      <Link className="dropdown-item" to="/admin" onClick={manejarClickNavLink}>
+                      <Link className="dropdown-item text-dark" to="/admin" onClick={manejarClickNavLink}>
                         Panel Administrador
                       </Link>
                     </li>
                   )}
                   <li><hr className="dropdown-divider" /></li>
                   <li>
-                    <button className="dropdown-item" onClick={manejarSalir}>
+                    <button className="dropdown-item text-danger fw-bold" onClick={manejarSalir}>
                       Salir
                     </button>
                   </li>

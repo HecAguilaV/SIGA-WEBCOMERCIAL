@@ -718,3 +718,10 @@ La arquitectura es escalable y mantenible, con separación clara de responsabili
 
 **Última actualización:** Diciembre 2025
 
+
+---
+
+## Autor
+
+> **Héctor Aguila**  
+>> Un Soñador con Poca RAM
