@@ -107,9 +107,10 @@ export default function Navbar() {
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
             {['Inicio', 'Planes', 'Acerca'].map((item) => (
               <li className="nav-item" key={item}>
+// Forcing White text for Blue Background compatibility
                 <NavLink
                   className={({ isActive }) =>
-                    `nav-link ${isActive ? 'fw-bold' : ''} ${esTransparente ? 'text-white' : 'text-dark'}`
+                    `nav-link ${isActive ? 'fw-bold' : ''} text-white`
                   }
                   to={item === 'Inicio' ? '/' : `/${item.toLowerCase()}`}
                   onClick={manejarClickNavLink}
@@ -123,7 +124,7 @@ export default function Navbar() {
               <>
                 <li className="nav-item">
                   <NavLink
-                    className={`nav-link ${esTransparente ? 'text-white' : 'text-dark'}`}
+                    className="nav-link text-white"
                     to="/perfil" onClick={manejarClickNavLink}
                   >
                     Mi Perfil
@@ -133,7 +134,7 @@ export default function Navbar() {
                 {usuario.planId && (
                   <li className="nav-item">
                     <button
-                      className={`nav-link fw-bold btn btn-link ${esTransparente ? 'text-acento' : 'text-primary'}`}
+                      className={`nav-link fw-bold btn btn-link ${esTransparente ? 'text-acento' : 'text-white'}`}
                       onClick={async () => {
                         manejarClickNavLink();
                         await iniciarSSO(usuario);
@@ -155,7 +156,7 @@ export default function Navbar() {
             {usuario?.rol === 'admin' && (
               <li className="nav-item">
                 <NavLink
-                  className={`nav-link ${esTransparente ? 'text-white' : 'text-dark'}`}
+                  className="nav-link text-white"
                   to="/admin" onClick={manejarClickNavLink}
                 >
                   Administrador
@@ -167,14 +168,14 @@ export default function Navbar() {
           {/* Enlaces de usuario */}
           <ul className="navbar-nav ms-auto align-items-center">
             <li className="nav-item me-2">
-              <NavLink className={`nav-link ${esTransparente ? 'text-white' : 'text-dark'}`} to="/carrito" onClick={manejarClickNavLink}>
+              <NavLink className="nav-link text-white" to="/carrito" onClick={manejarClickNavLink}>
                 <ShoppingCart size={20} />
               </NavLink>
             </li>
             {!usuario ? (
               <>
                 <li className="nav-item">
-                  <NavLink className={`nav-link ${esTransparente ? 'text-white' : 'text-dark'} me-2`} to="/login" onClick={manejarClickNavLink}>
+                  <NavLink className="nav-link text-white me-2" to="/login" onClick={manejarClickNavLink}>
                     Iniciar Sesión
                   </NavLink>
                 </li>

@@ -44,7 +44,7 @@ export default function HomePage() {
                   <img
                     src="/brand/Dashboard.png"
                     alt="Dashboard SIGA"
-                    className="w-100 h-100 object-fit-cover"
+                    className="w-100 h-100 object-fit-contain"
                     style={{ display: 'block' }}
                   />
 
