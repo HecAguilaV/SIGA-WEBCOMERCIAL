@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { usuariosAPI, api } from '../services/api.js';
+import { refreshAccessToken, obtenerTokenOperativo } from '../services/api.js';
 
 /**
  * Hook para manejar la lógica de SSO hacia la WebApp
@@ -20,7 +19,11 @@ export function useWebAppSSO() {
 
             console.log('🔄 Iniciando SSO...');
 
-            // Obtener token operativo mediante SSO
+            // Paso Crítico: Forzar la renovación del token para asegurar que sea fresco (recién creado)
+            // Esto evita el error de "Token Expirado" al llegar a la WebApp
+            await refreshAccessToken();
+
+            // Obtener token operativo mediante SSO (ahora con credenciales frescas)
             const ssoResponse = await obtenerTokenOperativo();
 
             if (!ssoResponse.success) {

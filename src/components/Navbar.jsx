@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { obtenerUsuarioAutenticado, cerrarSesion } from '../utils/auth.js';
 import { Rocket, ShoppingCart } from 'phosphor-react';
+import { useWebAppSSO } from '../hooks/useWebAppSSO.js';
 
 // Barra de navegación principal de la aplicación SIGA
 // Diseñada con la identidad visual de la marca
@@ -10,6 +11,7 @@ export default function Navbar() {
   const location = useLocation();
   const usuario = obtenerUsuarioAutenticado();
   const navbarCollapseRef = useRef(null);
+  const { loading, iniciarSSO } = useWebAppSSO();
 
   const manejarSalir = () => {
     cerrarSesion();
@@ -130,10 +132,22 @@ export default function Navbar() {
                 {/* Mostrar acceso a WebApp solo si tiene suscripción activa (plan de pago o trial activo) */}
                 {usuario.planId && (
                   <li className="nav-item">
-                    <NavLink className={`nav-link fw-bold ${esTransparente ? 'text-acento' : 'text-primary'}`} to="/perfil" onClick={manejarClickNavLink}>
-                      <Rocket size={18} className="me-1" style={{ verticalAlign: 'middle' }} />
-                      Acceder a WebApp
-                    </NavLink>
+                    <button
+                      className={`nav-link fw-bold btn btn-link ${esTransparente ? 'text-acento' : 'text-primary'}`}
+                      onClick={async () => {
+                        manejarClickNavLink();
+                        await iniciarSSO(usuario);
+                      }}
+                      disabled={loading}
+                      style={{ textDecoration: 'none', border: 'none', background: 'transparent' }}
+                    >
+                      {loading ? (
+                        <span className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                      ) : (
+                        <Rocket size={18} className="me-1" style={{ verticalAlign: 'middle' }} />
+                      )}
+                      {loading ? 'Entrando...' : 'Acceder a WebApp'}
+                    </button>
                   </li>
                 )}
               </>

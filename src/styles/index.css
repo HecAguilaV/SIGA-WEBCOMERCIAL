@@ -86,7 +86,7 @@ body {
 
 /* Evitar colisión con contenido al ser fixed */
 body {
-  padding-top: 0;
+  padding-top: 80px; /* Space for fixed navbar */
 }
 
 .navbar-siga .navbar-toggler {
