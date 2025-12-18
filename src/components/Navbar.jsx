@@ -107,7 +107,7 @@ export default function Navbar() {
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
             {['Inicio', 'Planes', 'Acerca'].map((item) => (
               <li className="nav-item" key={item}>
-// Forcing White text for Blue Background compatibility
+
                 <NavLink
                   className={({ isActive }) =>
                     `nav-link ${isActive ? 'fw-bold' : ''} text-white`

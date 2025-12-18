@@ -44,8 +44,8 @@ export default function HomePage() {
                   <img
                     src="/brand/Dashboard.png"
                     alt="Dashboard SIGA"
-                    className="w-100 h-100 object-fit-contain"
-                    style={{ display: 'block' }}
+                    className="w-100 h-100"
+                    style={{ display: 'block', objectFit: 'cover', objectPosition: 'top' }}
                   />
 
                   {/* Overlay sutil para integrar con el fondo */}
