@@ -64,6 +64,12 @@ export function useWebAppSSO() {
 
         } catch (err) {
             console.error('❌ Error en SSO:', err);
+            
+            // Si es un error de conexión, disparar evento para mostrar página de mantenimiento
+            if (err.message?.includes('Failed to fetch') || err.message?.includes('conexión')) {
+                window.dispatchEvent(new CustomEvent('backend-connection-error'));
+            }
+            
             setError(err.message || 'Error al conectar con la aplicación');
         } finally {
             setLoading(false);

@@ -5,6 +5,10 @@
 // Manejo de variables de entorno compatible con Vite y Karma
 let API_BASE_URL = ''; // Por defecto relativo (para usar proxy en Vercel/Vite)
 
+// MANTENIMIENTO: Cambiar a true para forzar pantalla de migración
+// Si está en false, el sistema seguirá intentando conectar al backend normal
+export const MAINTENANCE_MODE = true; 
+
 try {
   // Verificar si estamos en un entorno con import.meta (Vite)
   if (typeof import.meta !== 'undefined' && import.meta.env) {
@@ -311,6 +315,9 @@ async function apiRequest(endpoint, options = {}) {
       } else {
         mensaje = `Error de conexión: No se pudo conectar con el servidor en ${API_BASE_URL}. Verifica que el backend esté funcionando y que la URL sea correcta.`;
       }
+
+      // Notificar al sistema que hay un problema serio de conexión
+      window.dispatchEvent(new CustomEvent('backend-connection-error'));
 
       throw new Error(mensaje);
     }
