@@ -36,7 +36,7 @@ export default function Footer() {
         <hr className="border-secondary opacity-25" />
 
         <div className="d-flex flex-column flex-md-row justify-content-between align-items-center small text-white-50">
-          <div>© 2026 SIGA Inc. Todos los derechos reservados.</div>
+          <div>© 2026 SIGA. Todos los derechos reservados.</div>
           <div> > Un Soñador con Poca RAM 👨🏻‍💻</div>
         </div>
       </div>
